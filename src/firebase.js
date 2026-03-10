@@ -10,5 +10,21 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
-const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
+// Debug: Check if config is loaded
+if (!firebaseConfig.apiKey) {
+  console.warn('⚠️ Firebase config not loaded. Check .env.local and restart dev server.')
+  console.log('Config:', firebaseConfig)
+}
+
+let app
+let db
+
+try {
+  app = initializeApp(firebaseConfig)
+  db = getFirestore(app)
+  console.log('✅ Firebase initialized successfully')
+} catch (error) {
+  console.error('❌ Firebase initialization failed:', error)
+}
+
+export { db, app }

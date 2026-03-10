@@ -14,6 +14,25 @@ function App() {
 
   // Load projects from Firestore
   useEffect(() => {
+    if (!db) {
+      console.error('Firebase not initialized. Using localStorage fallback.')
+      const saved = localStorage.getItem('portfolio_projects')
+      if (saved) {
+        setProjects(JSON.parse(saved))
+      } else {
+        setProjects([
+          {
+            id: 1,
+            title: 'Project 1',
+            description: 'A brief description of your project',
+            link: '#',
+            image: 'https://via.placeholder.com/300x200?text=Project+1'
+          }
+        ])
+      }
+      return
+    }
+
     const projectsRef = collection(db, 'projects')
     const unsubscribe = onSnapshot(projectsRef, (snapshot) => {
       const projectsList = snapshot.docs.map(doc => ({
@@ -21,8 +40,10 @@ function App() {
         ...doc.data()
       }))
       setProjects(projectsList)
+      // Also save to localStorage as backup
+      localStorage.setItem('portfolio_projects', JSON.stringify(projectsList))
     }, (error) => {
-      console.error('Error loading projects:', error)
+      console.error('Error loading projects from Firebase:', error)
       // Fallback to localStorage if Firebase fails
       const saved = localStorage.getItem('portfolio_projects')
       if (saved) setProjects(JSON.parse(saved))
@@ -33,6 +54,25 @@ function App() {
 
   // Load photos from Firestore
   useEffect(() => {
+    if (!db) {
+      console.error('Firebase not initialized. Using localStorage fallback.')
+      const saved = localStorage.getItem('portfolio_photos')
+      if (saved) {
+        setPhotos(JSON.parse(saved))
+      } else {
+        setPhotos([
+          {
+            id: 1,
+            title: 'Photo 1',
+            image: 'https://via.placeholder.com/300x300?text=Photo+1',
+            description: 'Photography description'
+          }
+        ])
+      }
+      setIsLoading(false)
+      return
+    }
+
     const photosRef = collection(db, 'photos')
     const unsubscribe = onSnapshot(photosRef, (snapshot) => {
       const photosList = snapshot.docs.map(doc => ({
@@ -40,9 +80,11 @@ function App() {
         ...doc.data()
       }))
       setPhotos(photosList)
+      // Also save to localStorage as backup
+      localStorage.setItem('portfolio_photos', JSON.stringify(photosList))
       setIsLoading(false)
     }, (error) => {
-      console.error('Error loading photos:', error)
+      console.error('Error loading photos from Firebase:', error)
       // Fallback to localStorage if Firebase fails
       const saved = localStorage.getItem('portfolio_photos')
       if (saved) setPhotos(JSON.parse(saved))
@@ -53,6 +95,16 @@ function App() {
   }, [])
 
   const addProject = async (project) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot save to cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Saving locally.')
+      const existing = localStorage.getItem('portfolio_projects')
+      const projects = existing ? JSON.parse(existing) : []
+      projects.push({ ...project, id: Date.now() })
+      localStorage.setItem('portfolio_projects', JSON.stringify(projects))
+      return
+    }
+
     try {
       const projectsRef = collection(db, 'projects')
       await addDoc(projectsRef, {
@@ -60,12 +112,26 @@ function App() {
         createdAt: new Date()
       })
     } catch (error) {
-      console.error('Error adding project:', error)
-      alert('Failed to save project. Check console for details.')
+      console.error('Error adding project to Firebase:', error)
+      alert('Failed to save to cloud. Saving locally.')
+      const existing = localStorage.getItem('portfolio_projects')
+      const projects = existing ? JSON.parse(existing) : []
+      projects.push({ ...project, id: Date.now() })
+      localStorage.setItem('portfolio_projects', JSON.stringify(projects))
     }
   }
 
   const deleteProject = async (id) => {
+    if (!db) {
+      // Delete from localStorage if Firebase not available
+      const existing = localStorage.getItem('portfolio_projects')
+      if (existing) {
+        const projects = JSON.parse(existing).filter(p => p.id !== id)
+        localStorage.setItem('portfolio_projects', JSON.stringify(projects))
+      }
+      return
+    }
+
     try {
       await deleteDoc(doc(db, 'projects', id))
     } catch (error) {
@@ -75,6 +141,16 @@ function App() {
   }
 
   const addPhoto = async (photo) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot save to cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Saving locally.')
+      const existing = localStorage.getItem('portfolio_photos')
+      const photos = existing ? JSON.parse(existing) : []
+      photos.push({ ...photo, id: Date.now() })
+      localStorage.setItem('portfolio_photos', JSON.stringify(photos))
+      return
+    }
+
     try {
       const photosRef = collection(db, 'photos')
       await addDoc(photosRef, {
@@ -82,12 +158,26 @@ function App() {
         createdAt: new Date()
       })
     } catch (error) {
-      console.error('Error adding photo:', error)
-      alert('Failed to save photo. Check console for details.')
+      console.error('Error adding photo to Firebase:', error)
+      alert('Failed to save to cloud. Saving locally.')
+      const existing = localStorage.getItem('portfolio_photos')
+      const photos = existing ? JSON.parse(existing) : []
+      photos.push({ ...photo, id: Date.now() })
+      localStorage.setItem('portfolio_photos', JSON.stringify(photos))
     }
   }
 
   const deletePhoto = async (id) => {
+    if (!db) {
+      // Delete from localStorage if Firebase not available
+      const existing = localStorage.getItem('portfolio_photos')
+      if (existing) {
+        const photos = JSON.parse(existing).filter(p => p.id !== id)
+        localStorage.setItem('portfolio_photos', JSON.stringify(photos))
+      }
+      return
+    }
+
     try {
       await deleteDoc(doc(db, 'photos', id))
     } catch (error) {
