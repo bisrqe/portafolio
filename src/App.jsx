@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { db } from './firebase'
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore'
 import Navigation from './components/Navigation'
 import ProjectManager from './components/ProjectManager'
 import PhotographyPortfolio from './components/PhotographyPortfolio'
@@ -10,65 +12,88 @@ function App() {
   const [photos, setPhotos] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load data from localStorage on mount
+  // Load projects from Firestore
   useEffect(() => {
-    const savedProjects = localStorage.getItem('portfolio_projects')
-    const savedPhotos = localStorage.getItem('portfolio_photos')
+    const projectsRef = collection(db, 'projects')
+    const unsubscribe = onSnapshot(projectsRef, (snapshot) => {
+      const projectsList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      setProjects(projectsList)
+    }, (error) => {
+      console.error('Error loading projects:', error)
+      // Fallback to localStorage if Firebase fails
+      const saved = localStorage.getItem('portfolio_projects')
+      if (saved) setProjects(JSON.parse(saved))
+    })
 
-    if (savedProjects) {
-      setProjects(JSON.parse(savedProjects))
-    } else {
-      // Default sample data if nothing saved
-      setProjects([
-        {
-          id: 1,
-          title: 'Project 1',
-          description: 'A brief description of your project',
-          link: '#',
-          image: 'https://via.placeholder.com/300x200?text=Project+1'
-        }
-      ])
-    }
-
-    if (savedPhotos) {
-      setPhotos(JSON.parse(savedPhotos))
-    } else {
-      // Default sample data if nothing saved
-      setPhotos([
-        {
-          id: 1,
-          title: 'Photo 1',
-          image: 'https://via.placeholder.com/300x300?text=Photo+1',
-          description: 'Photography description'
-        }
-      ])
-    }
-
-    setIsLoading(false)
+    return unsubscribe
   }, [])
 
-  const addProject = (project) => {
-    const newProjects = [...projects, { ...project, id: Date.now() }]
-    setProjects(newProjects)
-    localStorage.setItem('portfolio_projects', JSON.stringify(newProjects))
+  // Load photos from Firestore
+  useEffect(() => {
+    const photosRef = collection(db, 'photos')
+    const unsubscribe = onSnapshot(photosRef, (snapshot) => {
+      const photosList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      setPhotos(photosList)
+      setIsLoading(false)
+    }, (error) => {
+      console.error('Error loading photos:', error)
+      // Fallback to localStorage if Firebase fails
+      const saved = localStorage.getItem('portfolio_photos')
+      if (saved) setPhotos(JSON.parse(saved))
+      setIsLoading(false)
+    })
+
+    return unsubscribe
+  }, [])
+
+  const addProject = async (project) => {
+    try {
+      const projectsRef = collection(db, 'projects')
+      await addDoc(projectsRef, {
+        ...project,
+        createdAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error adding project:', error)
+      alert('Failed to save project. Check console for details.')
+    }
   }
 
-  const deleteProject = (id) => {
-    const updatedProjects = projects.filter(p => p.id !== id)
-    setProjects(updatedProjects)
-    localStorage.setItem('portfolio_projects', JSON.stringify(updatedProjects))
+  const deleteProject = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'projects', id))
+    } catch (error) {
+      console.error('Error deleting project:', error)
+      alert('Failed to delete project.')
+    }
   }
 
-  const addPhoto = (photo) => {
-    const newPhotos = [...photos, { ...photo, id: Date.now() }]
-    setPhotos(newPhotos)
-    localStorage.setItem('portfolio_photos', JSON.stringify(newPhotos))
+  const addPhoto = async (photo) => {
+    try {
+      const photosRef = collection(db, 'photos')
+      await addDoc(photosRef, {
+        ...photo,
+        createdAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error adding photo:', error)
+      alert('Failed to save photo. Check console for details.')
+    }
   }
 
-  const deletePhoto = (id) => {
-    const updatedPhotos = photos.filter(p => p.id !== id)
-    setPhotos(updatedPhotos)
-    localStorage.setItem('portfolio_photos', JSON.stringify(updatedPhotos))
+  const deletePhoto = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'photos', id))
+    } catch (error) {
+      console.error('Error deleting photo:', error)
+      alert('Failed to delete photo.')
+    }
   }
 
   if (isLoading) {
