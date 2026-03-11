@@ -4,7 +4,7 @@ import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc } from
 import Navigation from './components/Navigation'
 import ProjectsView from './components/ProjectsView'
 import PhotographyView from './components/PhotographyView'
-import AdminDashboard from './components/AdminDashboard'
+import AuthAdminPage from './components/AuthAdminPage'
 import './App.css'
 
 function App() {
@@ -12,6 +12,16 @@ function App() {
   const [projects, setProjects] = useState([])
   const [photos, setPhotos] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [currentPath, setCurrentPath] = useState(window.location.pathname)
+
+  // Update path on navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname)
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
 
   // Load projects from Firestore
   useEffect(() => {
@@ -239,6 +249,24 @@ function App() {
     return <div className="app"><div style={{ color: 'white', textAlign: 'center', paddingTop: '50px' }}>Loading...</div></div>
   }
 
+  // Check if we're on the admin auth page
+  if (currentPath === '/auth/admin') {
+    return (
+      <div className="app">
+        <AuthAdminPage 
+          projects={projects}
+          photos={photos}
+          onAddProject={addProject}
+          onDeleteProject={deleteProject}
+          onAddPhoto={addPhoto}
+          onDeletePhoto={deletePhoto}
+          onUpdateProject={updateProject}
+          onUpdatePhoto={updatePhoto}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="app">
       <Navigation currentSection={currentSection} setCurrentSection={setCurrentSection} />
@@ -249,6 +277,23 @@ function App() {
             <div className="hero-content">
               <h1>Welcome to My Portfolio</h1>
               <p>Explore my projects and creative work</p>
+              <div style={{ marginTop: '30px' }}>
+                <a 
+                  href="/auth/admin" 
+                  style={{
+                    fontSize: '12px',
+                    color: '#888',
+                    textDecoration: 'none',
+                    opacity: 0.7,
+                    transition: 'opacity 0.3s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.opacity = '1'}
+                  onMouseLeave={(e) => e.target.style.opacity = '0.7'}
+                  title="Admin Dashboard"
+                >
+                  ⚙️ Admin Access
+                </a>
+              </div>
             </div>
           </section>
         )}
@@ -262,20 +307,6 @@ function App() {
         {currentSection === 'photography-view' && (
           <PhotographyView 
             photos={photos}
-          />
-        )}
-
-        {currentSection === 'admin' && (
-          <AdminDashboard 
-            projects={projects}
-            photos={photos}
-            onAddProject={addProject}
-            onDeleteProject={deleteProject}
-            onAddPhoto={addPhoto}
-            onDeletePhoto={deletePhoto}
-            onUpdateProject={updateProject}
-            onUpdatePhoto={updatePhoto}
-            onExit={() => setCurrentSection('home')}
           />
         )}
       </main>

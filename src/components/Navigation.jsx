@@ -32,15 +32,6 @@ function Navigation({ currentSection, setCurrentSection }) {
               Photography
             </button>
           </li>
-          <li className="nav-item">
-            <button 
-              className={`nav-link admin-link ${currentSection === 'admin' ? 'active' : ''}`}
-              onClick={() => setCurrentSection('admin')}
-              title="Admin: Manage projects and photos"
-            >
-              ⚙️ Admin
-            </button>
-          </li>
         </ul>
       </div>
     </nav>
