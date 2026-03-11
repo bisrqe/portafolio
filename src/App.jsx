@@ -277,23 +277,6 @@ function App() {
             <div className="hero-content">
               <h1>Welcome to My Portfolio</h1>
               <p>Explore my projects and creative work</p>
-              <div style={{ marginTop: '30px' }}>
-                <a 
-                  href="/auth/admin" 
-                  style={{
-                    fontSize: '12px',
-                    color: '#888',
-                    textDecoration: 'none',
-                    opacity: 0.7,
-                    transition: 'opacity 0.3s'
-                  }}
-                  onMouseEnter={(e) => e.target.style.opacity = '1'}
-                  onMouseLeave={(e) => e.target.style.opacity = '0.7'}
-                  title="Admin Dashboard"
-                >
-                  ⚙️ Admin Access
-                </a>
-              </div>
             </div>
           </section>
         )}
