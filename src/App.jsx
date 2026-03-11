@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { db } from './firebase'
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore'
 import Navigation from './components/Navigation'
-import ProjectManager from './components/ProjectManager'
-import PhotographyPortfolio from './components/PhotographyPortfolio'
+import ProjectsView from './components/ProjectsView'
+import PhotographyView from './components/PhotographyView'
+import AdminDashboard from './components/AdminDashboard'
 import './App.css'
 
 function App() {
@@ -204,19 +205,26 @@ function App() {
           </section>
         )}
 
-        {currentSection === 'projects' && (
-          <ProjectManager 
-            projects={projects} 
-            onAdd={addProject}
-            onDelete={deleteProject}
+        {currentSection === 'projects-view' && (
+          <ProjectsView 
+            projects={projects}
           />
         )}
 
-        {currentSection === 'photography' && (
-          <PhotographyPortfolio 
+        {currentSection === 'photography-view' && (
+          <PhotographyView 
             photos={photos}
-            onAdd={addPhoto}
-            onDelete={deletePhoto}
+          />
+        )}
+
+        {currentSection === 'admin' && (
+          <AdminDashboard 
+            projects={projects}
+            photos={photos}
+            onAddProject={addProject}
+            onDeleteProject={deleteProject}
+            onAddPhoto={addPhoto}
+            onDeletePhoto={deletePhoto}
           />
         )}
       </main>

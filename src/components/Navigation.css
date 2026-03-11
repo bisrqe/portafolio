@@ -55,6 +55,24 @@
   font-weight: bold;
 }
 
+.admin-link {
+  background: rgba(102, 126, 234, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border-bottom: none;
+  transition: all 0.3s ease;
+}
+
+.admin-link:hover {
+  background: rgba(102, 126, 234, 0.35);
+  border-bottom-color: transparent;
+}
+
+.admin-link.active {
+  background: rgba(102, 126, 234, 0.5);
+  border-bottom-color: transparent;
+}
+
 @media (max-width: 768px) {
   .nav-menu {
     gap: 1rem;

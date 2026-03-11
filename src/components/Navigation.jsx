@@ -18,18 +18,27 @@ function Navigation({ currentSection, setCurrentSection }) {
           </li>
           <li className="nav-item">
             <button 
-              className={`nav-link ${currentSection === 'projects' ? 'active' : ''}`}
-              onClick={() => setCurrentSection('projects')}
+              className={`nav-link ${currentSection === 'projects-view' ? 'active' : ''}`}
+              onClick={() => setCurrentSection('projects-view')}
             >
               Projects
             </button>
           </li>
           <li className="nav-item">
             <button 
-              className={`nav-link ${currentSection === 'photography' ? 'active' : ''}`}
-              onClick={() => setCurrentSection('photography')}
+              className={`nav-link ${currentSection === 'photography-view' ? 'active' : ''}`}
+              onClick={() => setCurrentSection('photography-view')}
             >
               Photography
+            </button>
+          </li>
+          <li className="nav-item">
+            <button 
+              className={`nav-link admin-link ${currentSection === 'admin' ? 'active' : ''}`}
+              onClick={() => setCurrentSection('admin')}
+              title="Admin: Manage projects and photos"
+            >
+              ⚙️ Admin
             </button>
           </li>
         </ul>
