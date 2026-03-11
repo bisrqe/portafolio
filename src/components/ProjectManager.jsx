@@ -1,15 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CloudinaryUpload from './CloudinaryUpload'
+import AdminAuth from './AdminAuth'
 import './ProjectManager.css'
 
 function ProjectManager({ projects, onAdd, onDelete }) {
   const [showForm, setShowForm] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     link: '',
     image: ''
   })
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('portfolio_admin_token')
+    if (token) {
+      setIsAdmin(true)
+    }
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -36,18 +46,35 @@ function ProjectManager({ projects, onAdd, onDelete }) {
   }
 
   return (
-    <section className="projects-section">
-      <div className="section-header">
-        <h2>My Projects</h2>
-        <button 
-          className="btn-add"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? '✕ Cancel' : '+ Add Project'}
-        </button>
-      </div>
+    <>
+      {!isAdmin && <AdminAuth onLoginSuccess={() => setIsAdmin(true)} />}
+      
+      {isAdmin && (
+        <section className="projects-section">
+          <div className="section-header">
+            <h2>My Projects</h2>
+            <div className="header-buttons">
+              <button 
+                className="btn-add"
+                onClick={() => setShowForm(!showForm)}
+              >
+                {showForm ? '✕ Cancel' : '+ Add Project'}
+              </button>
+              <button
+                className="btn-logout"
+                onClick={() => {
+                  localStorage.removeItem('portfolio_admin_token')
+                  setIsAdmin(false)
+                  setShowForm(false)
+                }}
+                title="Logout admin access"
+              >
+                🔓 Logout
+              </button>
+            </div>
+          </div>
 
-      {showForm && (
+          {showForm && (
         <form className="project-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -128,7 +155,9 @@ function ProjectManager({ projects, onAdd, onDelete }) {
           ))
         )}
       </div>
-    </section>
+        </section>
+      )}
+    </>
   )
 }
 

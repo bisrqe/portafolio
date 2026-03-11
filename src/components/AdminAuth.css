@@ -1,0 +1,99 @@
+.admin-auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.admin-auth-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-auth-modal h2 {
+  color: white;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.admin-auth-modal p {
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.admin-auth-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-auth-modal input {
+  padding: 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.admin-auth-modal input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+.admin-auth-modal input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-auth-modal input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  color: #ff3b30;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  background: rgba(255, 59, 48, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #ff3b30;
+}
+
+.admin-auth-modal button {
+  padding: 0.75rem;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-auth-modal button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.admin-auth-modal button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

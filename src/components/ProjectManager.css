@@ -14,6 +14,12 @@
   margin: 0;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .btn-add {
   padding: 0.75rem 1.5rem;
   background: rgba(255, 255, 255, 0.2);
@@ -28,6 +34,23 @@
 
 .btn-add:hover {
   background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-logout {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 59, 48, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 59, 48, 0.8);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 59, 48, 1);
   transform: translateY(-2px);
 }
 
