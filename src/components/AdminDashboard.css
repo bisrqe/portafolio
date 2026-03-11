@@ -324,7 +324,27 @@
   font-size: 0.75rem;
   text-transform: capitalize;
   margin-bottom: 8px;
+  margin-right: 6px;
   width: fit-content;
+}
+
+.photo-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.photo-label {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(83, 162, 190, 0.3) 0%, rgba(10, 34, 57, 0.3) 100%);
+  color: #DEC1FF;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-style: italic;
+  width: fit-content;
+  border: 1px solid rgba(83, 162, 190, 0.4);
 }
 
 .photo-info p {

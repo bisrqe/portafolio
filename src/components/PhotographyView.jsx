@@ -1,6 +1,26 @@
+import { useState, useMemo } from 'react'
 import './PhotographyView.css'
 
 function PhotographyView({ photos }) {
+  const [activeLabel, setActiveLabel] = useState(null)
+
+  // Group photos by label
+  const photosByLabel = useMemo(() => {
+    const grouped = {}
+    photos.forEach(photo => {
+      const label = photo.label || 'Unsorted'
+      if (!grouped[label]) {
+        grouped[label] = []
+      }
+      grouped[label].push(photo)
+    })
+    return grouped
+  }, [photos])
+
+  const labels = Object.keys(photosByLabel).sort()
+  const selectedLabel = activeLabel || (labels.length > 0 ? labels[0] : null)
+  const displayPhotos = selectedLabel ? photosByLabel[selectedLabel] : []
+
   return (
     <section className="photography-view-section">
       <div className="view-header">
@@ -8,20 +28,39 @@ function PhotographyView({ photos }) {
         <p>Explore my creative work</p>
       </div>
 
+      {/* Label Filter Tabs */}
+      {labels.length > 1 && (
+        <div className="label-filters">
+          {labels.map(label => (
+            <button
+              key={label}
+              className={`label-tab ${selectedLabel === label ? 'active' : ''}`}
+              onClick={() => setActiveLabel(label)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Photos Gallery */}
       <div className="gallery-grid">
-        {photos.length === 0 ? (
+        {displayPhotos.length === 0 ? (
           <div className="empty-state">
-            <p>No photography yet.</p>
+            <p>No photography in this category yet.</p>
           </div>
         ) : (
-          photos.map(photo => (
+          displayPhotos.map(photo => (
             <div key={photo.id} className="gallery-item">
               <div className="gallery-image">
                 <img src={photo.image} alt={photo.title || 'Photography'} />
                 <div className="gallery-overlay">
                   {photo.title && <h3>{photo.title}</h3>}
                   {photo.description && <p>{photo.description}</p>}
-                  {photo.category && <span className="category-tag">{photo.category}</span>}
+                  <div className="overlay-tags">
+                    {photo.category && <span className="category-tag">{photo.category}</span>}
+                    {photo.label && <span className="label-tag">{photo.label}</span>}
+                  </div>
                 </div>
               </div>
             </div>

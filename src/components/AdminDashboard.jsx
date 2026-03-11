@@ -19,7 +19,8 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     title: '',
     description: '',
     image: '',
-    category: 'photography'
+    category: 'photography',
+    label: ''
   })
 
   // Check if user is already logged in
@@ -103,7 +104,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
         // Add new photo
         onAddPhoto(photoForm)
       }
-      setPhotoForm({ title: '', description: '', image: '', category: 'photography' })
+      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '' })
       setShowForm(false)
     }
   }
@@ -114,14 +115,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
       title: photo.title,
       description: photo.description,
       image: photo.image,
-      category: photo.category
+      category: photo.category,
+      label: photo.label || ''
     })
     setShowForm(true)
   }
 
   const handleCancelPhotoEdit = () => {
     setEditingPhoto(null)
-    setPhotoForm({ title: '', description: '', image: '', category: 'photography' })
+    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '' })
     setShowForm(false)
   }
 
@@ -363,6 +365,17 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                   </div>
 
                   <div className="form-group">
+                    <label>Subcategory / Label</label>
+                    <input
+                      type="text"
+                      name="label"
+                      placeholder="e.g., Portraits, Nature, Events, etc."
+                      value={photoForm.label}
+                      onChange={handlePhotoInputChange}
+                    />
+                  </div>
+
+                  <div className="form-group">
                     <label>Image/Thumbnail URL *</label>
                     <input
                       type="url"
@@ -395,7 +408,10 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                       </div>
                       <div className="photo-info">
                         <h4>{photo.title || 'Untitled'}</h4>
-                        <span className="photo-category">{photo.category}</span>
+                        <div className="photo-meta">
+                          <span className="photo-category">{photo.category}</span>
+                          {photo.label && <span className="photo-label">{photo.label}</span>}
+                        </div>
                         {photo.description && <p className="truncate">{photo.description}</p>}
                       </div>
                       <div className="item-actions">
