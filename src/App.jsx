@@ -277,6 +277,7 @@ function App() {
             <div className="hero-content">
               <h1>Welcome to My Portfolio</h1>
               <p>Explore my projects and creative work</p>
+              <p>Mi trabajo artístico nace de la curiosidad y del deseo de expresar ideas y emociones mediante formas, colores y composiciones. Me interesa experimentar con diferentes técnicas y enfoques visuales para descubrir nuevas maneras de comunicar y representar lo que observo y siento; así como lo que sienten los demás. Cada obra busca inmortalizar los momentos, de ahí el nombre: timeless photography.</p>
             </div>
           </section>
         )}
