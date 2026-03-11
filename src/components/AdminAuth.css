@@ -22,6 +22,41 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+  flex: 1;
+}
+
+.btn-exit-auth {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.btn-exit-auth:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
 .admin-auth-modal h2 {
   color: white;
   margin: 0 0 0.5rem 0;

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './AdminAuth.css'
 
-function AdminAuth({ onLoginSuccess }) {
+function AdminAuth({ onLoginSuccess, onExit }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -29,7 +29,18 @@ function AdminAuth({ onLoginSuccess }) {
   return (
     <div className="admin-auth-overlay">
       <div className="admin-auth-modal">
-        <h2>🔐 Admin Access</h2>
+        <div className="auth-header">
+          <h2>🔐 Admin Access</h2>
+          {onExit && (
+            <button 
+              className="btn-exit-auth" 
+              onClick={onExit}
+              title="Return to home"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         <p>Enter password to manage projects and photos</p>
         
         <form onSubmit={handleSubmit}>

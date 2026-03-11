@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { db } from './firebase'
-import { collection, addDoc, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore'
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc } from 'firebase/firestore'
 import Navigation from './components/Navigation'
 import ProjectsView from './components/ProjectsView'
 import PhotographyView from './components/PhotographyView'
@@ -187,6 +187,54 @@ function App() {
     }
   }
 
+  const updateProject = async (id, project) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot update to cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Updating locally.')
+      const existing = localStorage.getItem('portfolio_projects')
+      if (existing) {
+        const projects = JSON.parse(existing).map(p => p.id === id ? { ...project, id } : p)
+        localStorage.setItem('portfolio_projects', JSON.stringify(projects))
+      }
+      return
+    }
+
+    try {
+      const projectRef = doc(db, 'projects', id)
+      await updateDoc(projectRef, {
+        ...project,
+        updatedAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error updating project:', error)
+      alert('Failed to update project.')
+    }
+  }
+
+  const updatePhoto = async (id, photo) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot update to cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Updating locally.')
+      const existing = localStorage.getItem('portfolio_photos')
+      if (existing) {
+        const photos = JSON.parse(existing).map(p => p.id === id ? { ...photo, id } : p)
+        localStorage.setItem('portfolio_photos', JSON.stringify(photos))
+      }
+      return
+    }
+
+    try {
+      const photoRef = doc(db, 'photos', id)
+      await updateDoc(photoRef, {
+        ...photo,
+        updatedAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error updating photo:', error)
+      alert('Failed to update photo.')
+    }
+  }
+
   if (isLoading) {
     return <div className="app"><div style={{ color: 'white', textAlign: 'center', paddingTop: '50px' }}>Loading...</div></div>
   }
@@ -225,6 +273,9 @@ function App() {
             onDeleteProject={deleteProject}
             onAddPhoto={addPhoto}
             onDeletePhoto={deletePhoto}
+            onUpdateProject={updateProject}
+            onUpdatePhoto={updatePhoto}
+            onExit={() => setCurrentSection('home')}
           />
         )}
       </main>

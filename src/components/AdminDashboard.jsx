@@ -3,10 +3,12 @@ import CloudinaryUpload from './CloudinaryUpload'
 import AdminAuth from './AdminAuth'
 import './AdminDashboard.css'
 
-function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto }) {
+function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onExit }) {
   const [activeTab, setActiveTab] = useState('projects')
   const [isAdmin, setIsAdmin] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [editingProject, setEditingProject] = useState(null)
+  const [editingPhoto, setEditingPhoto] = useState(null)
   const [projectForm, setProjectForm] = useState({
     title: '',
     description: '',
@@ -40,10 +42,36 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
   const handleProjectSubmit = (e) => {
     e.preventDefault()
     if (projectForm.title.trim()) {
-      onAddProject(projectForm)
+      if (editingProject) {
+        // Update existing project
+        if (onUpdateProject) {
+          onUpdateProject(editingProject.id, projectForm)
+        }
+        setEditingProject(null)
+      } else {
+        // Add new project
+        onAddProject(projectForm)
+      }
       setProjectForm({ title: '', description: '', link: '', image: '' })
       setShowForm(false)
     }
+  }
+
+  const handleEditProject = (project) => {
+    setEditingProject(project)
+    setProjectForm({
+      title: project.title,
+      description: project.description,
+      link: project.link,
+      image: project.image
+    })
+    setShowForm(true)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingProject(null)
+    setProjectForm({ title: '', description: '', link: '', image: '' })
+    setShowForm(false)
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
@@ -65,10 +93,36 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
   const handlePhotoSubmit = (e) => {
     e.preventDefault()
     if (photoForm.image.trim()) {
-      onAddPhoto(photoForm)
+      if (editingPhoto) {
+        // Update existing photo
+        if (onUpdatePhoto) {
+          onUpdatePhoto(editingPhoto.id, photoForm)
+        }
+        setEditingPhoto(null)
+      } else {
+        // Add new photo
+        onAddPhoto(photoForm)
+      }
       setPhotoForm({ title: '', description: '', image: '', category: 'photography' })
       setShowForm(false)
     }
+  }
+
+  const handleEditPhoto = (photo) => {
+    setEditingPhoto(photo)
+    setPhotoForm({
+      title: photo.title,
+      description: photo.description,
+      image: photo.image,
+      category: photo.category
+    })
+    setShowForm(true)
+  }
+
+  const handleCancelPhotoEdit = () => {
+    setEditingPhoto(null)
+    setPhotoForm({ title: '', description: '', image: '', category: 'photography' })
+    setShowForm(false)
   }
 
   const handlePhotoUploadSuccess = (uploadData) => {
@@ -78,9 +132,20 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     }))
   }
 
+  const handleExit = () => {
+    localStorage.removeItem('portfolio_admin_token')
+    setIsAdmin(false)
+    setShowForm(false)
+    setEditingProject(null)
+    setEditingPhoto(null)
+    if (onExit) {
+      onExit()
+    }
+  }
+
   return (
     <>
-      {!isAdmin && <AdminAuth onLoginSuccess={() => setIsAdmin(true)} />}
+      {!isAdmin && <AdminAuth onLoginSuccess={() => setIsAdmin(true)} onExit={onExit} />}
       
       {isAdmin && (
         <section className="admin-dashboard-section">
@@ -91,11 +156,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
             </div>
             <button
               className="btn-logout-admin"
-              onClick={() => {
-                localStorage.removeItem('portfolio_admin_token')
-                setIsAdmin(false)
-                setShowForm(false)
-              }}
+              onClick={handleExit}
               title="Logout admin access"
             >
               🔓 Logout
@@ -131,16 +192,22 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                 <h3>My Projects</h3>
                 <button 
                   className="btn-add-admin"
-                  onClick={() => setShowForm(!showForm)}
+                  onClick={() => {
+                    if (editingProject) {
+                      handleCancelEdit()
+                    } else {
+                      setShowForm(!showForm)
+                    }
+                  }}
                 >
-                  {showForm ? '✕ Cancel' : '+ Add Project'}
+                  {editingProject ? '✕ Cancel Edit' : (showForm ? '✕ Cancel' : '+ Add Project')}
                 </button>
               </div>
 
               {showForm && (
                 <form className="admin-form" onSubmit={handleProjectSubmit}>
                   <div className="form-group">
-                    <label>Project Title *</label>
+                    <label>{editingProject ? 'Update Project Title' : 'Project Title'} *</label>
                     <input
                       type="text"
                       name="title"
@@ -186,7 +253,9 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
-                  <button type="submit" className="btn-submit-admin">Save Project</button>
+                  <button type="submit" className="btn-submit-admin">
+                    {editingProject ? 'Save Changes' : 'Save Project'}
+                  </button>
                 </form>
               )}
 
@@ -210,16 +279,26 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                           </a>
                         )}
                       </div>
-                      <button 
-                        className="btn-delete-admin"
-                        onClick={() => {
-                          if (confirm('Delete this project?')) {
-                            onDeleteProject(project.id)
-                          }
-                        }}
-                      >
-                        🗑️
-                      </button>
+                      <div className="item-actions">
+                        <button 
+                          className="btn-edit-admin"
+                          onClick={() => handleEditProject(project)}
+                          title="Edit project"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          className="btn-delete-admin"
+                          onClick={() => {
+                            if (confirm('Delete this project?')) {
+                              onDeleteProject(project.id)
+                            }
+                          }}
+                          title="Delete project"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -234,9 +313,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                 <h3>Photography & Videography</h3>
                 <button 
                   className="btn-add-admin"
-                  onClick={() => setShowForm(!showForm)}
+                  onClick={() => {
+                    if (editingPhoto) {
+                      handleCancelPhotoEdit()
+                    } else {
+                      setShowForm(!showForm)
+                    }
+                  }}
                 >
-                  {showForm ? '✕ Cancel' : '+ Add Work'}
+                  {editingPhoto ? '✕ Cancel Edit' : (showForm ? '✕ Cancel' : '+ Add Work')}
                 </button>
               </div>
 
@@ -291,7 +376,9 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                     <CloudinaryUpload onUploadSuccess={handlePhotoUploadSuccess} />
                   </div>
 
-                  <button type="submit" className="btn-submit-admin">Save Work</button>
+                  <button type="submit" className="btn-submit-admin">
+                    {editingPhoto ? 'Save Changes' : 'Save Work'}
+                  </button>
                 </form>
               )}
 
@@ -311,16 +398,26 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                         <span className="photo-category">{photo.category}</span>
                         {photo.description && <p className="truncate">{photo.description}</p>}
                       </div>
-                      <button 
-                        className="btn-delete-admin"
-                        onClick={() => {
-                          if (confirm('Delete this work?')) {
-                            onDeletePhoto(photo.id)
-                          }
-                        }}
-                      >
-                        🗑️
-                      </button>
+                      <div className="item-actions">
+                        <button 
+                          className="btn-edit-admin"
+                          onClick={() => handleEditPhoto(photo)}
+                          title="Edit photo"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          className="btn-delete-admin"
+                          onClick={() => {
+                            if (confirm('Delete this work?')) {
+                              onDeletePhoto(photo.id)
+                            }
+                          }}
+                          title="Delete photo"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
