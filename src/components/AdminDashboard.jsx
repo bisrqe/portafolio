@@ -20,7 +20,9 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     description: '',
     image: '',
     category: 'photography',
-    label: ''
+    label: '',
+    positionX: 0,
+    positionY: 0
   })
 
   // Check if user is already logged in
@@ -104,7 +106,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
         // Add new photo
         onAddPhoto(photoForm)
       }
-      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '' })
+      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0 })
       setShowForm(false)
     }
   }
@@ -116,14 +118,16 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
       description: photo.description,
       image: photo.image,
       category: photo.category,
-      label: photo.label || ''
+      label: photo.label || '',
+      positionX: photo.positionX || 0,
+      positionY: photo.positionY || 0
     })
     setShowForm(true)
   }
 
   const handleCancelPhotoEdit = () => {
     setEditingPhoto(null)
-    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '' })
+    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0 })
     setShowForm(false)
   }
 
@@ -388,6 +392,54 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                     <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handlePhotoUploadSuccess} />
                   </div>
+
+                  {photoForm.image && (
+                    <div className="form-group">
+                      <label>Image Position</label>
+                      <div className="position-controls">
+                        <div className="position-control-group">
+                          <label>Horizontal (X): {photoForm.positionX || 0}%</label>
+                          <input
+                            type="range"
+                            name="positionX"
+                            min="-100"
+                            max="100"
+                            step="5"
+                            value={photoForm.positionX || 0}
+                            onChange={handlePhotoInputChange}
+                            className="position-slider"
+                          />
+                        </div>
+                        <div className="position-control-group">
+                          <label>Vertical (Y): {photoForm.positionY || 0}%</label>
+                          <input
+                            type="range"
+                            name="positionY"
+                            min="-100"
+                            max="100"
+                            step="5"
+                            value={photoForm.positionY || 0}
+                            onChange={handlePhotoInputChange}
+                            className="position-slider"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="position-preview">
+                        <div className="preview-container">
+                          <img 
+                            src={photoForm.image} 
+                            alt="Preview" 
+                            className="preview-image"
+                            style={{
+                              transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%)`
+                            }}
+                          />
+                        </div>
+                        <small>Preview of how the image will be positioned</small>
+                      </div>
+                    </div>
+                  )}
 
                   <button type="submit" className="btn-submit-admin">
                     {editingPhoto ? 'Save Changes' : 'Save Work'}

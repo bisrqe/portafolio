@@ -53,7 +53,13 @@ function PhotographyView({ photos }) {
           displayPhotos.map(photo => (
             <div key={photo.id} className="gallery-item">
               <div className="gallery-image">
-                <img src={photo.image} alt={photo.title || 'Photography'} />
+                <img 
+                  src={photo.image} 
+                  alt={photo.title || 'Photography'}
+                  style={{
+                    transform: `translate(${photo.positionX || 0}%, ${photo.positionY || 0}%)`
+                  }}
+                />
                 <div className="gallery-overlay">
                   {photo.title && <h3>{photo.title}</h3>}
                   {photo.description && <p>{photo.description}</p>}
