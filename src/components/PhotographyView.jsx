@@ -25,7 +25,7 @@ function PhotographyView({ photos }) {
     <section className="photography-view-section">
       <div className="view-header">
         <h2>Photography & Videography</h2>
-        <p>Explore my creative work</p>
+        <p>My artistic work stems from curiosity and the desire to express ideas and emotions through forms, colors, and compositions. I am interested in experimenting with different techniques and visual approaches to discover new ways of communicating and representing what I observe and feel, as well as what others feel. Each piece seeks to immortalize moments; hence the name: timeless photography.</p>
       </div>
 
       {/* Label Filter Tabs */}
