@@ -13,13 +13,13 @@
 }
 
 .admin-auth-modal {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(20, 20, 40, 0.95) 0%, rgba(30, 10, 40, 0.95) 100%);
   border-radius: 12px;
   padding: 2rem;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 2px solid #DEC1FF;
 }
 
 .auth-header {
@@ -89,8 +89,8 @@
 
 .admin-auth-modal input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.2);
-  border-color: white;
+  background: rgba(222, 193, 255, 0.15);
+  border-color: #DEC1FF;
 }
 
 .admin-auth-modal input::placeholder {
@@ -113,8 +113,8 @@
 
 .admin-auth-modal button {
   padding: 0.75rem;
-  background: white;
-  color: #667eea;
+  background: linear-gradient(135deg, #DEC1FF 0%, #c9a6ff 100%);
+  color: #1a1a2e;
   border: none;
   border-radius: 6px;
   font-size: 1rem;

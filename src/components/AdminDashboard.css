@@ -1,7 +1,7 @@
 .admin-dashboard-section {
   padding: 60px 40px;
   min-height: calc(100vh - 80px);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(20, 20, 40, 0.8) 0%, rgba(30, 20, 50, 0.8) 100%);
 }
 
 .dashboard-header {
@@ -69,8 +69,8 @@
 }
 
 .tab-button.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: #DEC1FF;
+  border-bottom-color: #DEC1FF;
 }
 
 /* Admin Content */
@@ -98,8 +98,8 @@
 }
 
 .btn-add-admin {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #DEC1FF 0%, #c9a6ff 100%);
+  color: #1a1a2e;
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
@@ -111,7 +111,7 @@
 
 .btn-add-admin:hover {
   transform: scale(1.05);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 25px rgba(222, 193, 255, 0.4);
 }
 
 /* Form */
@@ -156,8 +156,8 @@
 .form-group select:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(102, 126, 234, 0.5);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #DEC1FF;
+  box-shadow: 0 0 0 3px rgba(222, 193, 255, 0.2);
 }
 
 .form-group textarea {
@@ -178,8 +178,8 @@
 }
 
 .btn-submit-admin {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #DEC1FF 0%, #c9a6ff 100%);
+  color: #1a1a2e;
   border: none;
   padding: 12px 30px;
   border-radius: 6px;
@@ -192,7 +192,7 @@
 
 .btn-submit-admin:hover {
   transform: scale(1.02);
-  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 15px 35px rgba(222, 193, 255, 0.4);
 }
 
 /* Projects Grid */
@@ -317,8 +317,8 @@
 
 .photo-category {
   display: inline-block;
-  background: rgba(102, 126, 234, 0.3);
-  color: #a4b3ff;
+  background: rgba(222, 193, 255, 0.2);
+  color: #DEC1FF;
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -358,9 +358,9 @@
 
 /* Edit Button */
 .btn-edit-admin {
-  background: rgba(102, 126, 234, 0.2);
-  border: 1px solid rgba(102, 126, 234, 0.4);
-  color: #667eea;
+  background: rgba(222, 193, 255, 0.2);
+  border: 1px solid rgba(222, 193, 255, 0.4);
+  color: #DEC1FF;
   width: 36px;
   height: 36px;
   border-radius: 6px;
@@ -373,8 +373,8 @@
 }
 
 .btn-edit-admin:hover {
-  background: rgba(102, 126, 234, 0.3);
-  border-color: rgba(102, 126, 234, 0.6);
+  background: rgba(222, 193, 255, 0.3);
+  border-color: #DEC1FF;
   transform: scale(1.1);
 }
 

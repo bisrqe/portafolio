@@ -1,7 +1,7 @@
 .photography-view-section {
   padding: 60px 40px;
   min-height: calc(100vh - 80px);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(82, 5, 10, 0.1) 0%, rgba(131, 33, 97, 0.1) 100%);
 }
 
 .view-header {
@@ -42,8 +42,8 @@
 }
 
 .gallery-item:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+  border-color: #DEC1FF;
+  box-shadow: 0 15px 35px rgba(131, 33, 97, 0.3);
 }
 
 .gallery-image {
@@ -99,8 +99,8 @@
 
 .category-tag {
   display: inline-block;
-  background: rgba(102, 126, 234, 0.8);
-  color: white;
+  background: linear-gradient(135deg, #52050A 0%, #832161 100%);
+  color: #DEC1FF;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.75rem;

@@ -56,21 +56,23 @@
 }
 
 .admin-link {
-  background: rgba(102, 126, 234, 0.2);
+  background: rgba(222, 193, 255, 0.15);
   border-radius: 6px;
   padding: 0.5rem 1rem;
   border-bottom: none;
   transition: all 0.3s ease;
+  color: #DEC1FF;
 }
 
 .admin-link:hover {
-  background: rgba(102, 126, 234, 0.35);
+  background: rgba(222, 193, 255, 0.25);
   border-bottom-color: transparent;
 }
 
 .admin-link.active {
-  background: rgba(102, 126, 234, 0.5);
+  background: rgba(222, 193, 255, 0.35);
   border-bottom-color: transparent;
+  color: #DEC1FF;
 }
 
 @media (max-width: 768px) {
