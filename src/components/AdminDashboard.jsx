@@ -9,6 +9,8 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
   const [showForm, setShowForm] = useState(false)
   const [editingProject, setEditingProject] = useState(null)
   const [editingPhoto, setEditingPhoto] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [projectForm, setProjectForm] = useState({
     title: '',
     description: '',
@@ -147,6 +149,41 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     if (onExit) {
       onExit()
     }
+  }
+
+  const handlePreviewMouseDown = (e) => {
+    setIsDragging(true)
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
+
+  const handlePreviewMouseMove = (e) => {
+    if (!isDragging) return
+
+    const deltaX = (e.clientX - dragStart.x) * 0.15
+    const deltaY = (e.clientY - dragStart.y) * 0.15
+
+    const newX = Math.max(-100, Math.min(100, (photoForm.positionX || 0) + deltaX))
+    const newY = Math.max(-100, Math.min(100, (photoForm.positionY || 0) + deltaY))
+
+    setPhotoForm(prev => ({
+      ...prev,
+      positionX: Math.round(newX),
+      positionY: Math.round(newY)
+    }))
+
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
+
+  const handlePreviewMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const resetPosition = () => {
+    setPhotoForm(prev => ({
+      ...prev,
+      positionX: 0,
+      positionY: 0
+    }))
   }
 
   return (
@@ -396,47 +433,36 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                   {photoForm.image && (
                     <div className="form-group">
                       <label>Image Position</label>
-                      <div className="position-controls">
-                        <div className="position-control-group">
-                          <label>Horizontal (X): {photoForm.positionX || 0}%</label>
-                          <input
-                            type="range"
-                            name="positionX"
-                            min="-100"
-                            max="100"
-                            step="5"
-                            value={photoForm.positionX || 0}
-                            onChange={handlePhotoInputChange}
-                            className="position-slider"
-                          />
-                        </div>
-                        <div className="position-control-group">
-                          <label>Vertical (Y): {photoForm.positionY || 0}%</label>
-                          <input
-                            type="range"
-                            name="positionY"
-                            min="-100"
-                            max="100"
-                            step="5"
-                            value={photoForm.positionY || 0}
-                            onChange={handlePhotoInputChange}
-                            className="position-slider"
-                          />
-                        </div>
-                      </div>
-                      
                       <div className="position-preview">
-                        <div className="preview-container">
+                        <div 
+                          className={`preview-container ${isDragging ? 'dragging' : ''}`}
+                          onMouseDown={handlePreviewMouseDown}
+                          onMouseMove={handlePreviewMouseMove}
+                          onMouseUp={handlePreviewMouseUp}
+                          onMouseLeave={handlePreviewMouseUp}
+                        >
                           <img 
                             src={photoForm.image} 
                             alt="Preview" 
                             className="preview-image"
                             style={{
-                              transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%)`
+                              transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%)`,
+                              cursor: isDragging ? 'grabbing' : 'grab'
                             }}
+                            draggable={false}
                           />
+                          <div className="position-overlay">
+                            X: {photoForm.positionX || 0}% | Y: {photoForm.positionY || 0}%
+                          </div>
                         </div>
-                        <small>Preview of how the image will be positioned</small>
+                        <small>Drag the image to position it (X: {photoForm.positionX || 0}%, Y: {photoForm.positionY || 0}%)</small>
+                        <button 
+                          type="button"
+                          className="btn-reset-position"
+                          onClick={resetPosition}
+                        >
+                          ↺ Reset Position
+                        </button>
                       </div>
                     </div>
                   )}
