@@ -87,6 +87,13 @@ function LeadershipView({ leadership }) {
                     ))}
                   </div>
                 )}
+                <div className="leadership-actions">
+                  {item.link && (
+                    <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn-link">
+                      Learn More →
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           ))

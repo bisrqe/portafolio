@@ -35,6 +35,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     role: '',
     description: '',
     image: '',
+    link: '',
     tags: [],
     sdg: []
   })
@@ -269,6 +270,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       role: item.role,
       description: item.description,
       image: item.image,
+      link: item.link || '',
       tags: item.tags || [],
       sdg: item.sdg || []
     })
@@ -277,7 +279,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [], sdg: [] })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [] })
     setShowForm(false)
   }
 
@@ -759,6 +761,17 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
+                    <label>Link</label>
+                    <input
+                      type="url"
+                      name="link"
+                      placeholder="https://..."
+                      value={leadershipForm.link}
+                      onChange={handleLeadershipInputChange}
+                    />
+                  </div>
+
+                  <div className="form-group">
                     <label>Tags (comma-separated)</label>
                     <input
                       type="text"
@@ -803,6 +816,11 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                         <h4>{item.title}</h4>
                         <p className="truncate">{item.role}</p>
                         <p className="truncate">{item.description}</p>
+                        {item.link && (
+                          <a href={item.link} target="_blank" rel="noopener noreferrer" className="item-link">
+                            View →
+                          </a>
+                        )}
                         {item.sdg && item.sdg.length > 0 && (
                           <div className="item-tags">
                             {item.sdg.map((goal, idx) => (
