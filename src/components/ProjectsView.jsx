@@ -3,6 +3,7 @@ import './ProjectsView.css'
 
 function ProjectsView({ projects }) {
   const [activeTag, setActiveTag] = useState(null)
+  const visibleTags = ['Simulation', 'Professional Experience', 'Student Groups', 'Personal Projects', 'Hackathons', 'Other']
 
   // Extract unique tags from all projects
   const allTags = useMemo(() => {

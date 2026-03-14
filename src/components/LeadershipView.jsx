@@ -3,17 +3,24 @@ import './LeadershipView.css'
 
 function LeadershipView({ leadership }) {
   const [activeTag, setActiveTag] = useState(null)
+  const visibleTags = ['EGS', 'Student Groups', 'Personal Projects', 'Leadership Programs', 'Other']
 
-  // Get all unique tags
+  // Extract unique tags from all projects
   const allTags = useMemo(() => {
-    const tags = new Set()
-    leadership.forEach(item => {
-      if (item.tags && Array.isArray(item.tags)) {
-        item.tags.forEach(tag => tags.add(tag))
-      }
+  const tags = new Set()
+
+  projects.forEach(project => {
+    if (project.tags && Array.isArray(project.tags)) {
+    leadership.tags.forEach(tag => {
+        if (!visibleTags || visibleTags.includes(tag)) {
+        tags.add(tag)
+        }
     })
+    }
+    })
+
     return Array.from(tags).sort()
-  }, [leadership])
+    }, [leadership])
 
   // Filter leadership by selected tag
   const filteredLeadership = activeTag
