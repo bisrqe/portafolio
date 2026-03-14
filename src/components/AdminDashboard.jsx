@@ -16,10 +16,8 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     title: '',
     description: '',
     link: '',
-    images: [],
-    tags: [],
-    featuredTags: [],
-    currentImagePreview: 0
+    image: '',
+    tags: []
   })
   const [photoForm, setPhotoForm] = useState({
     title: '',
@@ -36,11 +34,9 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     title: '',
     role: '',
     description: '',
-    images: [],
+    image: '',
     tags: [],
-    featuredTags: [],
-    sdg: [],
-    currentImagePreview: 0
+    sdg: []
   })
 
   // Check if user is already logged in
@@ -73,7 +69,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new project
         onAddProject(projectForm)
       }
-      setProjectForm({ title: '', description: '', link: '', images: [], tags: [], featuredTags: [], currentImagePreview: 0 })
+      setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
       setShowForm(false)
     }
   }
@@ -84,24 +80,22 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       title: project.title,
       description: project.description,
       link: project.link,
-      images: project.images || (project.image ? [project.image] : []),
-      tags: project.tags || [],
-      featuredTags: project.featuredTags || [],
-      currentImagePreview: 0
+      image: project.image,
+      tags: project.tags || []
     })
     setShowForm(true)
   }
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', images: [], tags: [], featuredTags: [], currentImagePreview: 0 })
+    setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
     setShowForm(false)
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
     setProjectForm(prev => ({
       ...prev,
-      images: [...prev.images, uploadData.url]
+      image: uploadData.url
     }))
   }
 
@@ -263,7 +257,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new leadership item
         onAddLeadership(leadershipForm)
       }
-      setLeadershipForm({ title: '', role: '', description: '', images: [], tags: [], featuredTags: [], sdg: [], currentImagePreview: 0 })
+      setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
       setShowForm(false)
     }
   }
@@ -274,25 +268,23 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       title: item.title,
       role: item.role,
       description: item.description,
-      images: item.images || (item.image ? [item.image] : []),
+      image: item.image,
       tags: item.tags || [],
-      featuredTags: item.featuredTags || [],
-      sdg: item.sdg || [],
-      currentImagePreview: 0
+      sdg: item.sdg || []
     })
     setShowForm(true)
   }
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', images: [], tags: [], featuredTags: [], sdg: [], currentImagePreview: 0 })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [], sdg: [] })
     setShowForm(false)
   }
 
   const handleLeadershipUploadSuccess = (uploadData) => {
     setLeadershipForm(prev => ({
       ...prev,
-      images: [...prev.images, uploadData.url]
+      image: uploadData.url
     }))
   }
 
@@ -403,64 +395,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Images (add multiple for carousel)</label>
-                    <div className="image-list-section">
-                      {projectForm.images.length > 0 && (
-                        <div className="current-images">
-                          <p className="section-label">Uploaded Images ({projectForm.images.length})</p>
-                          {projectForm.images.map((img, idx) => (
-                            <div key={idx} className="image-item">
-                              <span>{idx + 1}. {img.substring(0, 40)}...</span>
-                              <button
-                                type="button"
-                                className="btn-remove-image"
-                                onClick={() => setProjectForm(prev => ({
-                                  ...prev,
-                                  images: prev.images.filter((_, i) => i !== idx),
-                                  currentImagePreview: Math.min(prev.currentImagePreview, prev.images.length - 2)
-                                }))}
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <div className="form-divider">Add New Image</div>
-                      <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
-                    </div>
+                    <label>Image URL</label>
+                    <input
+                      type="url"
+                      name="image"
+                      placeholder="https://..."
+                      value={projectForm.image}
+                      onChange={handleProjectInputChange}
+                    />
+                    <div className="form-divider">or</div>
+                    <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
                   <div className="form-group">
-                    <label>Featured Tags (select tags to show first)</label>
-                    <div className="tags-selection">
-                      {projectForm.tags.length > 0 ? (
-                        projectForm.tags.map((tag, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            className={`tag-checkbox ${projectForm.featuredTags.includes(tag) ? 'selected' : ''}`}
-                            onClick={() => {
-                              setProjectForm(prev => ({
-                                ...prev,
-                                featuredTags: prev.featuredTags.includes(tag)
-                                  ? prev.featuredTags.filter(t => t !== tag)
-                                  : [...prev.featuredTags, tag]
-                              }))
-                            }}
-                          >
-                            {projectForm.featuredTags.includes(tag) ? '✓ ' : ''}
-                            {tag}
-                          </button>
-                        ))
-                      ) : (
-                        <p className="no-tags">Add tags above to select featured tags</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>All Tags (comma-separated)</label>
+                    <label>Tags (comma-separated)</label>
                     <input
                       type="text"
                       placeholder="e.g., React, Web Development, Full-stack"
@@ -468,11 +416,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       onChange={(e) => {
                         const tagsString = e.target.value
                         const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
-                        setProjectForm(prev => ({ 
-                          ...prev, 
-                          tags,
-                          featuredTags: prev.featuredTags.filter(t => tags.includes(t))
-                        }))
+                        setProjectForm(prev => ({ ...prev, tags }))
                       }}
                     />
                   </div>
@@ -802,64 +746,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Images (add multiple for carousel)</label>
-                    <div className="image-list-section">
-                      {leadershipForm.images.length > 0 && (
-                        <div className="current-images">
-                          <p className="section-label">Uploaded Images ({leadershipForm.images.length})</p>
-                          {leadershipForm.images.map((img, idx) => (
-                            <div key={idx} className="image-item">
-                              <span>{idx + 1}. {img.substring(0, 40)}...</span>
-                              <button
-                                type="button"
-                                className="btn-remove-image"
-                                onClick={() => setLeadershipForm(prev => ({
-                                  ...prev,
-                                  images: prev.images.filter((_, i) => i !== idx),
-                                  currentImagePreview: Math.min(prev.currentImagePreview, prev.images.length - 2)
-                                }))}
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <div className="form-divider">Add New Image</div>
-                      <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
-                    </div>
+                    <label>Image URL</label>
+                    <input
+                      type="url"
+                      name="image"
+                      placeholder="https://..."
+                      value={leadershipForm.image}
+                      onChange={handleLeadershipInputChange}
+                    />
+                    <div className="form-divider">or</div>
+                    <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
 
                   <div className="form-group">
-                    <label>Featured Tags (select tags to show first)</label>
-                    <div className="tags-selection">
-                      {leadershipForm.tags.length > 0 ? (
-                        leadershipForm.tags.map((tag, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            className={`tag-checkbox ${leadershipForm.featuredTags.includes(tag) ? 'selected' : ''}`}
-                            onClick={() => {
-                              setLeadershipForm(prev => ({
-                                ...prev,
-                                featuredTags: prev.featuredTags.includes(tag)
-                                  ? prev.featuredTags.filter(t => t !== tag)
-                                  : [...prev.featuredTags, tag]
-                              }))
-                            }}
-                          >
-                            {leadershipForm.featuredTags.includes(tag) ? '✓ ' : ''}
-                            {tag}
-                          </button>
-                        ))
-                      ) : (
-                        <p className="no-tags">Add tags below to select featured tags</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>All Tags (comma-separated)</label>
+                    <label>Tags (comma-separated)</label>
                     <input
                       type="text"
                       placeholder="e.g., mentor, advisor, speaker"

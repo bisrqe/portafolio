@@ -3,7 +3,6 @@ import './ProjectsView.css'
 
 function ProjectsView({ projects }) {
   const [activeTag, setActiveTag] = useState(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState({})
 
   // Extract unique tags from all projects
   const allTags = useMemo(() => {
@@ -58,67 +57,19 @@ function ProjectsView({ projects }) {
             <p>{activeTag ? `No projects found with tag "${activeTag}".` : 'No projects yet.'}</p>
           </div>
         ) : (
-          filteredProjects.map(project => {
-            const images = project.images || (project.image ? [project.image] : [])
-            const currentIdx = currentImageIndex[project.id] || 0
-            const currentImage = images[currentIdx] || 'https://via.placeholder.com/300x200?text=Project'
-            
-            // Separate featured tags and remaining tags
-            const featuredTags = project.featuredTags || []
-            const remainingTags = project.tags?.filter(tag => !featuredTags.includes(tag)) || []
-            
-            return (
+          filteredProjects.map(project => (
             <div key={project.id} className="project-card">
               <div className="project-image">
-                <img src={currentImage} alt={project.title} />
-                {images.length > 1 && (
-                  <div className="carousel-controls">
-                    <button 
-                      className="carousel-btn"
-                      onClick={() => setCurrentImageIndex(prev => ({
-                        ...prev,
-                        [project.id]: (currentIdx - 1 + images.length) % images.length
-                      }))}
-                    >
-                      ‹
-                    </button>
-                    <span className="carousel-indicator">{currentIdx + 1}/{images.length}</span>
-                    <button 
-                      className="carousel-btn"
-                      onClick={() => setCurrentImageIndex(prev => ({
-                        ...prev,
-                        [project.id]: (currentIdx + 1) % images.length
-                      }))}
-                    >
-                      ›
-                    </button>
-                  </div>
-                )}
+                <img src={project.image || 'https://via.placeholder.com/300x200?text=Project'} alt={project.title} />
               </div>
               <div className="project-content">
                 <h3>{project.title}</h3>
-                <p className="description-text">{project.description?.split('\n').map((line, idx) => (
-                  <span key={idx}>
-                    {line}
-                    <br />
-                  </span>
-                ))}</p>
-                {(featuredTags.length > 0 || remainingTags.length > 0) && (
-                  <div className="tags-section">
-                    {featuredTags.length > 0 && (
-                      <div className="tags featured-tags">
-                        {featuredTags.map((tag, idx) => (
-                          <span key={idx} className="tag featured">{tag}</span>
-                        ))}
-                      </div>
-                    )}
-                    {remainingTags.length > 0 && (
-                      <div className="tags">
-                        {remainingTags.map((tag, idx) => (
-                          <span key={idx} className="tag">{tag}</span>
-                        ))}
-                      </div>
-                    )}
+                <p>{project.description}</p>
+                {project.tags && project.tags.length > 0 && (
+                  <div className="tags">
+                    {project.tags.map((tag, idx) => (
+                      <span key={idx} className="tag">{tag}</span>
+                    ))}
                   </div>
                 )}
                 <div className="project-actions">
@@ -130,8 +81,7 @@ function ProjectsView({ projects }) {
                 </div>
               </div>
             </div>
-            )
-          })
+          ))
         )}
       </div>
     </section>
