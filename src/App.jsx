@@ -388,7 +388,7 @@ function App() {
           </section>
         )}
 
-        {currentPath === '/personal-projects' && (
+        {currentPath === '/professional-projects' && (
           <ProjectsView 
             projects={projects}
           />
