@@ -1,7 +1,6 @@
 .projects-view-section {
   padding: 60px 40px;
   min-height: calc(100vh - 80px);
-  background: linear-gradient(135deg, rgba(83, 162, 190, 0.1) 0%, rgba(10, 34, 57, 0.1) 100%);
 }
 
 .view-header {
@@ -90,10 +89,6 @@
   margin: 0 0 15px 0;
   font-size: 0.95rem;
   line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .project-actions {
