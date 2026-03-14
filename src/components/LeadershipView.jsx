@@ -3,7 +3,7 @@ import './LeadershipView.css'
 
 function LeadershipView({ leadership }) {
   const [activeTag, setActiveTag] = useState(null)
-  const visibleTags = ['EGS', 'Leadership Programs', 'International Events', 'Social Service']
+  const visibleTags = ['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service']
   
   // Get all unique tags
   const allTags = useMemo(() => {
