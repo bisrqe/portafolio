@@ -52,7 +52,7 @@ function ProjectManager({ projects, onAdd, onDelete }) {
       {isAdmin && (
         <section className="projects-section">
           <div className="section-header">
-            <h2>My Projects</h2>
+            <h2>Professional Projects</h2>
             <div className="header-buttons">
               <button 
                 className="btn-add"

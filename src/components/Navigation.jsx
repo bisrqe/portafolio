@@ -20,10 +20,10 @@ function Navigation({ currentPath }) {
           </li>
           <li className="nav-item">
             <a 
-              href="/personal-projects" 
-              className={`nav-link ${currentPath === '/personal-projects' ? 'active' : ''}`}
+              href="/professional-projects" 
+              className={`nav-link ${currentPath === '/professional-projects' ? 'active' : ''}`}
             >
-              Projects
+              Professional Projects
             </a>
           </li>
           <li className="nav-item">

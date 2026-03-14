@@ -26,8 +26,8 @@ function ProjectsView({ projects }) {
   return (
     <section className="projects-view-section">
       <div className="view-header">
-        <h2>My Projects</h2>
-        <p>Explore my latest work and projects</p>
+        <h2>Professional Projects</h2>
+        <p>Explore my latest work and projects I've worked on</p>
       </div>
 
       {/* Tag Filter */}
