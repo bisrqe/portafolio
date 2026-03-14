@@ -18,8 +18,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     link: '',
     image: '',
     images: [],
-    tags: [],
-    date: new Date().toISOString().split('T')[0]
+    tags: []
   })
   const [photoForm, setPhotoForm] = useState({
     title: '',
@@ -40,8 +39,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     images: [],
     link: '',
     tags: [],
-    sdg: [],
-    date: new Date().toISOString().split('T')[0]
+    sdg: []
   })
 
   // Check if user is already logged in
@@ -74,7 +72,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new project
         onAddProject(projectForm)
       }
-      setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [], date: new Date().toISOString().split('T')[0] })
+      setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [] })
       setShowForm(false)
     }
   }
@@ -85,17 +83,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       title: project.title,
       description: project.description,
       link: project.link,
-      image: project.image || (Array.isArray(project.images) && project.images.length > 0 ? project.images[0] : ''),
-      images: Array.isArray(project.images) ? project.images : [],
-      tags: project.tags || [],
-      date: project.date || new Date().toISOString().split('T')[0]
+      image: project.image,
+      images: project.images || [],
+      tags: project.tags || []
     })
     setShowForm(true)
   }
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [], date: new Date().toISOString().split('T')[0] })
+    setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [] })
     setShowForm(false)
   }
 
@@ -265,7 +262,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new leadership item
         onAddLeadership(leadershipForm)
       }
-      setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [], date: new Date().toISOString().split('T')[0] })
+      setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [] })
       setShowForm(false)
     }
   }
@@ -277,18 +274,17 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       role: item.role,
       description: item.description,
       image: item.image,
-      images: Array.isArray(item.images) ? item.images : [],
+      images: item.images || [],
       link: item.link || '',
       tags: item.tags || [],
-      sdg: item.sdg || [],
-      date: item.date || new Date().toISOString().split('T')[0]
+      sdg: item.sdg || []
     })
     setShowForm(true)
   }
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [], date: new Date().toISOString().split('T')[0] })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [] })
     setShowForm(false)
   }
 
@@ -407,7 +403,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Primary Image URL</label>
+                    <label>Image URL</label>
                     <input
                       type="url"
                       name="image"
@@ -421,20 +417,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
                   {projectForm.images && projectForm.images.length > 0 && (
                     <div className="form-group">
-                      <label>Additional Images ({projectForm.images.length})</label>
-                      <div className="images-list">
-                        {projectForm.images.map((imgUrl, idx) => (
-                          <div key={idx} className="image-item">
-                            <img src={imgUrl} alt={`Project image ${idx + 1}`} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                      <label>Project Images Carousel ({projectForm.images.length})</label>
+                      <div className="images-preview">
+                        {projectForm.images.map((img, idx) => (
+                          <div key={idx} className="image-preview-item">
+                            <img src={img} alt={`Project ${idx + 1}`} />
                             <button
                               type="button"
+                              className="btn-remove-image"
                               onClick={() => {
                                 setProjectForm(prev => ({
                                   ...prev,
                                   images: prev.images.filter((_, i) => i !== idx)
                                 }))
                               }}
-                              className="btn-remove-image"
                             >
                               Remove
                             </button>
@@ -455,16 +451,6 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                         const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
                         setProjectForm(prev => ({ ...prev, tags }))
                       }}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Date</label>
-                    <input
-                      type="date"
-                      name="date"
-                      value={projectForm.date}
-                      onChange={handleProjectInputChange}
                     />
                   </div>
 
@@ -807,20 +793,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
                   {leadershipForm.images && leadershipForm.images.length > 0 && (
                     <div className="form-group">
-                      <label>Additional Images ({leadershipForm.images.length})</label>
-                      <div className="images-list">
-                        {leadershipForm.images.map((imgUrl, idx) => (
-                          <div key={idx} className="image-item">
-                            <img src={imgUrl} alt={`Leadership image ${idx + 1}`} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                      <label>Leadership Images Carousel ({leadershipForm.images.length})</label>
+                      <div className="images-preview">
+                        {leadershipForm.images.map((img, idx) => (
+                          <div key={idx} className="image-preview-item">
+                            <img src={img} alt={`Leadership ${idx + 1}`} />
                             <button
                               type="button"
+                              className="btn-remove-image"
                               onClick={() => {
                                 setLeadershipForm(prev => ({
                                   ...prev,
                                   images: prev.images.filter((_, i) => i !== idx)
                                 }))
                               }}
-                              className="btn-remove-image"
                             >
                               Remove
                             </button>
@@ -862,16 +848,6 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                         const sdgs = sdgString.split(',').map(goal => goal.trim()).filter(goal => goal)
                         setLeadershipForm(prev => ({ ...prev, sdg: sdgs }))
                       }}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Date</label>
-                    <input
-                      type="date"
-                      name="date"
-                      value={leadershipForm.date}
-                      onChange={handleLeadershipInputChange}
                     />
                   </div>
 
