@@ -599,6 +599,119 @@
   margin: 0;
 }
 
+/* Image Management */
+.image-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-images {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-label {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.image-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(222, 193, 255, 0.05);
+  border: 1px solid rgba(222, 193, 255, 0.2);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.image-item:hover {
+  background: rgba(222, 193, 255, 0.1);
+  border-color: rgba(222, 193, 255, 0.3);
+}
+
+.btn-remove-image {
+  background: rgba(255, 87, 87, 0.2);
+  border: 1px solid rgba(255, 87, 87, 0.4);
+  color: #ff5757;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 28px;
+  text-align: center;
+}
+
+.btn-remove-image:hover {
+  background: rgba(255, 87, 87, 0.3);
+  border-color: rgba(255, 87, 87, 0.6);
+  transform: scale(1.1);
+}
+
+.form-divider {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  padding: 8px 0;
+  font-weight: 500;
+}
+
+/* Featured Tags Selection */
+.tags-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.no-tags {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.tag-checkbox {
+  background: rgba(222, 193, 255, 0.1);
+  border: 1px solid rgba(222, 193, 255, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tag-checkbox:hover {
+  background: rgba(222, 193, 255, 0.2);
+  border-color: rgba(222, 193, 255, 0.5);
+  color: #fff;
+}
+
+.tag-checkbox.selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: rgba(222, 193, 255, 0.8);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+}
+
 /* Utilities */
 .truncate {
   display: -webkit-box;

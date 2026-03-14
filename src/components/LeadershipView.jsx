@@ -3,6 +3,7 @@ import './LeadershipView.css'
 
 function LeadershipView({ leadership }) {
   const [activeTag, setActiveTag] = useState(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState({})
 
   // Get all unique tags
   const allTags = useMemo(() => {
@@ -55,17 +56,58 @@ function LeadershipView({ leadership }) {
             <p>No leadership items in this category yet.</p>
           </div>
         ) : (
-          filteredLeadership.map(item => (
+          filteredLeadership.map(item => {
+            const images = item.images || (item.image ? [item.image] : [])
+            const currentIdx = currentImageIndex[item.id] || 0
+            const currentImage = images[currentIdx]
+            
+            // Separate featured tags and remaining tags
+            const featuredTags = item.featuredTags || []
+            const remainingTags = item.tags?.filter(tag => !featuredTags.includes(tag)) || []
+            
+            return (
             <div key={item.id} className="leadership-card">
-              {item.image && (
+              {currentImage && (
                 <div className="leadership-image">
-                  <img src={item.image} alt={item.title || 'Leadership'} />
+                  <img src={currentImage} alt={item.title || 'Leadership'} />
+                  {images.length > 1 && (
+                    <div className="carousel-controls">
+                      <button 
+                        className="carousel-btn"
+                        onClick={() => setCurrentImageIndex(prev => ({
+                          ...prev,
+                          [item.id]: (currentIdx - 1 + images.length) % images.length
+                        }))}
+                      >
+                        ‹
+                      </button>
+                      <span className="carousel-indicator">{currentIdx + 1}/{images.length}</span>
+                      <button 
+                        className="carousel-btn"
+                        onClick={() => setCurrentImageIndex(prev => ({
+                          ...prev,
+                          [item.id]: (currentIdx + 1) % images.length
+                        }))}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="leadership-content">
                 <h3>{item.title || 'Untitled'}</h3>
                 {item.role && <p className="role">{item.role}</p>}
-                {item.description && <p className="description">{item.description}</p>}
+                {item.description && (
+                  <p className="description">
+                    {item.description?.split('\n').map((line, idx) => (
+                      <span key={idx}>
+                        {line}
+                        <br />
+                      </span>
+                    ))}
+                  </p>
+                )}
                 {item.sdg && item.sdg.length > 0 && (
                   <div className="sdg-tags">
                     {item.sdg.map(goal => (
@@ -73,16 +115,28 @@ function LeadershipView({ leadership }) {
                     ))}
                   </div>
                 )}
-                {item.tags && item.tags.length > 0 && (
-                  <div className="tags">
-                    {item.tags.map(tag => (
-                      <span key={tag} className="tag">{tag}</span>
-                    ))}
+                {(featuredTags.length > 0 || remainingTags.length > 0) && (
+                  <div className="tags-section">
+                    {featuredTags.length > 0 && (
+                      <div className="tags featured-tags">
+                        {featuredTags.map((tag, idx) => (
+                          <span key={idx} className="tag featured">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                    {remainingTags.length > 0 && (
+                      <div className="tags">
+                        {remainingTags.map((tag, idx) => (
+                          <span key={idx} className="tag">{tag}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
-          ))
+            )
+          })
         )}
       </div>
     </section>
