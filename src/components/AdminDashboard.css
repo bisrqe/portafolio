@@ -540,6 +540,25 @@
   text-align: center;
 }
 
+.btn-reset-zoom {
+  background: rgba(222, 193, 255, 0.15);
+  color: #DEC1FF;
+  border: 1px solid rgba(222, 193, 255, 0.3);
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-reset-zoom:hover {
+  background: rgba(222, 193, 255, 0.25);
+  border-color: rgba(222, 193, 255, 0.5);
+  transform: scale(1.05);
+}
+
 /* Empty State */
 .empty-admin-state {
   text-align: center;

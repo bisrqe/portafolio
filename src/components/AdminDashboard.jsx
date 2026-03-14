@@ -3,19 +3,21 @@ import CloudinaryUpload from './CloudinaryUpload'
 import AdminAuth from './AdminAuth'
 import './AdminDashboard.css'
 
-function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onExit }) {
+function AdminDashboard({ projects, photos, leadership, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership, onExit }) {
   const [activeTab, setActiveTab] = useState('projects')
   const [isAdmin, setIsAdmin] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingProject, setEditingProject] = useState(null)
   const [editingPhoto, setEditingPhoto] = useState(null)
+  const [editingLeadership, setEditingLeadership] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [projectForm, setProjectForm] = useState({
     title: '',
     description: '',
     link: '',
-    image: ''
+    image: '',
+    tags: []
   })
   const [photoForm, setPhotoForm] = useState({
     title: '',
@@ -25,7 +27,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     label: '',
     positionX: 0,
     positionY: 0,
-    zoom: 1
+    zoom: 1,
+    tags: []
+  })
+  const [leadershipForm, setLeadershipForm] = useState({
+    title: '',
+    role: '',
+    description: '',
+    image: '',
+    tags: []
   })
 
   // Check if user is already logged in
@@ -58,7 +68,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
         // Add new project
         onAddProject(projectForm)
       }
-      setProjectForm({ title: '', description: '', link: '', image: '' })
+      setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
       setShowForm(false)
     }
   }
@@ -69,14 +79,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
       title: project.title,
       description: project.description,
       link: project.link,
-      image: project.image
+      image: project.image,
+      tags: project.tags || []
     })
     setShowForm(true)
   }
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', image: '' })
+    setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
     setShowForm(false)
   }
 
@@ -109,7 +120,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
         // Add new photo
         onAddPhoto(photoForm)
       }
-      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1 })
+      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1, tags: [] })
       setShowForm(false)
     }
   }
@@ -124,14 +135,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
       label: photo.label || '',
       positionX: photo.positionX || 0,
       positionY: photo.positionY || 0,
-      zoom: photo.zoom || 1
+      zoom: photo.zoom || 1,
+      tags: photo.tags || []
     })
     setShowForm(true)
   }
 
   const handleCancelPhotoEdit = () => {
     setEditingPhoto(null)
-    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1 })
+    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1, tags: [] })
     setShowForm(false)
   }
 
@@ -204,6 +216,76 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     }))
   }
 
+  const resetZoom = () => {
+    setPhotoForm(prev => ({
+      ...prev,
+      zoom: 1,
+      positionX: 0,
+      positionY: 0
+    }))
+  }
+
+  // Leadership handlers
+  const handleLeadershipInputChange = (e) => {
+    const { name, value } = e.target
+    setLeadershipForm(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleLeadershipTagsChange = (e) => {
+    const tagsString = e.target.value
+    const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
+    setLeadershipForm(prev => ({
+      ...prev,
+      tags
+    }))
+  }
+
+  const handleLeadershipSubmit = (e) => {
+    e.preventDefault()
+    if (leadershipForm.title.trim() && leadershipForm.role.trim()) {
+      if (editingLeadership) {
+        // Update existing leadership item
+        if (onUpdateLeadership) {
+          onUpdateLeadership(editingLeadership.id, leadershipForm)
+        }
+        setEditingLeadership(null)
+      } else {
+        // Add new leadership item
+        onAddLeadership(leadershipForm)
+      }
+      setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
+      setShowForm(false)
+    }
+  }
+
+  const handleEditLeadership = (item) => {
+    setEditingLeadership(item)
+    setLeadershipForm({
+      title: item.title,
+      role: item.role,
+      description: item.description,
+      image: item.image,
+      tags: item.tags || []
+    })
+    setShowForm(true)
+  }
+
+  const handleCancelLeadershipEdit = () => {
+    setEditingLeadership(null)
+    setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
+    setShowForm(false)
+  }
+
+  const handleLeadershipUploadSuccess = (uploadData) => {
+    setLeadershipForm(prev => ({
+      ...prev,
+      image: uploadData.url
+    }))
+  }
+
   return (
     <>
       {!isAdmin && <AdminAuth onLoginSuccess={() => setIsAdmin(true)} onExit={onExit} />}
@@ -234,6 +316,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
               }}
             >
               📁 Projects ({projects.length})
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'leadership' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('leadership')
+                setShowForm(false)
+              }}
+            >
+              🎯 Leadership ({leadership.length})
             </button>
             <button
               className={`tab-button ${activeTab === 'photography' ? 'active' : ''}`}
@@ -502,6 +593,14 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                             >
                               +
                             </button>
+                            <button 
+                              type="button"
+                              className="btn-reset-zoom"
+                              onClick={resetZoom}
+                              title="Reset Zoom and Position"
+                            >
+                              ↺ Reset Zoom
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -549,6 +648,141 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                             }
                           }}
                           title="Delete photo"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Leadership Tab */}
+          {activeTab === 'leadership' && (
+            <div className="admin-content">
+              <div className="admin-header">
+                <h3>Leadership & Experience</h3>
+                <button 
+                  className="btn-add-admin"
+                  onClick={() => {
+                    if (editingLeadership) {
+                      handleCancelLeadershipEdit()
+                    } else {
+                      setShowForm(!showForm)
+                    }
+                  }}
+                >
+                  {editingLeadership ? '✕ Cancel Edit' : (showForm ? '✕ Cancel' : '+ Add Item')}
+                </button>
+              </div>
+
+              {showForm && (
+                <form className="admin-form" onSubmit={handleLeadershipSubmit}>
+                  <div className="form-group">
+                    <label>Name / Title *</label>
+                    <input
+                      type="text"
+                      name="title"
+                      placeholder="e.g., Jane Smith"
+                      value={leadershipForm.title}
+                      onChange={handleLeadershipInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Role / Position *</label>
+                    <input
+                      type="text"
+                      name="role"
+                      placeholder="e.g., CEO, VP of Engineering"
+                      value={leadershipForm.role}
+                      onChange={handleLeadershipInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea
+                      name="description"
+                      placeholder="Bio or description"
+                      value={leadershipForm.description}
+                      onChange={handleLeadershipInputChange}
+                      rows="4"
+                    ></textarea>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Image URL</label>
+                    <input
+                      type="url"
+                      name="image"
+                      placeholder="https://..."
+                      value={leadershipForm.image}
+                      onChange={handleLeadershipInputChange}
+                    />
+                    <div className="form-divider">or</div>
+                    <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Tags (comma-separated)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., mentor, advisor, speaker"
+                      value={leadershipForm.tags.join(', ')}
+                      onChange={handleLeadershipTagsChange}
+                    />
+                  </div>
+
+                  <button type="submit" className="btn-submit-admin">
+                    {editingLeadership ? 'Save Changes' : 'Save Leadership Item'}
+                  </button>
+                </form>
+              )}
+
+              <div className="admin-grid">
+                {leadership.length === 0 ? (
+                  <div className="empty-admin-state">
+                    <p>No leadership items yet. Add your first one!</p>
+                  </div>
+                ) : (
+                  leadership.map(item => (
+                    <div key={item.id} className="admin-item project-item">
+                      <div className="item-image">
+                        <img src={item.image || 'https://via.placeholder.com/200x150?text=Leadership'} alt={item.title} />
+                      </div>
+                      <div className="item-info">
+                        <h4>{item.title}</h4>
+                        <p className="truncate">{item.role}</p>
+                        <p className="truncate">{item.description}</p>
+                        {item.tags && item.tags.length > 0 && (
+                          <div className="item-tags">
+                            {item.tags.map((tag, idx) => (
+                              <span key={idx} className="tag">{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="item-actions">
+                        <button 
+                          className="btn-edit-admin"
+                          onClick={() => handleEditLeadership(item)}
+                          title="Edit item"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          className="btn-delete-admin"
+                          onClick={() => {
+                            if (confirm('Delete this leadership item?')) {
+                              onDeleteLeadership(item.id)
+                            }
+                          }}
+                          title="Delete item"
                         >
                           🗑️
                         </button>

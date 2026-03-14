@@ -1,36 +1,46 @@
 import './Navigation.css'
 
-function Navigation({ currentSection, setCurrentSection }) {
+function Navigation({ currentPath }) {
   return (
     <nav className="navbar">
       <div className="nav-container">
         <div className="nav-logo">
-          <h2>Portfolio</h2>
+          <a href="/" className="logo-link">
+            <h2>Portfolio</h2>
+          </a>
         </div>
         <ul className="nav-menu">
           <li className="nav-item">
-            <button 
-              className={`nav-link ${currentSection === 'home' ? 'active' : ''}`}
-              onClick={() => setCurrentSection('home')}
+            <a 
+              href="/" 
+              className={`nav-link ${currentPath === '/' ? 'active' : ''}`}
             >
               Home
-            </button>
+            </a>
           </li>
           <li className="nav-item">
-            <button 
-              className={`nav-link ${currentSection === 'projects-view' ? 'active' : ''}`}
-              onClick={() => setCurrentSection('projects-view')}
+            <a 
+              href="/personal-projects" 
+              className={`nav-link ${currentPath === '/personal-projects' ? 'active' : ''}`}
             >
               Projects
-            </button>
+            </a>
           </li>
           <li className="nav-item">
-            <button 
-              className={`nav-link ${currentSection === 'photography-view' ? 'active' : ''}`}
-              onClick={() => setCurrentSection('photography-view')}
+            <a 
+              href="/leadership" 
+              className={`nav-link ${currentPath === '/leadership' ? 'active' : ''}`}
+            >
+              Leadership
+            </a>
+          </li>
+          <li className="nav-item">
+            <a 
+              href="/photography-portfolio" 
+              className={`nav-link ${currentPath === '/photography-portfolio' ? 'active' : ''}`}
             >
               Photography
-            </button>
+            </a>
           </li>
         </ul>
       </div>

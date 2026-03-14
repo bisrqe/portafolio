@@ -4,6 +4,7 @@ import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc } from
 import Navigation from './components/Navigation'
 import ProjectsView from './components/ProjectsView'
 import PhotographyView from './components/PhotographyView'
+import LeadershipView from './components/LeadershipView'
 import AuthAdminPage from './components/AuthAdminPage'
 import './App.css'
 
@@ -11,6 +12,7 @@ function App() {
   const [currentSection, setCurrentSection] = useState('home')
   const [projects, setProjects] = useState([])
   const [photos, setPhotos] = useState([])
+  const [leadership, setLeadership] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [currentPath, setCurrentPath] = useState(window.location.pathname)
 
@@ -100,6 +102,36 @@ function App() {
       const saved = localStorage.getItem('portfolio_photos')
       if (saved) setPhotos(JSON.parse(saved))
       setIsLoading(false)
+    })
+
+    return unsubscribe
+  }, [])
+
+  // Load leadership from Firestore
+  useEffect(() => {
+    if (!db) {
+      console.error('Firebase not initialized. Using localStorage fallback.')
+      const saved = localStorage.getItem('portfolio_leadership')
+      if (saved) {
+        setLeadership(JSON.parse(saved))
+      }
+      return
+    }
+
+    const leadershipRef = collection(db, 'leadership')
+    const unsubscribe = onSnapshot(leadershipRef, (snapshot) => {
+      const leadershipList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      setLeadership(leadershipList)
+      // Also save to localStorage as backup
+      localStorage.setItem('portfolio_leadership', JSON.stringify(leadershipList))
+    }, (error) => {
+      console.error('Error loading leadership from Firebase:', error)
+      // Fallback to localStorage if Firebase fails
+      const saved = localStorage.getItem('portfolio_leadership')
+      if (saved) setLeadership(JSON.parse(saved))
     })
 
     return unsubscribe
@@ -245,6 +277,76 @@ function App() {
     }
   }
 
+  const addLeadership = async (item) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot add to cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Adding locally.')
+      const newItem = { ...item, id: Date.now().toString() }
+      const existing = localStorage.getItem('portfolio_leadership')
+      const items = existing ? JSON.parse(existing) : []
+      localStorage.setItem('portfolio_leadership', JSON.stringify([...items, newItem]))
+      setLeadership(prev => [...prev, newItem])
+      return
+    }
+
+    try {
+      const docRef = await addDoc(collection(db, 'leadership'), {
+        ...item,
+        createdAt: new Date()
+      })
+      setLeadership(prev => [...prev, { ...item, id: docRef.id }])
+    } catch (error) {
+      console.error('Error adding leadership item:', error)
+      alert('Failed to add leadership item.')
+    }
+  }
+
+  const deleteLeadership = async (id) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot delete from cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Deleting locally.')
+      const existing = localStorage.getItem('portfolio_leadership')
+      if (existing) {
+        const items = JSON.parse(existing).filter(item => item.id !== id)
+        localStorage.setItem('portfolio_leadership', JSON.stringify(items))
+      }
+      setLeadership(prev => prev.filter(item => item.id !== id))
+      return
+    }
+
+    try {
+      await deleteDoc(doc(db, 'leadership', id))
+      setLeadership(prev => prev.filter(item => item.id !== id))
+    } catch (error) {
+      console.error('Error deleting leadership item:', error)
+      alert('Failed to delete leadership item.')
+    }
+  }
+
+  const updateLeadership = async (id, item) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot update to cloud. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Updating locally.')
+      const existing = localStorage.getItem('portfolio_leadership')
+      if (existing) {
+        const items = JSON.parse(existing).map(i => i.id === id ? { ...item, id } : i)
+        localStorage.setItem('portfolio_leadership', JSON.stringify(items))
+      }
+      return
+    }
+
+    try {
+      const leadershipRef = doc(db, 'leadership', id)
+      await updateDoc(leadershipRef, {
+        ...item,
+        updatedAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error updating leadership item:', error)
+      alert('Failed to update leadership item.')
+    }
+  }
+
   if (isLoading) {
     return <div className="app"><div style={{ color: 'white', textAlign: 'center', paddingTop: '50px' }}>Loading...</div></div>
   }
@@ -256,12 +358,16 @@ function App() {
         <AuthAdminPage 
           projects={projects}
           photos={photos}
+          leadership={leadership}
           onAddProject={addProject}
           onDeleteProject={deleteProject}
           onAddPhoto={addPhoto}
           onDeletePhoto={deletePhoto}
           onUpdateProject={updateProject}
           onUpdatePhoto={updatePhoto}
+          onAddLeadership={addLeadership}
+          onDeleteLeadership={deleteLeadership}
+          onUpdateLeadership={updateLeadership}
         />
       </div>
     )
@@ -269,10 +375,10 @@ function App() {
 
   return (
     <div className="app">
-      <Navigation currentSection={currentSection} setCurrentSection={setCurrentSection} />
+      <Navigation currentPath={currentPath} />
       
       <main className="main-content">
-        {currentSection === 'home' && (
+        {currentPath === '/' && (
           <section className="hero">
             <div className="hero-content">
               <h1>Welcome 2 my Portfolio</h1>
@@ -282,13 +388,19 @@ function App() {
           </section>
         )}
 
-        {currentSection === 'projects-view' && (
+        {currentPath === '/personal-projects' && (
           <ProjectsView 
             projects={projects}
           />
         )}
 
-        {currentSection === 'photography-view' && (
+        {currentPath === '/leadership' && (
+          <LeadershipView 
+            leadership={leadership}
+          />
+        )}
+
+        {currentPath === '/photography-portfolio' && (
           <PhotographyView 
             photos={photos}
           />
