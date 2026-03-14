@@ -74,7 +74,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new project
         onAddProject(projectForm)
       }
-      setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
+      setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [], date: new Date().toISOString().split('T')[0] })
       setShowForm(false)
     }
   }
@@ -265,7 +265,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new leadership item
         onAddLeadership(leadershipForm)
       }
-      setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
+      setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [], date: new Date().toISOString().split('T')[0] })
       setShowForm(false)
     }
   }
@@ -407,7 +407,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Image URL</label>
+                    <label>Primary Image URL</label>
                     <input
                       type="url"
                       name="image"
@@ -418,6 +418,31 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
+
+                  {projectForm.images && projectForm.images.length > 0 && (
+                    <div className="form-group">
+                      <label>Additional Images ({projectForm.images.length})</label>
+                      <div className="images-list">
+                        {projectForm.images.map((imgUrl, idx) => (
+                          <div key={idx} className="image-item">
+                            <img src={imgUrl} alt={`Project image ${idx + 1}`} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProjectForm(prev => ({
+                                  ...prev,
+                                  images: prev.images.filter((_, i) => i !== idx)
+                                }))
+                              }}
+                              className="btn-remove-image"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label>Tags (comma-separated)</label>
@@ -779,6 +804,31 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
+
+                  {leadershipForm.images && leadershipForm.images.length > 0 && (
+                    <div className="form-group">
+                      <label>Additional Images ({leadershipForm.images.length})</label>
+                      <div className="images-list">
+                        {leadershipForm.images.map((imgUrl, idx) => (
+                          <div key={idx} className="image-item">
+                            <img src={imgUrl} alt={`Leadership image ${idx + 1}`} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLeadershipForm(prev => ({
+                                  ...prev,
+                                  images: prev.images.filter((_, i) => i !== idx)
+                                }))
+                              }}
+                              className="btn-remove-image"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label>Link</label>
