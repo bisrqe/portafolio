@@ -3,18 +3,24 @@ import './ProjectsView.css'
 
 function ProjectsView({ projects }) {
   const [activeTag, setActiveTag] = useState(null)
-  const visibleTags = ['Simulation', 'Professional Experience', 'Student Groups', 'Personal Projects', 'Hackathons', 'Other']
+  const visibleTags = ['Simulation', 'Professional Experience', 'Student Groups', 'Personal Projects', 'Hackathons']
 
   // Extract unique tags from all projects
   const allTags = useMemo(() => {
-    const tags = new Set()
-    projects.forEach(project => {
-      if (project.tags && Array.isArray(project.tags)) {
-        project.tags.forEach(tag => tags.add(tag))
-      }
+  const tags = new Set()
+
+  projects.forEach(project => {
+    if (project.tags && Array.isArray(project.tags)) {
+    project.tags.forEach(tag => {
+        if (!visibleTags || visibleTags.includes(tag)) {
+        tags.add(tag)
+        }
     })
+    }
+    })
+
     return Array.from(tags).sort()
-  }, [projects])
+    }, [projects])
 
   // Filter projects by selected tag
   const filteredProjects = useMemo(() => {
