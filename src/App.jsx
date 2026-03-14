@@ -352,7 +352,7 @@ function App() {
   }
 
   // Check if we're on the admin auth page
-  if (currentPath === '/auth/admin') {
+  if (currentPath === '/admin') {
     return (
       <div className="app">
         <AuthAdminPage 
