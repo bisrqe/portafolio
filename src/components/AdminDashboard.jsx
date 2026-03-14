@@ -17,7 +17,9 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     description: '',
     link: '',
     image: '',
-    tags: []
+    images: [],
+    tags: [],
+    date: new Date().toISOString().split('T')[0]
   })
   const [photoForm, setPhotoForm] = useState({
     title: '',
@@ -35,9 +37,11 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     role: '',
     description: '',
     image: '',
+    images: [],
     link: '',
     tags: [],
-    sdg: []
+    sdg: [],
+    date: new Date().toISOString().split('T')[0]
   })
 
   // Check if user is already logged in
@@ -81,22 +85,25 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       title: project.title,
       description: project.description,
       link: project.link,
-      image: project.image,
-      tags: project.tags || []
+      image: project.image || (Array.isArray(project.images) && project.images.length > 0 ? project.images[0] : ''),
+      images: Array.isArray(project.images) ? project.images : [],
+      tags: project.tags || [],
+      date: project.date || new Date().toISOString().split('T')[0]
     })
     setShowForm(true)
   }
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
+    setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [], date: new Date().toISOString().split('T')[0] })
     setShowForm(false)
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
     setProjectForm(prev => ({
       ...prev,
-      image: uploadData.url
+      image: uploadData.url,
+      images: [...(prev.images || []), uploadData.url]
     }))
   }
 
@@ -270,23 +277,26 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       role: item.role,
       description: item.description,
       image: item.image,
+      images: Array.isArray(item.images) ? item.images : [],
       link: item.link || '',
       tags: item.tags || [],
-      sdg: item.sdg || []
+      sdg: item.sdg || [],
+      date: item.date || new Date().toISOString().split('T')[0]
     })
     setShowForm(true)
   }
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [] })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [], date: new Date().toISOString().split('T')[0] })
     setShowForm(false)
   }
 
   const handleLeadershipUploadSuccess = (uploadData) => {
     setLeadershipForm(prev => ({
       ...prev,
-      image: uploadData.url
+      image: uploadData.url,
+      images: [...(prev.images || []), uploadData.url]
     }))
   }
 
@@ -420,6 +430,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                         const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
                         setProjectForm(prev => ({ ...prev, tags }))
                       }}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Date</label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={projectForm.date}
+                      onChange={handleProjectInputChange}
                     />
                   </div>
 
@@ -792,6 +812,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                         const sdgs = sdgString.split(',').map(goal => goal.trim()).filter(goal => goal)
                         setLeadershipForm(prev => ({ ...prev, sdg: sdgs }))
                       }}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Date</label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={leadershipForm.date}
+                      onChange={handleLeadershipInputChange}
                     />
                   </div>
 
