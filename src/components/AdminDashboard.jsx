@@ -405,6 +405,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
+                  <div className="form-group">
+                    <label>Tags (comma-separated)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., React, Web Development, Full-stack"
+                      value={projectForm.tags.join(', ')}
+                      onChange={(e) => {
+                        const tagsString = e.target.value
+                        const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
+                        setProjectForm(prev => ({ ...prev, tags }))
+                      }}
+                    />
+                  </div>
+
                   <button type="submit" className="btn-submit-admin">
                     {editingProject ? 'Save Changes' : 'Save Project'}
                   </button>
@@ -606,6 +620,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       </div>
                     </div>
                   )}
+
+                  <div className="form-group">
+                    <label>Tags (comma-separated)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., landscape, portrait, summer"
+                      value={photoForm.tags.join(', ')}
+                      onChange={(e) => {
+                        const tagsString = e.target.value
+                        const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
+                        setPhotoForm(prev => ({ ...prev, tags }))
+                      }}
+                    />
+                  </div>
 
                   <button type="submit" className="btn-submit-admin">
                     {editingPhoto ? 'Save Changes' : 'Save Work'}
