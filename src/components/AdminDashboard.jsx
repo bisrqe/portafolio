@@ -35,9 +35,10 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     role: '',
     description: '',
     image: '',
+    link: '',
     tags: [],
     sdg: []
-  })
+    })
 
   // Check if user is already logged in
   useEffect(() => {
@@ -257,20 +258,21 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new leadership item
         onAddLeadership(leadershipForm)
       }
-      setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
+      setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [] })
       setShowForm(false)
     }
   }
 
   const handleEditLeadership = (item) => {
     setEditingLeadership(item)
-    setLeadershipForm({
-      title: item.title,
-      role: item.role,
-      description: item.description,
-      image: item.image,
-      tags: item.tags || [],
-      sdg: item.sdg || []
+   setLeadershipForm({
+    title: item.title,
+    role: item.role,
+    description: item.description,
+    image: item.image,
+    link: item.link || '',
+    tags: item.tags || [],
+    sdg: item.sdg || []
     })
     setShowForm(true)
   }
@@ -304,7 +306,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
               onClick={handleExit}
               title="Logout admin access"
             >
-              🔓 Logout
+              Logout
             </button>
           </div>
 
@@ -335,7 +337,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                 setShowForm(false)
               }}
             >
-              📷 Photography ({photos.length})
+              Photography ({photos.length})
             </button>
           </div>
 
@@ -384,15 +386,15 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Project Link</label>
+                    <label>Project / Initiative Link</label>
                     <input
-                      type="url"
-                      name="link"
-                      placeholder="https://..."
-                      value={projectForm.link}
-                      onChange={handleProjectInputChange}
+                        type="url"
+                        name="link"
+                        placeholder="https://..."
+                        value={leadershipForm.link || ''}
+                        onChange={handleLeadershipInputChange}
                     />
-                  </div>
+                    </div>
 
                   <div className="form-group">
                     <label>Image URL</label>
@@ -744,6 +746,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       rows="4"
                     ></textarea>
                   </div>
+
+                 <div className="form-group">
+                    <input
+                    type="url"
+                    name="link"
+                    placeholder="Project Link (https://...)"
+                    value={formData.link}
+                    onChange={handleInputChange}
+                    />
+                </div>
 
                   <div className="form-group">
                     <label>Image URL</label>
