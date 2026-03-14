@@ -480,13 +480,64 @@
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  align-self: flex-start;
 }
 
 .btn-reset-position:hover {
   background: rgba(222, 193, 255, 0.25);
   border-color: rgba(222, 193, 255, 0.5);
   transform: scale(1.05);
+}
+
+.position-controls-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.btn-zoom {
+  background: rgba(222, 193, 255, 0.2);
+  color: #DEC1FF;
+  border: 1px solid rgba(222, 193, 255, 0.4);
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-zoom:hover:not(:disabled) {
+  background: rgba(222, 193, 255, 0.3);
+  border-color: rgba(222, 193, 255, 0.6);
+  transform: scale(1.1);
+}
+
+.btn-zoom:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoom-level {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-width: 35px;
+  text-align: center;
 }
 
 /* Empty State */

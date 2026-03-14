@@ -24,7 +24,7 @@ function PhotographyView({ photos }) {
   return (
     <section className="photography-view-section">
       <div className="view-header">
-        <h2>Photography & Videography</h2>
+        <h2>Timeless Photography</h2>
         <p>My artistic work stems from curiosity and the desire to express ideas and emotions through forms, colors, and compositions. I am interested in experimenting with different techniques and visual approaches to discover new ways of communicating and representing what I observe and feel, as well as what others feel. Each piece seeks to immortalize moments; hence the name: timeless photography.</p>
       </div>
 
@@ -57,7 +57,7 @@ function PhotographyView({ photos }) {
                   src={photo.image} 
                   alt={photo.title || 'Photography'}
                   style={{
-                    transform: `translate(${photo.positionX || 0}%, ${photo.positionY || 0}%)`
+                    transform: `translate(${photo.positionX || 0}%, ${photo.positionY || 0}%) scale(${photo.zoom || 1})`
                   }}
                 />
                 <div className="gallery-overlay">

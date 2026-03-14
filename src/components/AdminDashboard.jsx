@@ -24,7 +24,8 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
     category: 'photography',
     label: '',
     positionX: 0,
-    positionY: 0
+    positionY: 0,
+    zoom: 1
   })
 
   // Check if user is already logged in
@@ -108,7 +109,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
         // Add new photo
         onAddPhoto(photoForm)
       }
-      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0 })
+      setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1 })
       setShowForm(false)
     }
   }
@@ -122,14 +123,15 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
       category: photo.category,
       label: photo.label || '',
       positionX: photo.positionX || 0,
-      positionY: photo.positionY || 0
+      positionY: photo.positionY || 0,
+      zoom: photo.zoom || 1
     })
     setShowForm(true)
   }
 
   const handleCancelPhotoEdit = () => {
     setEditingPhoto(null)
-    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0 })
+    setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1 })
     setShowForm(false)
   }
 
@@ -159,11 +161,14 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
   const handlePreviewMouseMove = (e) => {
     if (!isDragging) return
 
+    const zoom = photoForm.zoom || 1
+    const maxShift = (zoom - 1) * 50
+
     const deltaX = (e.clientX - dragStart.x) * 0.15
     const deltaY = (e.clientY - dragStart.y) * 0.15
 
-    const newX = Math.max(-100, Math.min(100, (photoForm.positionX || 0) + deltaX))
-    const newY = Math.max(-100, Math.min(100, (photoForm.positionY || 0) + deltaY))
+    const newX = Math.max(-maxShift, Math.min(maxShift, (photoForm.positionX || 0) + deltaX))
+    const newY = Math.max(-maxShift, Math.min(maxShift, (photoForm.positionY || 0) + deltaY))
 
     setPhotoForm(prev => ({
       ...prev,
@@ -183,6 +188,19 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
       ...prev,
       positionX: 0,
       positionY: 0
+    }))
+  }
+
+  const handleZoom = (direction) => {
+    const currentZoom = photoForm.zoom || 1
+    const step = 0.1
+    const newZoom = direction === 'in' 
+      ? Math.min(3, currentZoom + step)
+      : Math.max(1, currentZoom - step)
+
+    setPhotoForm(prev => ({
+      ...prev,
+      zoom: Math.round(newZoom * 10) / 10
     }))
   }
 
@@ -446,7 +464,7 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                             alt="Preview" 
                             className="preview-image"
                             style={{
-                              transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%)`,
+                              transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%) scale(${photoForm.zoom || 1})`,
                               cursor: isDragging ? 'grabbing' : 'grab'
                             }}
                             draggable={false}
@@ -456,13 +474,36 @@ function AdminDashboard({ projects, photos, onAddProject, onDeleteProject, onAdd
                           </div>
                         </div>
                         <small>Drag the image to position it (X: {photoForm.positionX || 0}%, Y: {photoForm.positionY || 0}%)</small>
-                        <button 
-                          type="button"
-                          className="btn-reset-position"
-                          onClick={resetPosition}
-                        >
-                          ↺ Reset Position
-                        </button>
+                        <div className="position-controls-group">
+                          <button 
+                            type="button"
+                            className="btn-reset-position"
+                            onClick={resetPosition}
+                          >
+                            ↺ Reset Position
+                          </button>
+                          <div className="zoom-controls">
+                            <button 
+                              type="button"
+                              className="btn-zoom"
+                              onClick={() => handleZoom('out')}
+                              disabled={photoForm.zoom <= 1}
+                              title="Zoom Out"
+                            >
+                              −
+                            </button>
+                            <span className="zoom-level">{(photoForm.zoom || 1).toFixed(1)}×</span>
+                            <button 
+                              type="button"
+                              className="btn-zoom"
+                              onClick={() => handleZoom('in')}
+                              disabled={photoForm.zoom >= 3}
+                              title="Zoom In"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
