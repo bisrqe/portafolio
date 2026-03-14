@@ -43,10 +43,10 @@
 }
 
 .project-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
   transform: translateX(8px);
-  border-color: #DEC1FF;
-  box-shadow: 0 20px 40px rgba(83, 162, 190, 0.3);
-  background: rgba(222, 193, 255, 0.05);
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .project-image {
