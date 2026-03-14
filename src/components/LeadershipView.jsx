@@ -71,23 +71,40 @@ function LeadershipView({ leadership }) {
               )}
               <div className="leadership-content">
                 <h3>{item.title || 'Untitled'}</h3>
+
                 {item.role && <p className="role">{item.role}</p>}
-                {item.description && <p className="description">{item.description}</p>}
+
+                {item.description && (
+                    <p className="description">{item.description}</p>
+                )}
+
+                {item.link && (
+                    <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-link"
+                    >
+                    View Project
+                    </a>
+                )}
+
                 {item.sdg && item.sdg.length > 0 && (
-                  <div className="sdg-tags">
+                    <div className="sdg-tags">
                     {item.sdg.map(goal => (
-                      <span key={goal} className="sdg-tag">{goal}</span>
+                        <span key={goal} className="sdg-tag">{goal}</span>
                     ))}
-                  </div>
+                    </div>
                 )}
+
                 {item.tags && item.tags.length > 0 && (
-                  <div className="tags">
+                    <div className="tags">
                     {item.tags.map(tag => (
-                      <span key={tag} className="tag">{tag}</span>
+                        <span key={tag} className="tag">{tag}</span>
                     ))}
-                  </div>
+                    </div>
                 )}
-              </div>
+                </div>
             </div>
           ))
         )}
