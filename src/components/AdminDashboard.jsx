@@ -403,7 +403,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Image URL</label>
+                    <label>Main Image & Carousel</label>
                     <input
                       type="url"
                       name="image"
@@ -411,13 +411,13 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       value={projectForm.image}
                       onChange={handleProjectInputChange}
                     />
-                    <div className="form-divider">or</div>
+                    <div className="form-divider">or upload additional images</div>
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
-                  {projectForm.images && projectForm.images.length > 0 && (
+                  {projectForm.images && projectForm.images.length > 0 ? (
                     <div className="form-group">
-                      <label>Project Images Carousel ({projectForm.images.length})</label>
+                      <label>📸 Project Images Carousel ({projectForm.images.length})</label>
                       <div className="images-preview">
                         {projectForm.images.map((img, idx) => (
                           <div key={idx} className="image-preview-item">
@@ -437,6 +437,10 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                           </div>
                         ))}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="form-group">
+                      <p className="form-hint">💡 Upload images above to create a carousel gallery for this project.</p>
                     </div>
                   )}
 
@@ -779,7 +783,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Image URL</label>
+                    <label>Main Image & Carousel</label>
                     <input
                       type="url"
                       name="image"
@@ -787,13 +791,13 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       value={leadershipForm.image}
                       onChange={handleLeadershipInputChange}
                     />
-                    <div className="form-divider">or</div>
+                    <div className="form-divider">or upload additional images</div>
                     <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
 
-                  {leadershipForm.images && leadershipForm.images.length > 0 && (
+                  {leadershipForm.images && leadershipForm.images.length > 0 ? (
                     <div className="form-group">
-                      <label>Leadership Images Carousel ({leadershipForm.images.length})</label>
+                      <label>📸 Leadership Images Carousel ({leadershipForm.images.length})</label>
                       <div className="images-preview">
                         {leadershipForm.images.map((img, idx) => (
                           <div key={idx} className="image-preview-item">
@@ -813,6 +817,10 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                           </div>
                         ))}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="form-group">
+                      <p className="form-hint">💡 Upload images above to create a carousel gallery for this item.</p>
                     </div>
                   )}
 
