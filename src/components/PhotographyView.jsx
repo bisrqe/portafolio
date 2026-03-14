@@ -3,6 +3,7 @@ import './PhotographyView.css'
 
 function PhotographyView({ photos }) {
   const [activeLabel, setActiveLabel] = useState(null)
+  const [activeTag, setActiveTag] = useState(null)
 
   // Group photos by label
   const photosByLabel = useMemo(() => {
@@ -17,9 +18,27 @@ function PhotographyView({ photos }) {
     return grouped
   }, [photos])
 
+  // Extract unique tags
+  const allTags = useMemo(() => {
+    const tags = new Set()
+    photos.forEach(photo => {
+      if (photo.tags && Array.isArray(photo.tags)) {
+        photo.tags.forEach(tag => tags.add(tag))
+      }
+    })
+    return Array.from(tags).sort()
+  }, [photos])
+
   const labels = Object.keys(photosByLabel).sort()
   const selectedLabel = activeLabel || (labels.length > 0 ? labels[0] : null)
-  const displayPhotos = selectedLabel ? photosByLabel[selectedLabel] : []
+  let displayPhotos = selectedLabel ? photosByLabel[selectedLabel] : []
+
+  // Further filter by tag if selected
+  if (activeTag) {
+    displayPhotos = displayPhotos.filter(photo => 
+      photo.tags && photo.tags.includes(activeTag)
+    )
+  }
 
   return (
     <section className="photography-view-section">
@@ -35,9 +54,33 @@ function PhotographyView({ photos }) {
             <button
               key={label}
               className={`label-tab ${selectedLabel === label ? 'active' : ''}`}
-              onClick={() => setActiveLabel(label)}
+              onClick={() => {
+                setActiveLabel(label)
+                setActiveTag(null)
+              }}
             >
               {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Tag Filter */}
+      {allTags.length > 0 && (
+        <div className="tag-filter-container">
+          <button 
+            className={`tag-btn ${!activeTag ? 'active' : ''}`}
+            onClick={() => setActiveTag(null)}
+          >
+            All
+          </button>
+          {allTags.map(tag => (
+            <button 
+              key={tag}
+              className={`tag-btn ${activeTag === tag ? 'active' : ''}`}
+              onClick={() => setActiveTag(tag)}
+            >
+              {tag.charAt(0).toUpperCase() + tag.slice(1)}
             </button>
           ))}
         </div>
@@ -47,7 +90,7 @@ function PhotographyView({ photos }) {
       <div className="gallery-grid">
         {displayPhotos.length === 0 ? (
           <div className="empty-state">
-            <p>No photography in this category yet.</p>
+            <p>{activeTag ? `No photos found with tag "${activeTag}".` : 'No photography in this category yet.'}</p>
           </div>
         ) : (
           displayPhotos.map(photo => (
@@ -66,6 +109,13 @@ function PhotographyView({ photos }) {
                   <div className="overlay-tags">
                     {photo.category && <span className="category-tag">{photo.category}</span>}
                     {photo.label && <span className="label-tag">{photo.label}</span>}
+                    {photo.tags && photo.tags.length > 0 && (
+                      <div className="photo-tags">
+                        {photo.tags.map((tag, idx) => (
+                          <span key={idx} className="tag">{tag}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
