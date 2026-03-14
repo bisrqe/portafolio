@@ -97,11 +97,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
-    setProjectForm(prev => ({
-      ...prev,
-      image: uploadData.url,
-      images: [...(prev.images || []), uploadData.url]
-    }))
+    console.log('Upload success:', uploadData)
+    setProjectForm(prev => {
+      const updated = {
+        ...prev,
+        image: uploadData.url,
+        images: [...(prev.images || []), uploadData.url]
+      }
+      console.log('Updated projectForm:', updated)
+      return updated
+    })
   }
 
   // Photo handlers
@@ -289,11 +294,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
   }
 
   const handleLeadershipUploadSuccess = (uploadData) => {
-    setLeadershipForm(prev => ({
-      ...prev,
-      image: uploadData.url,
-      images: [...(prev.images || []), uploadData.url]
-    }))
+    console.log('Leadership upload success:', uploadData)
+    setLeadershipForm(prev => {
+      const updated = {
+        ...prev,
+        image: uploadData.url,
+        images: [...(prev.images || []), uploadData.url]
+      }
+      console.log('Updated leadershipForm:', updated)
+      return updated
+    })
   }
 
   return (
@@ -415,9 +425,9 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
-                  {projectForm.images && projectForm.images.length > 0 ? (
-                    <div className="form-group">
-                      <label>📸 Project Images Carousel ({projectForm.images.length})</label>
+                  <div className="form-group">
+                    <label>📸 Project Images Carousel{projectForm.images && projectForm.images.length > 0 && ` (${projectForm.images.length})`}</label>
+                    {projectForm.images && projectForm.images.length > 0 ? (
                       <div className="images-preview">
                         {projectForm.images.map((img, idx) => (
                           <div key={idx} className="image-preview-item">
@@ -437,12 +447,10 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                           </div>
                         ))}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="form-group">
-                      <p className="form-hint">💡 Upload images above to create a carousel gallery for this project.</p>
-                    </div>
-                  )}
+                    ) : (
+                      <p className="form-hint">📤 Upload images above to create a carousel gallery for this project.</p>
+                    )}
+                  </div>
 
                   <div className="form-group">
                     <label>Tags (comma-separated)</label>
@@ -795,9 +803,9 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
 
-                  {leadershipForm.images && leadershipForm.images.length > 0 ? (
-                    <div className="form-group">
-                      <label>📸 Leadership Images Carousel ({leadershipForm.images.length})</label>
+                  <div className="form-group">
+                    <label>📸 Leadership Images Carousel{leadershipForm.images && leadershipForm.images.length > 0 && ` (${leadershipForm.images.length})`}</label>
+                    {leadershipForm.images && leadershipForm.images.length > 0 ? (
                       <div className="images-preview">
                         {leadershipForm.images.map((img, idx) => (
                           <div key={idx} className="image-preview-item">
@@ -817,12 +825,10 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                           </div>
                         ))}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="form-group">
-                      <p className="form-hint">💡 Upload images above to create a carousel gallery for this item.</p>
-                    </div>
-                  )}
+                    ) : (
+                      <p className="form-hint">📤 Upload images above to create a carousel gallery for this item.</p>
+                    )}
+                  </div>
 
                   <div className="form-group">
                     <label>Link</label>
