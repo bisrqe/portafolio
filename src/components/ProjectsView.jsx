@@ -51,7 +51,7 @@ function ProjectsView({ projects }) {
         </div>
       )}
 
-      <div className="projects-grid">
+      <div className="projects-list">
         {filteredProjects.length === 0 ? (
           <div className="empty-state">
             <p>{activeTag ? `No projects found with tag "${activeTag}".` : 'No projects yet.'}</p>

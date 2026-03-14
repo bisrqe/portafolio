@@ -8,6 +8,18 @@
   padding: 40px 20px;
   max-width: 1200px;
   margin: 0 auto;
+  animation: pagefadeIn 0.5s ease-in-out;
+}
+
+@keyframes pagefadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Hero Section */

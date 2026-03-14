@@ -35,7 +35,8 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     role: '',
     description: '',
     image: '',
-    tags: []
+    tags: [],
+    sdg: []
   })
 
   // Check if user is already logged in
@@ -268,14 +269,15 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       role: item.role,
       description: item.description,
       image: item.image,
-      tags: item.tags || []
+      tags: item.tags || [],
+      sdg: item.sdg || []
     })
     setShowForm(true)
   }
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [], sdg: [] })
     setShowForm(false)
   }
 
@@ -766,6 +768,20 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     />
                   </div>
 
+                  <div className="form-group">
+                    <label>Sustainable Development Goals (SDGs) - Optional</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., SDG 4 - Quality Education, SDG 10 - Reduced Inequalities"
+                      value={leadershipForm.sdg.join(', ')}
+                      onChange={(e) => {
+                        const sdgString = e.target.value
+                        const sdgs = sdgString.split(',').map(goal => goal.trim()).filter(goal => goal)
+                        setLeadershipForm(prev => ({ ...prev, sdg: sdgs }))
+                      }}
+                    />
+                  </div>
+
                   <button type="submit" className="btn-submit-admin">
                     {editingLeadership ? 'Save Changes' : 'Save Leadership Item'}
                   </button>
@@ -787,6 +803,13 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                         <h4>{item.title}</h4>
                         <p className="truncate">{item.role}</p>
                         <p className="truncate">{item.description}</p>
+                        {item.sdg && item.sdg.length > 0 && (
+                          <div className="item-tags">
+                            {item.sdg.map((goal, idx) => (
+                              <span key={idx} className="sdg-tag">{goal}</span>
+                            ))}
+                          </div>
+                        )}
                         {item.tags && item.tags.length > 0 && (
                           <div className="item-tags">
                             {item.tags.map((tag, idx) => (

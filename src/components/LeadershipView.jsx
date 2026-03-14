@@ -48,8 +48,8 @@ function LeadershipView({ leadership }) {
         </div>
       )}
 
-      {/* Leadership Grid */}
-      <div className="leadership-grid">
+      {/* Leadership List */}
+      <div className="leadership-list">
         {filteredLeadership.length === 0 ? (
           <div className="empty-state">
             <p>No leadership items in this category yet.</p>
@@ -66,6 +66,13 @@ function LeadershipView({ leadership }) {
                 <h3>{item.title || 'Untitled'}</h3>
                 {item.role && <p className="role">{item.role}</p>}
                 {item.description && <p className="description">{item.description}</p>}
+                {item.sdg && item.sdg.length > 0 && (
+                  <div className="sdg-tags">
+                    {item.sdg.map(goal => (
+                      <span key={goal} className="sdg-tag">{goal}</span>
+                    ))}
+                  </div>
+                )}
                 {item.tags && item.tags.length > 0 && (
                   <div className="tags">
                     {item.tags.map(tag => (
