@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-function CloudinaryUpload({ onUploadSuccess }) {
+function CloudinaryUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', buttonLabel = '📸 Upload Image' }) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -23,6 +23,11 @@ function CloudinaryUpload({ onUploadSuccess }) {
     formData.append('file', file)
     formData.append('upload_preset', uploadPreset)
     formData.append('folder', 'portfolio')
+    
+    // For PDFs, use a specific resource type
+    if (file.type === 'application/pdf') {
+      formData.append('resource_type', 'raw')
+    }
 
     try {
       const response = await fetch(
@@ -72,7 +77,7 @@ function CloudinaryUpload({ onUploadSuccess }) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*,video/*"
+        accept={acceptFiles}
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
@@ -81,9 +86,9 @@ function CloudinaryUpload({ onUploadSuccess }) {
         className="btn-upload-image"
         onClick={handleClick}
         disabled={isUploading}
-        title={isUploading ? 'Uploading...' : 'Click to upload'}
+        title={isUploading ? 'Uploading...' : `Click to upload`}
       >
-        📸 {isUploading ? 'Uploading...' : 'Upload Image'}
+        {isUploading ? '⏳ Uploading...' : buttonLabel}
       </button>
     </>
   )

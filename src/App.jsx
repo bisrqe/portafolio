@@ -436,6 +436,7 @@ function App() {
 
   const updateCvUrl = async (url) => {
     if (!db) {
+      console.log('Firebase not initialized. Saving CV URL to localStorage only.')
       localStorage.setItem('portfolio_cvUrl', url)
       setCvUrl(url)
       return
@@ -443,13 +444,38 @@ function App() {
 
     try {
       const homeRef = doc(db, 'home', 'content')
-      await updateDoc(homeRef, {
-        cvUrl: url,
-        updatedAt: new Date()
-      })
+      try {
+        // Try to update existing document
+        await updateDoc(homeRef, {
+          cvUrl: url,
+          updatedAt: new Date()
+        })
+        console.log('CV URL updated in Firestore')
+      } catch (updateError) {
+        // If document doesn't exist, create it with CV URL
+        if (updateError.code === 'not-found') {
+          console.log('Home document not found, creating with CV URL')
+          await setDoc(homeRef, {
+            cvUrl: url,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+          console.log('Home document created with CV URL')
+        } else {
+          throw updateError
+        }
+      }
+      // Update local state after successful Firestore update
+      setCvUrl(url)
+      localStorage.setItem('portfolio_cvUrl', url)
     } catch (error) {
       console.error('Error updating CV URL:', error)
-      alert('Failed to update CV URL.')
+      console.error('Error code:', error.code)
+      console.error('Error message:', error.message)
+      // Still update local state and localStorage as fallback
+      localStorage.setItem('portfolio_cvUrl', url)
+      setCvUrl(url)
+      throw error
     }
   }
 

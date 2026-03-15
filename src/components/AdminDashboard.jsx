@@ -423,11 +423,16 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
     // The actual CV URL will be set via the handleCvUploadSuccess callback
   }
 
-  const handleCvUploadSuccess = (uploadData) => {
+  const handleCvUploadSuccess = async (uploadData) => {
     const url = uploadData.url || uploadData.secure_url
     setCurrentCvUrl(url)
-    onUpdateCvUrl(url)
-    alert('CV uploaded successfully!')
+    try {
+      await onUpdateCvUrl(url)
+      alert('✓ CV uploaded successfully!')
+    } catch (error) {
+      console.error('Error saving CV URL:', error)
+      alert(`CV file uploaded but failed to save: ${error.message}`)
+    }
   }
 
   const handleAddAchievement = () => {
@@ -601,10 +606,14 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
 
                 <div className="form-group">
                   <label>CV Upload (PDF)</label>
-                  <CloudinaryUpload onUploadSuccess={handleCvUploadSuccess} acceptFiles=".pdf" />
+                  <CloudinaryUpload 
+                    onUploadSuccess={handleCvUploadSuccess} 
+                    acceptFiles=".pdf,application/pdf"
+                    buttonLabel="📄 Upload CV (PDF)"
+                  />
                   {currentCvUrl && (
                     <div style={{ marginTop: '10px', color: '#DEC1FF' }}>
-                      <p>✓ CV uploaded: <a href={currentCvUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#DEC1FF', textDecoration: 'underline' }}>View CV</a></p>
+                      <p>✓ CV uploaded: <a href={currentCvUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#DEC1FF', textDecoration: 'underline' }}>Download CV</a></p>
                     </div>
                   )}
                 </div>
