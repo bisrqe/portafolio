@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { db } from './firebase'
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc } from 'firebase/firestore'
 import Navigation from './components/Navigation'
+import HomeView from './components/HomeView'
 import ProjectsView from './components/ProjectsView'
 import PhotographyView from './components/PhotographyView'
 import LeadershipView from './components/LeadershipView'
@@ -13,6 +14,8 @@ function App() {
   const [projects, setProjects] = useState([])
   const [photos, setPhotos] = useState([])
   const [leadership, setLeadership] = useState([])
+  const [homeContent, setHomeContent] = useState({})
+  const [cvUrl, setCvUrl] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [currentPath, setCurrentPath] = useState(window.location.pathname)
 
@@ -23,6 +26,40 @@ function App() {
     }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  // Load home content from Firestore
+  useEffect(() => {
+    if (!db) {
+      const saved = localStorage.getItem('portfolio_homeContent')
+      if (saved) {
+        setHomeContent(JSON.parse(saved))
+      }
+      const savedCv = localStorage.getItem('portfolio_cvUrl')
+      if (savedCv) {
+        setCvUrl(savedCv)
+      }
+      return
+    }
+
+    const homeRef = doc(db, 'home', 'content')
+    const unsubscribe = onSnapshot(homeRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data()
+        setHomeContent(data)
+        setCvUrl(data.cvUrl || '')
+        localStorage.setItem('portfolio_homeContent', JSON.stringify(data))
+        localStorage.setItem('portfolio_cvUrl', data.cvUrl || '')
+      }
+    }, (error) => {
+      console.error('Error loading home content:', error)
+      const saved = localStorage.getItem('portfolio_homeContent')
+      if (saved) setHomeContent(JSON.parse(saved))
+      const savedCv = localStorage.getItem('portfolio_cvUrl')
+      if (savedCv) setCvUrl(savedCv)
+    })
+
+    return unsubscribe
   }, [])
 
   // Load projects from Firestore
@@ -347,6 +384,46 @@ function App() {
     }
   }
 
+  const updateHomeContent = async (content) => {
+    if (!db) {
+      console.error('Firebase not initialized. Cannot update. Using localStorage only.')
+      alert('⚠️ Cloud sync unavailable. Saving locally.')
+      localStorage.setItem('portfolio_homeContent', JSON.stringify(content))
+      setHomeContent(content)
+      return
+    }
+
+    try {
+      const homeRef = doc(db, 'home', 'content')
+      await updateDoc(homeRef, {
+        ...content,
+        updatedAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error updating home content:', error)
+      alert('Failed to update home content.')
+    }
+  }
+
+  const updateCvUrl = async (url) => {
+    if (!db) {
+      localStorage.setItem('portfolio_cvUrl', url)
+      setCvUrl(url)
+      return
+    }
+
+    try {
+      const homeRef = doc(db, 'home', 'content')
+      await updateDoc(homeRef, {
+        cvUrl: url,
+        updatedAt: new Date()
+      })
+    } catch (error) {
+      console.error('Error updating CV URL:', error)
+      alert('Failed to update CV URL.')
+    }
+  }
+
   if (isLoading) {
     return <div className="app"><div style={{ color: 'white', textAlign: 'center', paddingTop: '50px' }}>Loading...</div></div>
   }
@@ -359,6 +436,8 @@ function App() {
           projects={projects}
           photos={photos}
           leadership={leadership}
+          homeContent={homeContent}
+          cvUrl={cvUrl}
           onAddProject={addProject}
           onDeleteProject={deleteProject}
           onAddPhoto={addPhoto}
@@ -368,6 +447,8 @@ function App() {
           onAddLeadership={addLeadership}
           onDeleteLeadership={deleteLeadership}
           onUpdateLeadership={updateLeadership}
+          onUpdateHomeContent={updateHomeContent}
+          onUpdateCvUrl={updateCvUrl}
         />
       </div>
     )
@@ -379,13 +460,10 @@ function App() {
       
       <main className="main-content">
         {currentPath === '/' && (
-          <section className="hero">
-            <div className="hero-content">
-              <h1>Welcome 2 my Portfolio</h1>
-              <p>In this page, you will find a collection of the latest projects I've worked on; as well as a bit of my artistic side.</p>
-              
-            </div>
-          </section>
+          <HomeView 
+            homeContent={homeContent}
+            cvUrl={cvUrl}
+          />
         )}
 
         {currentPath === '/professional-projects' && (

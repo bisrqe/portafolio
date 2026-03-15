@@ -3,7 +3,7 @@ import CloudinaryUpload from './CloudinaryUpload'
 import AdminAuth from './AdminAuth'
 import './AdminDashboard.css'
 
-function AdminDashboard({ projects, photos, leadership, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership, onExit }) {
+function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership, onUpdateHomeContent, onUpdateCvUrl, onExit }) {
   const [activeTab, setActiveTab] = useState('projects')
   const [isAdmin, setIsAdmin] = useState(false)
   const [showForm, setShowForm] = useState(false)
@@ -49,6 +49,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     positionY: 0,
     zoom: 1
   })
+  const [homeForm, setHomeForm] = useState({
+    name: '',
+    tagline: '',
+    description: '',
+    fullBio: '',
+    heroImage: '',
+    achievements: [],
+    abilities: []
+  })
+  const [currentCvUrl, setCurrentCvUrl] = useState(cvUrl)
 
   // Check if user is already logged in
   useEffect(() => {
@@ -57,6 +67,21 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       setIsAdmin(true)
     }
   }, [])
+
+  useEffect(() => {
+    setCurrentCvUrl(cvUrl)
+    if (homeContent && Object.keys(homeContent).length > 0) {
+      setHomeForm({
+        name: homeContent.name || '',
+        tagline: homeContent.tagline || '',
+        description: homeContent.description || '',
+        fullBio: homeContent.fullBio || '',
+        heroImage: homeContent.heroImage || '',
+        achievements: homeContent.achievements || [],
+        abilities: homeContent.abilities || []
+      })
+    }
+  }, [homeContent, cvUrl])
 
   // Project handlers
   const handleProjectInputChange = (e) => {
@@ -360,6 +385,86 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     }))
   }
 
+  // Home handlers
+  const handleHomeInputChange = (e) => {
+    const { name, value } = e.target
+    setHomeForm(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleHomeHeroUploadSuccess = (uploadData) => {
+    setHomeForm(prev => ({
+      ...prev,
+      heroImage: uploadData.url
+    }))
+  }
+
+  const handleHomeSubmit = (e) => {
+    e.preventDefault()
+    if (homeForm.name.trim()) {
+      onUpdateHomeContent(homeForm)
+      alert('Home content updated successfully!')
+    }
+  }
+
+  const handleCvUpload = async (file) => {
+    if (!file) return
+    
+    // For now, we'll use a simple approach - upload to Cloudinary via CloudinaryUpload
+    // The actual CV URL will be set via the handleCvUploadSuccess callback
+  }
+
+  const handleCvUploadSuccess = (uploadData) => {
+    const url = uploadData.url || uploadData.secure_url
+    setCurrentCvUrl(url)
+    onUpdateCvUrl(url)
+    alert('CV uploaded successfully!')
+  }
+
+  const handleAddAchievement = () => {
+    setHomeForm(prev => ({
+      ...prev,
+      achievements: [...prev.achievements, { id: Date.now(), number: '', label: '' }]
+    }))
+  }
+
+  const handleUpdateAchievement = (id, field, value) => {
+    setHomeForm(prev => ({
+      ...prev,
+      achievements: prev.achievements.map(a => a.id === id ? { ...a, [field]: value } : a)
+    }))
+  }
+
+  const handleRemoveAchievement = (id) => {
+    setHomeForm(prev => ({
+      ...prev,
+      achievements: prev.achievements.filter(a => a.id !== id)
+    }))
+  }
+
+  const handleAddAbility = () => {
+    setHomeForm(prev => ({
+      ...prev,
+      abilities: [...prev.abilities, { id: Date.now(), icon: '', title: '', description: '', tags: [] }]
+    }))
+  }
+
+  const handleUpdateAbility = (id, field, value) => {
+    setHomeForm(prev => ({
+      ...prev,
+      abilities: prev.abilities.map(a => a.id === id ? { ...a, [field]: value } : a)
+    }))
+  }
+
+  const handleRemoveAbility = (id) => {
+    setHomeForm(prev => ({
+      ...prev,
+      abilities: prev.abilities.filter(a => a.id !== id)
+    }))
+  }
+
   return (
     <>
       {!isAdmin && <AdminAuth onLoginSuccess={() => setIsAdmin(true)} onExit={onExit} />}
@@ -382,6 +487,15 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
           {/* Tabs */}
           <div className="admin-tabs">
+            <button
+              className={`tab-button ${activeTab === 'home' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('home')
+                setShowForm(false)
+              }}
+            >
+              🏠 Home
+            </button>
             <button
               className={`tab-button ${activeTab === 'projects' ? 'active' : ''}`}
               onClick={() => {
@@ -410,6 +524,192 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
               Photography ({photos.length})
             </button>
           </div>
+
+          {/* Home Tab */}
+          {activeTab === 'home' && (
+            <div className="admin-content">
+              <div className="admin-header">
+                <h3>Home Page Management</h3>
+              </div>
+
+              <form className="admin-form" onSubmit={handleHomeSubmit}>
+                <div className="form-group">
+                  <label>Your Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="e.g., Hey, I'm Sanjay Adhithyan"
+                    value={homeForm.name}
+                    onChange={handleHomeInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Tagline *</label>
+                  <input
+                    type="text"
+                    name="tagline"
+                    placeholder="e.g., Product Designer"
+                    value={homeForm.tagline}
+                    onChange={handleHomeInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Short Description</label>
+                  <textarea
+                    name="description"
+                    placeholder="Brief introduction for the hero section"
+                    value={homeForm.description}
+                    onChange={handleHomeInputChange}
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <div className="form-group">
+                  <label>Full Bio</label>
+                  <textarea
+                    name="fullBio"
+                    placeholder="Longer biography for the about section"
+                    value={homeForm.fullBio}
+                    onChange={handleHomeInputChange}
+                    rows="4"
+                  ></textarea>
+                </div>
+
+                <div className="form-group">
+                  <label>Hero Image URL</label>
+                  <input
+                    type="url"
+                    name="heroImage"
+                    placeholder="https://..."
+                    value={homeForm.heroImage}
+                    onChange={handleHomeInputChange}
+                  />
+                  <div className="form-divider">or</div>
+                  <CloudinaryUpload onUploadSuccess={handleHomeHeroUploadSuccess} />
+                </div>
+
+                <div className="form-group">
+                  <label>CV Upload (PDF)</label>
+                  <CloudinaryUpload onUploadSuccess={handleCvUploadSuccess} acceptFiles=".pdf" />
+                  {currentCvUrl && (
+                    <div style={{ marginTop: '10px', color: '#DEC1FF' }}>
+                      <p>✓ CV uploaded: <a href={currentCvUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#DEC1FF', textDecoration: 'underline' }}>View CV</a></p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-section-divider">
+                  <h4>Achievements</h4>
+                </div>
+
+                {homeForm.achievements.map((achievement) => (
+                  <div key={achievement.id} className="form-group achievement-item">
+                    <div className="achievement-inputs">
+                      <input
+                        type="text"
+                        placeholder="Number (e.g., 30+)"
+                        value={achievement.number}
+                        onChange={(e) => handleUpdateAchievement(achievement.id, 'number', e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Label (e.g., Projects)"
+                        value={achievement.label}
+                        onChange={(e) => handleUpdateAchievement(achievement.id, 'label', e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="btn-remove-item"
+                        onClick={() => handleRemoveAchievement(achievement.id)}
+                        title="Remove achievement"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="form-group">
+                  <button
+                    type="button"
+                    className="btn-add-item"
+                    onClick={handleAddAchievement}
+                  >
+                    + Add Achievement
+                  </button>
+                </div>
+
+                <div className="form-section-divider">
+                  <h4>Skills & Abilities</h4>
+                </div>
+
+                {homeForm.abilities.map((ability) => (
+                  <div key={ability.id} className="form-group ability-item">
+                    <div className="ability-inputs">
+                      <input
+                        type="text"
+                        placeholder="Icon/Emoji (e.g., 🎨)"
+                        value={ability.icon}
+                        onChange={(e) => handleUpdateAbility(ability.id, 'icon', e.target.value)}
+                        maxLength="2"
+                        style={{ maxWidth: '60px' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Title (e.g., Web Design)"
+                        value={ability.title}
+                        onChange={(e) => handleUpdateAbility(ability.id, 'title', e.target.value)}
+                      />
+                    </div>
+                    <textarea
+                      placeholder="Description"
+                      value={ability.description}
+                      onChange={(e) => handleUpdateAbility(ability.id, 'description', e.target.value)}
+                      rows="2"
+                      style={{ marginTop: '10px' }}
+                    ></textarea>
+                    <input
+                      type="text"
+                      placeholder="Tags (comma-separated, e.g., React, UI, UX)"
+                      value={ability.tags.join(', ')}
+                      onChange={(e) => {
+                        const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t)
+                        handleUpdateAbility(ability.id, 'tags', tags)
+                      }}
+                      style={{ marginTop: '10px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn-remove-item"
+                      onClick={() => handleRemoveAbility(ability.id)}
+                      title="Remove ability"
+                      style={{ marginTop: '10px' }}
+                    >
+                      ✕ Remove Ability
+                    </button>
+                  </div>
+                ))}
+
+                <div className="form-group">
+                  <button
+                    type="button"
+                    className="btn-add-item"
+                    onClick={handleAddAbility}
+                  >
+                    + Add Ability
+                  </button>
+                </div>
+
+                <button type="submit" className="btn-submit-admin">
+                  Save Home Page
+                </button>
+              </form>
+            </div>
+          )}
 
           {/* Projects Tab */}
           {activeTab === 'projects' && (

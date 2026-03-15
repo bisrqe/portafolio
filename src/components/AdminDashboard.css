@@ -626,6 +626,111 @@
   overflow: hidden;
 }
 
+/* Form Section Dividers */
+.form-section-divider {
+  margin: 30px 0 20px 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(222, 193, 255, 0.2);
+}
+
+.form-section-divider h4 {
+  margin: 0;
+  color: #DEC1FF;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Achievement Item */
+.achievement-item .achievement-inputs {
+  display: grid;
+  grid-template-columns: 150px 1fr 40px;
+  gap: 10px;
+  align-items: center;
+}
+
+.achievement-item input {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(222, 193, 255, 0.3);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.achievement-item input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Ability Item */
+.ability-item {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(222, 193, 255, 0.2);
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.ability-inputs {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 10px;
+}
+
+.ability-item input,
+.ability-item textarea {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(222, 193, 255, 0.3);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.ability-item textarea {
+  font-family: inherit;
+}
+
+.ability-item input::placeholder,
+.ability-item textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Add/Remove Item Buttons */
+.btn-add-item,
+.btn-remove-item {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-add-item {
+  background: rgba(222, 193, 255, 0.2);
+  color: #DEC1FF;
+  border: 1px solid rgba(222, 193, 255, 0.4);
+}
+
+.btn-add-item:hover {
+  background: rgba(222, 193, 255, 0.3);
+  border-color: rgba(222, 193, 255, 0.6);
+}
+
+.btn-remove-item {
+  background: rgba(255, 67, 67, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 67, 67, 0.3);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+.btn-remove-item:hover {
+  background: rgba(255, 67, 67, 0.3);
+  border-color: rgba(255, 67, 67, 0.5);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .admin-dashboard-section {

@@ -3,7 +3,7 @@ import AdminAuth from './AdminAuth'
 import AdminDashboard from './AdminDashboard'
 import './AdminAuth.css'
 
-function AuthAdminPage({ projects, photos, leadership, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership }) {
+function AuthAdminPage({ projects, photos, leadership, homeContent, cvUrl, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership, onUpdateHomeContent, onUpdateCvUrl }) {
   const [isAdmin, setIsAdmin] = useState(false)
 
   // Check if user is already logged in
@@ -36,6 +36,8 @@ function AuthAdminPage({ projects, photos, leadership, onAddProject, onDeletePro
           projects={projects}
           photos={photos}
           leadership={leadership}
+          homeContent={homeContent}
+          cvUrl={cvUrl}
           onAddProject={onAddProject}
           onDeleteProject={onDeleteProject}
           onAddPhoto={onAddPhoto}
@@ -45,6 +47,8 @@ function AuthAdminPage({ projects, photos, leadership, onAddProject, onDeletePro
           onAddLeadership={onAddLeadership}
           onDeleteLeadership={onDeleteLeadership}
           onUpdateLeadership={onUpdateLeadership}
+          onUpdateHomeContent={onUpdateHomeContent}
+          onUpdateCvUrl={onUpdateCvUrl}
           onExit={handleExit}
         />
       )}
