@@ -13,6 +13,9 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [draggingForm, setDraggingForm] = useState(null) // 'project', 'leadership', or 'photo'
+  const [showProjectPositionControls, setShowProjectPositionControls] = useState(false)
+  const [showPhotoPositionControls, setShowPhotoPositionControls] = useState(false)
+  const [showLeadershipPositionControls, setShowLeadershipPositionControls] = useState(false)
   const [projectForm, setProjectForm] = useState({
     title: '',
     description: '',
@@ -79,6 +82,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       }
       setProjectForm({ title: '', description: '', link: '', image: '', tags: [], positionX: 0, positionY: 0, zoom: 1 })
       setShowForm(false)
+      setShowProjectPositionControls(false)
     }
   }
 
@@ -101,6 +105,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     setEditingProject(null)
     setProjectForm({ title: '', description: '', link: '', image: '', tags: [], positionX: 0, positionY: 0, zoom: 1 })
     setShowForm(false)
+    setShowProjectPositionControls(false)
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
@@ -134,6 +139,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       }
       setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1, tags: [] })
       setShowForm(false)
+      setShowPhotoPositionControls(false)
     }
   }
 
@@ -157,6 +163,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     setEditingPhoto(null)
     setPhotoForm({ title: '', description: '', image: '', category: 'photography', label: '', positionX: 0, positionY: 0, zoom: 1, tags: [] })
     setShowForm(false)
+    setShowPhotoPositionControls(false)
   }
 
   const handlePhotoUploadSuccess = (uploadData) => {
@@ -317,6 +324,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         onAddLeadership(leadershipForm)
       }
       setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [], positionX: 0, positionY: 0, zoom: 1 })
+      setShowLeadershipPositionControls(false)
       setShowForm(false)
     }
   }
@@ -341,6 +349,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
     setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [], positionX: 0, positionY: 0, zoom: 1 })
+    setShowLeadershipPositionControls(false)
     setShowForm(false)
   }
 
@@ -472,69 +481,81 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
                   {projectForm.image && (
                     <div className="form-group">
-                      <label>Image Position</label>
-                      <div className="position-preview">
-                        <div 
-                          className={`preview-container ${isDragging && draggingForm === 'project' ? 'dragging' : ''}`}
-                          onMouseDown={(e) => handlePreviewMouseDown(e, 'project')}
-                          onMouseMove={handlePreviewMouseMove}
-                          onMouseUp={handlePreviewMouseUp}
-                          onMouseLeave={handlePreviewMouseUp}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <label>Image Position</label>
+                        <button
+                          type="button"
+                          className="btn-toggle-position"
+                          onClick={() => setShowProjectPositionControls(!showProjectPositionControls)}
+                          title={showProjectPositionControls ? 'Hide position controls' : 'Show position controls'}
                         >
-                          <img 
-                            src={projectForm.image} 
-                            alt="Preview" 
-                            className="preview-image"
-                            style={{
-                              transform: `translate(${projectForm.positionX || 0}%, ${projectForm.positionY || 0}%) scale(${projectForm.zoom || 1})`,
-                              cursor: isDragging && draggingForm === 'project' ? 'grabbing' : 'grab'
-                            }}
-                            draggable={false}
-                          />
-                          <div className="position-overlay">
-                            X: {projectForm.positionX || 0}% | Y: {projectForm.positionY || 0}%
-                          </div>
-                        </div>
-                        <small>Drag the image to position it (X: {projectForm.positionX || 0}%, Y: {projectForm.positionY || 0}%)</small>
-                        <div className="position-controls-group">
-                          <button 
-                            type="button"
-                            className="btn-reset-position"
-                            onClick={() => resetPosition('project')}
-                          >
-                            ↺ Reset Position
-                          </button>
-                          <div className="zoom-controls">
-                            <button 
-                              type="button"
-                              className="btn-zoom"
-                              onClick={() => handleZoom('out', 'project')}
-                              disabled={projectForm.zoom <= 1}
-                              title="Zoom Out"
-                            >
-                              −
-                            </button>
-                            <span className="zoom-level">{(projectForm.zoom || 1).toFixed(1)}×</span>
-                            <button 
-                              type="button"
-                              className="btn-zoom"
-                              onClick={() => handleZoom('in', 'project')}
-                              disabled={projectForm.zoom >= 3}
-                              title="Zoom In"
-                            >
-                              +
-                            </button>
-                            <button 
-                              type="button"
-                              className="btn-reset-zoom"
-                              onClick={() => resetZoom('project')}
-                              title="Reset Zoom and Position"
-                            >
-                              ↺ Reset Zoom
-                            </button>
-                          </div>
-                        </div>
+                          {showProjectPositionControls ? '▼ Hide' : '▶ Show'}
+                        </button>
                       </div>
+                      {showProjectPositionControls && (
+                        <div className="position-preview">
+                          <div 
+                            className={`preview-container ${isDragging && draggingForm === 'project' ? 'dragging' : ''}`}
+                            onMouseDown={(e) => handlePreviewMouseDown(e, 'project')}
+                            onMouseMove={handlePreviewMouseMove}
+                            onMouseUp={handlePreviewMouseUp}
+                            onMouseLeave={handlePreviewMouseUp}
+                          >
+                            <img 
+                              src={projectForm.image} 
+                              alt="Preview" 
+                              className="preview-image"
+                              style={{
+                                transform: `translate(${projectForm.positionX || 0}%, ${projectForm.positionY || 0}%) scale(${projectForm.zoom || 1})`,
+                                cursor: isDragging && draggingForm === 'project' ? 'grabbing' : 'grab'
+                              }}
+                              draggable={false}
+                            />
+                            <div className="position-overlay">
+                              X: {projectForm.positionX || 0}% | Y: {projectForm.positionY || 0}%
+                            </div>
+                          </div>
+                          <small>Drag the image to position it (X: {projectForm.positionX || 0}%, Y: {projectForm.positionY || 0}%)</small>
+                          <div className="position-controls-group">
+                            <button 
+                              type="button"
+                              className="btn-reset-position"
+                              onClick={() => resetPosition('project')}
+                            >
+                              ↺ Reset Position
+                            </button>
+                            <div className="zoom-controls">
+                              <button 
+                                type="button"
+                                className="btn-zoom"
+                                onClick={() => handleZoom('out', 'project')}
+                                disabled={projectForm.zoom <= 1}
+                                title="Zoom Out"
+                              >
+                                −
+                              </button>
+                              <span className="zoom-level">{(projectForm.zoom || 1).toFixed(1)}×</span>
+                              <button 
+                                type="button"
+                                className="btn-zoom"
+                                onClick={() => handleZoom('in', 'project')}
+                                disabled={projectForm.zoom >= 3}
+                                title="Zoom In"
+                              >
+                                +
+                              </button>
+                              <button 
+                                type="button"
+                                className="btn-reset-zoom"
+                                onClick={() => resetZoom('project')}
+                                title="Reset Zoom and Position"
+                              >
+                                ↺ Reset Zoom
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -688,69 +709,81 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
                   {photoForm.image && (
                     <div className="form-group">
-                      <label>Image Position</label>
-                      <div className="position-preview">
-                        <div 
-                          className={`preview-container ${isDragging && draggingForm === 'photo' ? 'dragging' : ''}`}
-                          onMouseDown={(e) => handlePreviewMouseDown(e, 'photo')}
-                          onMouseMove={handlePreviewMouseMove}
-                          onMouseUp={handlePreviewMouseUp}
-                          onMouseLeave={handlePreviewMouseUp}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <label>Image Position</label>
+                        <button
+                          type="button"
+                          className="btn-toggle-position"
+                          onClick={() => setShowPhotoPositionControls(!showPhotoPositionControls)}
+                          title={showPhotoPositionControls ? 'Hide position controls' : 'Show position controls'}
                         >
-                          <img 
-                            src={photoForm.image} 
-                            alt="Preview" 
-                            className="preview-image"
-                            style={{
-                              transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%) scale(${photoForm.zoom || 1})`,
-                              cursor: isDragging ? 'grabbing' : 'grab'
-                            }}
-                            draggable={false}
-                          />
-                          <div className="position-overlay">
-                            X: {photoForm.positionX || 0}% | Y: {photoForm.positionY || 0}%
-                          </div>
-                        </div>
-                        <small>Drag the image to position it (X: {photoForm.positionX || 0}%, Y: {photoForm.positionY || 0}%)</small>
-                        <div className="position-controls-group">
-                          <button 
-                            type="button"
-                            className="btn-reset-position"
-                            onClick={() => resetPosition('photo')}
-                          >
-                            ↺ Reset Position
-                          </button>
-                          <div className="zoom-controls">
-                            <button 
-                              type="button"
-                              className="btn-zoom"
-                              onClick={() => handleZoom('out', 'photo')}
-                              disabled={photoForm.zoom <= 1}
-                              title="Zoom Out"
-                            >
-                              −
-                            </button>
-                            <span className="zoom-level">{(photoForm.zoom || 1).toFixed(1)}×</span>
-                            <button 
-                              type="button"
-                              className="btn-zoom"
-                              onClick={() => handleZoom('in', 'photo')}
-                              disabled={photoForm.zoom >= 3}
-                              title="Zoom In"
-                            >
-                              +
-                            </button>
-                            <button 
-                              type="button"
-                              className="btn-reset-zoom"
-                              onClick={() => resetZoom('photo')}
-                              title="Reset Zoom and Position"
-                            >
-                              ↺ Reset Zoom
-                            </button>
-                          </div>
-                        </div>
+                          {showPhotoPositionControls ? '▼ Hide' : '▶ Show'}
+                        </button>
                       </div>
+                      {showPhotoPositionControls && (
+                        <div className="position-preview">
+                          <div 
+                            className={`preview-container ${isDragging && draggingForm === 'photo' ? 'dragging' : ''}`}
+                            onMouseDown={(e) => handlePreviewMouseDown(e, 'photo')}
+                            onMouseMove={handlePreviewMouseMove}
+                            onMouseUp={handlePreviewMouseUp}
+                            onMouseLeave={handlePreviewMouseUp}
+                          >
+                            <img 
+                              src={photoForm.image} 
+                              alt="Preview" 
+                              className="preview-image"
+                              style={{
+                                transform: `translate(${photoForm.positionX || 0}%, ${photoForm.positionY || 0}%) scale(${photoForm.zoom || 1})`,
+                                cursor: isDragging && draggingForm === 'photo' ? 'grabbing' : 'grab'
+                              }}
+                              draggable={false}
+                            />
+                            <div className="position-overlay">
+                              X: {photoForm.positionX || 0}% | Y: {photoForm.positionY || 0}%
+                            </div>
+                          </div>
+                          <small>Drag the image to position it (X: {photoForm.positionX || 0}%, Y: {photoForm.positionY || 0}%)</small>
+                          <div className="position-controls-group">
+                            <button 
+                              type="button"
+                              className="btn-reset-position"
+                              onClick={() => resetPosition('photo')}
+                            >
+                              ↺ Reset Position
+                            </button>
+                            <div className="zoom-controls">
+                              <button 
+                                type="button"
+                                className="btn-zoom"
+                                onClick={() => handleZoom('out', 'photo')}
+                                disabled={photoForm.zoom <= 1}
+                                title="Zoom Out"
+                              >
+                                −
+                              </button>
+                              <span className="zoom-level">{(photoForm.zoom || 1).toFixed(1)}×</span>
+                              <button 
+                                type="button"
+                                className="btn-zoom"
+                                onClick={() => handleZoom('in', 'photo')}
+                                disabled={photoForm.zoom >= 3}
+                                title="Zoom In"
+                              >
+                                +
+                              </button>
+                              <button 
+                                type="button"
+                                className="btn-reset-zoom"
+                                onClick={() => resetZoom('photo')}
+                                title="Reset Zoom and Position"
+                              >
+                                ↺ Reset Zoom
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -891,69 +924,81 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
                   {leadershipForm.image && (
                     <div className="form-group">
-                      <label>Image Position</label>
-                      <div className="position-preview">
-                        <div 
-                          className={`preview-container ${isDragging && draggingForm === 'leadership' ? 'dragging' : ''}`}
-                          onMouseDown={(e) => handlePreviewMouseDown(e, 'leadership')}
-                          onMouseMove={handlePreviewMouseMove}
-                          onMouseUp={handlePreviewMouseUp}
-                          onMouseLeave={handlePreviewMouseUp}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <label>Image Position</label>
+                        <button
+                          type="button"
+                          className="btn-toggle-position"
+                          onClick={() => setShowLeadershipPositionControls(!showLeadershipPositionControls)}
+                          title={showLeadershipPositionControls ? 'Hide position controls' : 'Show position controls'}
                         >
-                          <img 
-                            src={leadershipForm.image} 
-                            alt="Preview" 
-                            className="preview-image"
-                            style={{
-                              transform: `translate(${leadershipForm.positionX || 0}%, ${leadershipForm.positionY || 0}%) scale(${leadershipForm.zoom || 1})`,
-                              cursor: isDragging && draggingForm === 'leadership' ? 'grabbing' : 'grab'
-                            }}
-                            draggable={false}
-                          />
-                          <div className="position-overlay">
-                            X: {leadershipForm.positionX || 0}% | Y: {leadershipForm.positionY || 0}%
-                          </div>
-                        </div>
-                        <small>Drag the image to position it (X: {leadershipForm.positionX || 0}%, Y: {leadershipForm.positionY || 0}%)</small>
-                        <div className="position-controls-group">
-                          <button 
-                            type="button"
-                            className="btn-reset-position"
-                            onClick={() => resetPosition('leadership')}
-                          >
-                            ↺ Reset Position
-                          </button>
-                          <div className="zoom-controls">
-                            <button 
-                              type="button"
-                              className="btn-zoom"
-                              onClick={() => handleZoom('out', 'leadership')}
-                              disabled={leadershipForm.zoom <= 1}
-                              title="Zoom Out"
-                            >
-                              −
-                            </button>
-                            <span className="zoom-level">{(leadershipForm.zoom || 1).toFixed(1)}×</span>
-                            <button 
-                              type="button"
-                              className="btn-zoom"
-                              onClick={() => handleZoom('in', 'leadership')}
-                              disabled={leadershipForm.zoom >= 3}
-                              title="Zoom In"
-                            >
-                              +
-                            </button>
-                            <button 
-                              type="button"
-                              className="btn-reset-zoom"
-                              onClick={() => resetZoom('leadership')}
-                              title="Reset Zoom and Position"
-                            >
-                              ↺ Reset Zoom
-                            </button>
-                          </div>
-                        </div>
+                          {showLeadershipPositionControls ? '▼ Hide' : '▶ Show'}
+                        </button>
                       </div>
+                      {showLeadershipPositionControls && (
+                        <div className="position-preview">
+                          <div 
+                            className={`preview-container ${isDragging && draggingForm === 'leadership' ? 'dragging' : ''}`}
+                            onMouseDown={(e) => handlePreviewMouseDown(e, 'leadership')}
+                            onMouseMove={handlePreviewMouseMove}
+                            onMouseUp={handlePreviewMouseUp}
+                            onMouseLeave={handlePreviewMouseUp}
+                          >
+                            <img 
+                              src={leadershipForm.image} 
+                              alt="Preview" 
+                              className="preview-image"
+                              style={{
+                                transform: `translate(${leadershipForm.positionX || 0}%, ${leadershipForm.positionY || 0}%) scale(${leadershipForm.zoom || 1})`,
+                                cursor: isDragging && draggingForm === 'leadership' ? 'grabbing' : 'grab'
+                              }}
+                              draggable={false}
+                            />
+                            <div className="position-overlay">
+                              X: {leadershipForm.positionX || 0}% | Y: {leadershipForm.positionY || 0}%
+                            </div>
+                          </div>
+                          <small>Drag the image to position it (X: {leadershipForm.positionX || 0}%, Y: {leadershipForm.positionY || 0}%)</small>
+                          <div className="position-controls-group">
+                            <button 
+                              type="button"
+                              className="btn-reset-position"
+                              onClick={() => resetPosition('leadership')}
+                            >
+                              ↺ Reset Position
+                            </button>
+                            <div className="zoom-controls">
+                              <button 
+                                type="button"
+                                className="btn-zoom"
+                                onClick={() => handleZoom('out', 'leadership')}
+                                disabled={leadershipForm.zoom <= 1}
+                                title="Zoom Out"
+                              >
+                                −
+                              </button>
+                              <span className="zoom-level">{(leadershipForm.zoom || 1).toFixed(1)}×</span>
+                              <button 
+                                type="button"
+                                className="btn-zoom"
+                                onClick={() => handleZoom('in', 'leadership')}
+                                disabled={leadershipForm.zoom >= 3}
+                                title="Zoom In"
+                              >
+                                +
+                              </button>
+                              <button 
+                                type="button"
+                                className="btn-reset-zoom"
+                                onClick={() => resetZoom('leadership')}
+                                title="Reset Zoom and Position"
+                              >
+                                ↺ Reset Zoom
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 

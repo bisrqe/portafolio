@@ -470,6 +470,25 @@
   text-align: center;
 }
 
+.btn-toggle-position {
+  background: rgba(222, 193, 255, 0.2);
+  color: #DEC1FF;
+  border: 1px solid rgba(222, 193, 255, 0.4);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-toggle-position:hover {
+  background: rgba(222, 193, 255, 0.3);
+  border-color: rgba(222, 193, 255, 0.6);
+  transform: scale(1.05);
+}
+
 .btn-reset-position {
   background: rgba(222, 193, 255, 0.15);
   color: #DEC1FF;
