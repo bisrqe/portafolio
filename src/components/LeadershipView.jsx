@@ -3,7 +3,6 @@ import './LeadershipView.css'
 
 function LeadershipView({ leadership }) {
   const [activeTag, setActiveTag] = useState(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState({})
   const visibleTags = ['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service']
   
   // Get all unique tags
@@ -66,55 +65,8 @@ function LeadershipView({ leadership }) {
           filteredLeadership.map(item => (
             <div key={item.id} className="leadership-card">
               {item.image && (
-                <div className="leadership-image-container">
-                  {(() => {
-                    const images = (item.images && Array.isArray(item.images) && item.images.length > 0) ? item.images : (item.image ? [item.image] : [])
-                    const currentIdx = currentImageIndex[item.id] || 0
-                    const currentImage = images[currentIdx]
-
-                    return (
-                      <>
-                        <div className="leadership-image">
-                          <img src={currentImage} alt={item.title || 'Leadership'} />
-                        </div>
-                        {images.length > 1 && (
-                          <>
-                            <button
-                              className="carousel-btn carousel-prev"
-                              onClick={() => setCurrentImageIndex(prev => ({
-                                ...prev,
-                                [item.id]: (currentIdx - 1 + images.length) % images.length
-                              }))}
-                            >
-                              ❮
-                            </button>
-                            <button
-                              className="carousel-btn carousel-next"
-                              onClick={() => setCurrentImageIndex(prev => ({
-                                ...prev,
-                                [item.id]: (currentIdx + 1) % images.length
-                              }))}
-                            >
-                              ❯
-                            </button>
-                            <div className="carousel-indicators">
-                              {images.map((_, idx) => (
-                                <button
-                                  key={idx}
-                                  className={`indicator ${idx === currentIdx ? 'active' : ''}`}
-                                  onClick={() => setCurrentImageIndex(prev => ({
-                                    ...prev,
-                                    [item.id]: idx
-                                  }))}
-                                  aria-label={`Image ${idx + 1}`}
-                                />
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </>
-                    )
-                  })()}
+                <div className="leadership-image">
+                  <img src={item.image} alt={item.title || 'Leadership'} />
                 </div>
               )}
               <div className="leadership-content">

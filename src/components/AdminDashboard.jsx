@@ -17,7 +17,6 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     description: '',
     link: '',
     image: '',
-    images: [],
     tags: []
   })
   const [photoForm, setPhotoForm] = useState({
@@ -36,7 +35,6 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     role: '',
     description: '',
     image: '',
-    images: [],
     link: '',
     tags: [],
     sdg: []
@@ -72,7 +70,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new project
         onAddProject(projectForm)
       }
-      setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [] })
+      setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
       setShowForm(false)
     }
   }
@@ -84,7 +82,6 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       description: project.description,
       link: project.link,
       image: project.image,
-      images: project.images || [],
       tags: project.tags || []
     })
     setShowForm(true)
@@ -92,21 +89,15 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [] })
+    setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
     setShowForm(false)
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
-    console.log('Upload success:', uploadData)
-    setProjectForm(prev => {
-      const updated = {
-        ...prev,
-        image: uploadData.url,
-        images: [...(prev.images || []), uploadData.url]
-      }
-      console.log('Updated projectForm:', updated)
-      return updated
-    })
+    setProjectForm(prev => ({
+      ...prev,
+      image: uploadData.url
+    }))
   }
 
   // Photo handlers
@@ -267,7 +258,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new leadership item
         onAddLeadership(leadershipForm)
       }
-      setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [] })
+      setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
       setShowForm(false)
     }
   }
@@ -279,7 +270,6 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       role: item.role,
       description: item.description,
       image: item.image,
-      images: item.images || [],
       link: item.link || '',
       tags: item.tags || [],
       sdg: item.sdg || []
@@ -289,21 +279,15 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [] })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [] })
     setShowForm(false)
   }
 
   const handleLeadershipUploadSuccess = (uploadData) => {
-    console.log('Leadership upload success:', uploadData)
-    setLeadershipForm(prev => {
-      const updated = {
-        ...prev,
-        image: uploadData.url,
-        images: [...(prev.images || []), uploadData.url]
-      }
-      console.log('Updated leadershipForm:', updated)
-      return updated
-    })
+    setLeadershipForm(prev => ({
+      ...prev,
+      image: uploadData.url
+    }))
   }
 
   return (
@@ -413,7 +397,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Main Image & Carousel</label>
+                    <label>Image URL</label>
                     <input
                       type="url"
                       name="image"
@@ -421,35 +405,8 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       value={projectForm.image}
                       onChange={handleProjectInputChange}
                     />
-                    <div className="form-divider">or upload additional images</div>
+                    <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
-                  </div>
-
-                  <div className="form-group">
-                    <label>📸 Project Images Carousel{projectForm.images && projectForm.images.length > 0 && ` (${projectForm.images.length})`}</label>
-                    {projectForm.images && projectForm.images.length > 0 ? (
-                      <div className="images-preview">
-                        {projectForm.images.map((img, idx) => (
-                          <div key={idx} className="image-preview-item">
-                            <img src={img} alt={`Project ${idx + 1}`} />
-                            <button
-                              type="button"
-                              className="btn-remove-image"
-                              onClick={() => {
-                                setProjectForm(prev => ({
-                                  ...prev,
-                                  images: prev.images.filter((_, i) => i !== idx)
-                                }))
-                              }}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="form-hint">📤 Upload images above to create a carousel gallery for this project.</p>
-                    )}
                   </div>
 
                   <div className="form-group">
@@ -791,7 +748,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                   </div>
 
                   <div className="form-group">
-                    <label>Main Image & Carousel</label>
+                    <label>Image URL</label>
                     <input
                       type="url"
                       name="image"
@@ -799,35 +756,8 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       value={leadershipForm.image}
                       onChange={handleLeadershipInputChange}
                     />
-                    <div className="form-divider">or upload additional images</div>
+                    <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
-                  </div>
-
-                  <div className="form-group">
-                    <label>📸 Leadership Images Carousel{leadershipForm.images && leadershipForm.images.length > 0 && ` (${leadershipForm.images.length})`}</label>
-                    {leadershipForm.images && leadershipForm.images.length > 0 ? (
-                      <div className="images-preview">
-                        {leadershipForm.images.map((img, idx) => (
-                          <div key={idx} className="image-preview-item">
-                            <img src={img} alt={`Leadership ${idx + 1}`} />
-                            <button
-                              type="button"
-                              className="btn-remove-image"
-                              onClick={() => {
-                                setLeadershipForm(prev => ({
-                                  ...prev,
-                                  images: prev.images.filter((_, i) => i !== idx)
-                                }))
-                              }}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="form-hint">📤 Upload images above to create a carousel gallery for this item.</p>
-                    )}
                   </div>
 
                   <div className="form-group">
