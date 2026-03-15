@@ -401,11 +401,18 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
     }))
   }
 
-  const handleHomeSubmit = (e) => {
+  const handleHomeSubmit = async (e) => {
     e.preventDefault()
     if (homeForm.name.trim()) {
-      onUpdateHomeContent(homeForm)
-      alert('Home content updated successfully!')
+      try {
+        await onUpdateHomeContent(homeForm)
+        alert('Home content updated successfully!')
+      } catch (error) {
+        console.error('Error submitting home form:', error)
+        alert('Failed to update home content. Please try again.')
+      }
+    } else {
+      alert('Please enter your name.')
     }
   }
 

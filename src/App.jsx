@@ -387,7 +387,6 @@ function App() {
   const updateHomeContent = async (content) => {
     if (!db) {
       console.error('Firebase not initialized. Cannot update. Using localStorage only.')
-      alert('⚠️ Cloud sync unavailable. Saving locally.')
       localStorage.setItem('portfolio_homeContent', JSON.stringify(content))
       setHomeContent(content)
       return
@@ -395,13 +394,31 @@ function App() {
 
     try {
       const homeRef = doc(db, 'home', 'content')
-      await updateDoc(homeRef, {
-        ...content,
-        updatedAt: new Date()
-      })
+      try {
+        // Try to update existing document
+        await updateDoc(homeRef, {
+          ...content,
+          updatedAt: new Date()
+        })
+      } catch (updateError) {
+        // If document doesn't exist, create it
+        if (updateError.code === 'not-found') {
+          await setDoc(homeRef, {
+            ...content,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+        } else {
+          throw updateError
+        }
+      }
+      // Update local state after successful Firestore update
+      setHomeContent(content)
     } catch (error) {
       console.error('Error updating home content:', error)
-      alert('Failed to update home content.')
+      localStorage.setItem('portfolio_homeContent', JSON.stringify(content))
+      setHomeContent(content)
+      throw error
     }
   }
 
