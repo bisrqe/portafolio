@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { db } from './firebase'
-import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc } from 'firebase/firestore'
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc, setDoc } from 'firebase/firestore'
 import Navigation from './components/Navigation'
 import HomeView from './components/HomeView'
 import ProjectsView from './components/ProjectsView'
@@ -400,14 +400,17 @@ function App() {
           ...content,
           updatedAt: new Date()
         })
+        console.log('Home content updated successfully')
       } catch (updateError) {
         // If document doesn't exist, create it
         if (updateError.code === 'not-found') {
+          console.log('Document not found, creating new document')
           await setDoc(homeRef, {
             ...content,
             createdAt: new Date(),
             updatedAt: new Date()
           })
+          console.log('Home content document created successfully')
         } else {
           throw updateError
         }
@@ -416,6 +419,9 @@ function App() {
       setHomeContent(content)
     } catch (error) {
       console.error('Error updating home content:', error)
+      console.error('Error code:', error.code)
+      console.error('Error message:', error.message)
+      // Still update local state and localStorage as fallback
       localStorage.setItem('portfolio_homeContent', JSON.stringify(content))
       setHomeContent(content)
       throw error

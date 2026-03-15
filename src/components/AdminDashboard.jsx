@@ -409,7 +409,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
         alert('Home content updated successfully!')
       } catch (error) {
         console.error('Error submitting home form:', error)
-        alert('Failed to update home content. Please try again.')
+        alert(`Failed to update home content: ${error.message || 'Unknown error. Check console for details.'}`)
       }
     } else {
       alert('Please enter your name.')
