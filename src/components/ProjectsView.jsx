@@ -67,7 +67,13 @@ function ProjectsView({ projects }) {
           filteredProjects.map(project => (
             <div key={project.id} className="project-card">
               <div className="project-image">
-                <img src={project.image || 'https://via.placeholder.com/300x200?text=Project'} alt={project.title} />
+                <img 
+                  src={project.image || 'https://via.placeholder.com/300x200?text=Project'} 
+                  alt={project.title}
+                  style={{
+                    transform: `translate(${project.positionX || 0}%, ${project.positionY || 0}%) scale(${project.zoom || 1})`
+                  }}
+                />
               </div>
               <div className="project-content">
                 <h3>{project.title}</h3>

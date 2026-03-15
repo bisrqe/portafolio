@@ -66,7 +66,13 @@ function LeadershipView({ leadership }) {
             <div key={item.id} className="leadership-card">
               {item.image && (
                 <div className="leadership-image">
-                  <img src={item.image} alt={item.title || 'Leadership'} />
+                  <img 
+                    src={item.image} 
+                    alt={item.title || 'Leadership'}
+                    style={{
+                      transform: `translate(${item.positionX || 0}%, ${item.positionY || 0}%) scale(${item.zoom || 1})`
+                    }}
+                  />
                 </div>
               )}
               <div className="leadership-content">

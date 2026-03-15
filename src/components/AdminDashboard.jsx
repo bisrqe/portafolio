@@ -12,12 +12,16 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
   const [editingLeadership, setEditingLeadership] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [draggingForm, setDraggingForm] = useState(null) // 'project', 'leadership', or 'photo'
   const [projectForm, setProjectForm] = useState({
     title: '',
     description: '',
     link: '',
     image: '',
-    tags: []
+    tags: [],
+    positionX: 0,
+    positionY: 0,
+    zoom: 1
   })
   const [photoForm, setPhotoForm] = useState({
     title: '',
@@ -37,7 +41,10 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     image: '',
     link: '',
     tags: [],
-    sdg: []
+    sdg: [],
+    positionX: 0,
+    positionY: 0,
+    zoom: 1
   })
 
   // Check if user is already logged in
@@ -70,7 +77,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new project
         onAddProject(projectForm)
       }
-      setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
+      setProjectForm({ title: '', description: '', link: '', image: '', tags: [], positionX: 0, positionY: 0, zoom: 1 })
       setShowForm(false)
     }
   }
@@ -82,14 +89,17 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       description: project.description,
       link: project.link,
       image: project.image,
-      tags: project.tags || []
+      tags: project.tags || [],
+      positionX: project.positionX || 0,
+      positionY: project.positionY || 0,
+      zoom: project.zoom || 1
     })
     setShowForm(true)
   }
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', image: '', tags: [] })
+    setProjectForm({ title: '', description: '', link: '', image: '', tags: [], positionX: 0, positionY: 0, zoom: 1 })
     setShowForm(false)
   }
 
@@ -167,24 +177,38 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
     }
   }
 
-  const handlePreviewMouseDown = (e) => {
+  const handlePreviewMouseDown = (e, formType = 'photo') => {
     setIsDragging(true)
+    setDraggingForm(formType)
     setDragStart({ x: e.clientX, y: e.clientY })
   }
 
   const handlePreviewMouseMove = (e) => {
     if (!isDragging) return
 
-    const zoom = photoForm.zoom || 1
-    const maxShift = (zoom - 1) * 50
+    let currentForm, setCurrentForm, maxShift
+    
+    if (draggingForm === 'project') {
+      currentForm = projectForm
+      setCurrentForm = setProjectForm
+    } else if (draggingForm === 'leadership') {
+      currentForm = leadershipForm
+      setCurrentForm = setLeadershipForm
+    } else {
+      currentForm = photoForm
+      setCurrentForm = setPhotoForm
+    }
+
+    const zoom = currentForm.zoom || 1
+    maxShift = (zoom - 1) * 50
 
     const deltaX = (e.clientX - dragStart.x) * 0.15
     const deltaY = (e.clientY - dragStart.y) * 0.15
 
-    const newX = Math.max(-maxShift, Math.min(maxShift, (photoForm.positionX || 0) + deltaX))
-    const newY = Math.max(-maxShift, Math.min(maxShift, (photoForm.positionY || 0) + deltaY))
+    const newX = Math.max(-maxShift, Math.min(maxShift, (currentForm.positionX || 0) + deltaX))
+    const newY = Math.max(-maxShift, Math.min(maxShift, (currentForm.positionY || 0) + deltaY))
 
-    setPhotoForm(prev => ({
+    setCurrentForm(prev => ({
       ...prev,
       positionX: Math.round(newX),
       positionY: Math.round(newY)
@@ -195,36 +219,70 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
 
   const handlePreviewMouseUp = () => {
     setIsDragging(false)
+    setDraggingForm(null)
   }
 
-  const resetPosition = () => {
-    setPhotoForm(prev => ({
-      ...prev,
-      positionX: 0,
-      positionY: 0
-    }))
+  const resetPosition = (formType = 'photo') => {
+    if (formType === 'project') {
+      setProjectForm(prev => ({
+        ...prev,
+        positionX: 0,
+        positionY: 0
+      }))
+    } else if (formType === 'leadership') {
+      setLeadershipForm(prev => ({
+        ...prev,
+        positionX: 0,
+        positionY: 0
+      }))
+    } else {
+      setPhotoForm(prev => ({
+        ...prev,
+        positionX: 0,
+        positionY: 0
+      }))
+    }
   }
 
-  const handleZoom = (direction) => {
-    const currentZoom = photoForm.zoom || 1
+  const handleZoom = (direction, formType = 'photo') => {
+    const currentForm = formType === 'project' ? projectForm : formType === 'leadership' ? leadershipForm : photoForm
+    const setCurrentForm = formType === 'project' ? setProjectForm : formType === 'leadership' ? setLeadershipForm : setPhotoForm
+    
+    const currentZoom = currentForm.zoom || 1
     const step = 0.1
     const newZoom = direction === 'in' 
       ? Math.min(3, currentZoom + step)
       : Math.max(1, currentZoom - step)
 
-    setPhotoForm(prev => ({
+    setCurrentForm(prev => ({
       ...prev,
       zoom: Math.round(newZoom * 10) / 10
     }))
   }
 
-  const resetZoom = () => {
-    setPhotoForm(prev => ({
-      ...prev,
-      zoom: 1,
-      positionX: 0,
-      positionY: 0
-    }))
+  const resetZoom = (formType = 'photo') => {
+    if (formType === 'project') {
+      setProjectForm(prev => ({
+        ...prev,
+        zoom: 1,
+        positionX: 0,
+        positionY: 0
+      }))
+    } else if (formType === 'leadership') {
+      setLeadershipForm(prev => ({
+        ...prev,
+        zoom: 1,
+        positionX: 0,
+        positionY: 0
+      }))
+    } else {
+      setPhotoForm(prev => ({
+        ...prev,
+        zoom: 1,
+        positionX: 0,
+        positionY: 0
+      }))
+    }
   }
 
   // Leadership handlers
@@ -258,7 +316,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
         // Add new leadership item
         onAddLeadership(leadershipForm)
       }
-      setLeadershipForm({ title: '', role: '', description: '', image: '', tags: [] })
+      setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [], positionX: 0, positionY: 0, zoom: 1 })
       setShowForm(false)
     }
   }
@@ -272,14 +330,17 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
       image: item.image,
       link: item.link || '',
       tags: item.tags || [],
-      sdg: item.sdg || []
+      sdg: item.sdg || [],
+      positionX: item.positionX || 0,
+      positionY: item.positionY || 0,
+      zoom: item.zoom || 1
     })
     setShowForm(true)
   }
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [] })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [], positionX: 0, positionY: 0, zoom: 1 })
     setShowForm(false)
   }
 
@@ -408,6 +469,74 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
+
+                  {projectForm.image && (
+                    <div className="form-group">
+                      <label>Image Position</label>
+                      <div className="position-preview">
+                        <div 
+                          className={`preview-container ${isDragging && draggingForm === 'project' ? 'dragging' : ''}`}
+                          onMouseDown={(e) => handlePreviewMouseDown(e, 'project')}
+                          onMouseMove={handlePreviewMouseMove}
+                          onMouseUp={handlePreviewMouseUp}
+                          onMouseLeave={handlePreviewMouseUp}
+                        >
+                          <img 
+                            src={projectForm.image} 
+                            alt="Preview" 
+                            className="preview-image"
+                            style={{
+                              transform: `translate(${projectForm.positionX || 0}%, ${projectForm.positionY || 0}%) scale(${projectForm.zoom || 1})`,
+                              cursor: isDragging && draggingForm === 'project' ? 'grabbing' : 'grab'
+                            }}
+                            draggable={false}
+                          />
+                          <div className="position-overlay">
+                            X: {projectForm.positionX || 0}% | Y: {projectForm.positionY || 0}%
+                          </div>
+                        </div>
+                        <small>Drag the image to position it (X: {projectForm.positionX || 0}%, Y: {projectForm.positionY || 0}%)</small>
+                        <div className="position-controls-group">
+                          <button 
+                            type="button"
+                            className="btn-reset-position"
+                            onClick={() => resetPosition('project')}
+                          >
+                            ↺ Reset Position
+                          </button>
+                          <div className="zoom-controls">
+                            <button 
+                              type="button"
+                              className="btn-zoom"
+                              onClick={() => handleZoom('out', 'project')}
+                              disabled={projectForm.zoom <= 1}
+                              title="Zoom Out"
+                            >
+                              −
+                            </button>
+                            <span className="zoom-level">{(projectForm.zoom || 1).toFixed(1)}×</span>
+                            <button 
+                              type="button"
+                              className="btn-zoom"
+                              onClick={() => handleZoom('in', 'project')}
+                              disabled={projectForm.zoom >= 3}
+                              title="Zoom In"
+                            >
+                              +
+                            </button>
+                            <button 
+                              type="button"
+                              className="btn-reset-zoom"
+                              onClick={() => resetZoom('project')}
+                              title="Reset Zoom and Position"
+                            >
+                              ↺ Reset Zoom
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label>Tags (comma-separated)</label>
@@ -562,8 +691,8 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                       <label>Image Position</label>
                       <div className="position-preview">
                         <div 
-                          className={`preview-container ${isDragging ? 'dragging' : ''}`}
-                          onMouseDown={handlePreviewMouseDown}
+                          className={`preview-container ${isDragging && draggingForm === 'photo' ? 'dragging' : ''}`}
+                          onMouseDown={(e) => handlePreviewMouseDown(e, 'photo')}
                           onMouseMove={handlePreviewMouseMove}
                           onMouseUp={handlePreviewMouseUp}
                           onMouseLeave={handlePreviewMouseUp}
@@ -587,7 +716,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                           <button 
                             type="button"
                             className="btn-reset-position"
-                            onClick={resetPosition}
+                            onClick={() => resetPosition('photo')}
                           >
                             ↺ Reset Position
                           </button>
@@ -595,7 +724,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                             <button 
                               type="button"
                               className="btn-zoom"
-                              onClick={() => handleZoom('out')}
+                              onClick={() => handleZoom('out', 'photo')}
                               disabled={photoForm.zoom <= 1}
                               title="Zoom Out"
                             >
@@ -605,7 +734,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                             <button 
                               type="button"
                               className="btn-zoom"
-                              onClick={() => handleZoom('in')}
+                              onClick={() => handleZoom('in', 'photo')}
                               disabled={photoForm.zoom >= 3}
                               title="Zoom In"
                             >
@@ -614,7 +743,7 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                             <button 
                               type="button"
                               className="btn-reset-zoom"
-                              onClick={resetZoom}
+                              onClick={() => resetZoom('photo')}
                               title="Reset Zoom and Position"
                             >
                               ↺ Reset Zoom
@@ -759,6 +888,74 @@ function AdminDashboard({ projects, photos, leadership, onAddProject, onDeletePr
                     <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
+
+                  {leadershipForm.image && (
+                    <div className="form-group">
+                      <label>Image Position</label>
+                      <div className="position-preview">
+                        <div 
+                          className={`preview-container ${isDragging && draggingForm === 'leadership' ? 'dragging' : ''}`}
+                          onMouseDown={(e) => handlePreviewMouseDown(e, 'leadership')}
+                          onMouseMove={handlePreviewMouseMove}
+                          onMouseUp={handlePreviewMouseUp}
+                          onMouseLeave={handlePreviewMouseUp}
+                        >
+                          <img 
+                            src={leadershipForm.image} 
+                            alt="Preview" 
+                            className="preview-image"
+                            style={{
+                              transform: `translate(${leadershipForm.positionX || 0}%, ${leadershipForm.positionY || 0}%) scale(${leadershipForm.zoom || 1})`,
+                              cursor: isDragging && draggingForm === 'leadership' ? 'grabbing' : 'grab'
+                            }}
+                            draggable={false}
+                          />
+                          <div className="position-overlay">
+                            X: {leadershipForm.positionX || 0}% | Y: {leadershipForm.positionY || 0}%
+                          </div>
+                        </div>
+                        <small>Drag the image to position it (X: {leadershipForm.positionX || 0}%, Y: {leadershipForm.positionY || 0}%)</small>
+                        <div className="position-controls-group">
+                          <button 
+                            type="button"
+                            className="btn-reset-position"
+                            onClick={() => resetPosition('leadership')}
+                          >
+                            ↺ Reset Position
+                          </button>
+                          <div className="zoom-controls">
+                            <button 
+                              type="button"
+                              className="btn-zoom"
+                              onClick={() => handleZoom('out', 'leadership')}
+                              disabled={leadershipForm.zoom <= 1}
+                              title="Zoom Out"
+                            >
+                              −
+                            </button>
+                            <span className="zoom-level">{(leadershipForm.zoom || 1).toFixed(1)}×</span>
+                            <button 
+                              type="button"
+                              className="btn-zoom"
+                              onClick={() => handleZoom('in', 'leadership')}
+                              disabled={leadershipForm.zoom >= 3}
+                              title="Zoom In"
+                            >
+                              +
+                            </button>
+                            <button 
+                              type="button"
+                              className="btn-reset-zoom"
+                              onClick={() => resetZoom('leadership')}
+                              title="Reset Zoom and Position"
+                            >
+                              ↺ Reset Zoom
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label>Link</label>

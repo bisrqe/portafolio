@@ -30,7 +30,7 @@ function AdminAuth({ onLoginSuccess, onExit }) {
     <div className="admin-auth-overlay">
       <div className="admin-auth-modal">
         <div className="auth-header">
-          <h2>🔐 Admin Access</h2>
+          <h2>Admin Access</h2>
           {onExit && (
             <button 
               className="btn-exit-auth" 
