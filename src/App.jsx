@@ -46,15 +46,21 @@ function App() {
     const unsubscribe = onSnapshot(homeRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data()
+        console.log('Home content loaded from Firestore:', data)
         setHomeContent(data)
         setCvUrl(data.cvUrl || '')
         localStorage.setItem('portfolio_homeContent', JSON.stringify(data))
         localStorage.setItem('portfolio_cvUrl', data.cvUrl || '')
+      } else {
+        console.log('Home content document does not exist')
       }
     }, (error) => {
       console.error('Error loading home content:', error)
       const saved = localStorage.getItem('portfolio_homeContent')
-      if (saved) setHomeContent(JSON.parse(saved))
+      if (saved) {
+        console.log('Loading home content from localStorage')
+        setHomeContent(JSON.parse(saved))
+      }
       const savedCv = localStorage.getItem('portfolio_cvUrl')
       if (savedCv) setCvUrl(savedCv)
     })

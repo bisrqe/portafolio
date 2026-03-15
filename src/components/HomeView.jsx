@@ -17,7 +17,12 @@ function HomeView({ homeContent, cvUrl }) {
     }
   }
 
-  const summary = homeContent?.summary || {}
+  const summary = {
+    name: homeContent?.name,
+    tagline: homeContent?.tagline,
+    description: homeContent?.description,
+    heroImage: homeContent?.heroImage
+  }
   const achievements = homeContent?.achievements || []
   const abilities = homeContent?.abilities || []
 
@@ -78,13 +83,13 @@ function HomeView({ homeContent, cvUrl }) {
       )}
 
       {/* Summary Section */}
-      {summary.fullBio && (
+      {homeContent?.fullBio && (
         <section className="summary-section">
           <div className="summary-container">
             <div className="summary-label">ABOUT</div>
             <h2>Who I Am</h2>
             <div className="summary-content">
-              <p>{summary.fullBio}</p>
+              <p>{homeContent.fullBio}</p>
             </div>
           </div>
         </section>
