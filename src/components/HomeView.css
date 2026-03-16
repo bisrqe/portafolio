@@ -1,6 +1,6 @@
 /* Hero Section */
 .hero-section {
-  padding: 100px 40px;
+  padding: 0;
   background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(40, 30, 60, 0.9) 100%);
   min-height: 100vh;
   display: flex;
@@ -8,6 +8,8 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
 }
 
 .hero-section::before {
@@ -42,6 +44,7 @@
   gap: 60px;
   align-items: center;
   z-index: 2;
+  padding: 100px 40px;
 }
 
 .hero-content {
@@ -135,14 +138,20 @@
 
 /* Stats Section */
 .stats-section {
-  padding: 80px 40px;
+  padding: 0;
   background: linear-gradient(135deg, rgba(30, 20, 50, 0.8) 0%, rgba(20, 20, 40, 0.8) 100%);
-  border-top: 1px solid rgba(222, 193, 255, 0.1);
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 .stats-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 80px 40px;
 }
 
 .section-label {
@@ -200,14 +209,20 @@
 
 /* Summary Section */
 .summary-section {
-  padding: 80px 40px;
+  padding: 0;
   background: linear-gradient(135deg, rgba(20, 20, 40, 0.8) 0%, rgba(30, 20, 50, 0.8) 100%);
-  border-top: 1px solid rgba(222, 193, 255, 0.1);
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 .summary-container {
   max-width: 900px;
   margin: 0 auto;
+  padding: 80px 40px;
 }
 
 .summary-section h2 {
@@ -233,14 +248,20 @@
 
 /* Abilities Section */
 .abilities-section {
-  padding: 80px 40px;
+  padding: 0;
   background: linear-gradient(135deg, rgba(30, 20, 50, 0.8) 0%, rgba(20, 20, 40, 0.8) 100%);
-  border-top: 1px solid rgba(222, 193, 255, 0.1);
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 .abilities-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 80px 40px;
 }
 
 .abilities-section h2 {
@@ -316,14 +337,21 @@
 
 /* CTA Section */
 .cta-section {
-  padding: 80px 40px;
+  padding: 0;
   background: linear-gradient(135deg, #DEC1FF 0%, #B8A5FF 100%);
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   text-align: center;
 }
 
 .cta-container {
   max-width: 800px;
   margin: 0 auto;
+  padding: 80px 40px;
 }
 
 .cta-section h2 {
@@ -363,11 +391,7 @@
   .hero-container {
     grid-template-columns: 1fr;
     gap: 40px;
-  }
-
-  .hero-section {
     padding: 60px 20px;
-    min-height: auto;
   }
 
   .hero-actions {
@@ -380,6 +404,13 @@
     text-align: center;
   }
 
+  .stats-container,
+  .summary-container,
+  .abilities-container,
+  .cta-container {
+    padding: 60px 20px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -390,11 +421,11 @@
 }
 
 @media (max-width: 480px) {
-  .hero-section,
-  .stats-section,
-  .summary-section,
-  .abilities-section,
-  .cta-section {
+  .hero-container,
+  .stats-container,
+  .summary-container,
+  .abilities-container,
+  .cta-container {
     padding: 40px 15px;
   }
 
