@@ -24,19 +24,17 @@ function CloudinaryUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', bu
     formData.append('upload_preset', uploadPreset)
     formData.append('folder', 'portfolio')
     
-    // For PDFs, use a specific resource type
+    // Determine the upload endpoint based on file type
+    let uploadEndpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
     if (file.type === 'application/pdf') {
-      formData.append('resource_type', 'raw')
+      uploadEndpoint = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`
     }
 
     try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-          method: 'POST',
-          body: formData
-        }
-      )
+      const response = await fetch(uploadEndpoint, {
+        method: 'POST',
+        body: formData
+      })
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.statusText}`)

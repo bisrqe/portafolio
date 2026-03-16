@@ -4,16 +4,32 @@ import './HomeView.css'
 function HomeView({ homeContent, cvUrl }) {
   const [cvLoading, setCvLoading] = useState(false)
 
-  const handleDownloadCV = () => {
+  const handleDownloadCV = async () => {
     if (cvUrl) {
-      setCvLoading(true)
-      const link = document.createElement('a')
-      link.href = cvUrl
-      link.download = 'Sanjay_Adhithyan_CV.pdf'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      setCvLoading(false)
+      try {
+        setCvLoading(true)
+        
+        // For Cloudinary raw files, we need to fetch and create a blob to download properly
+        const response = await fetch(cvUrl)
+        if (!response.ok) throw new Error('Failed to download CV')
+        
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'Sanjay_Adhithyan_CV.pdf'
+        document.body.appendChild(link)
+        link.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(link)
+      } catch (error) {
+        console.error('Error downloading CV:', error)
+        alert('Failed to download CV. Try opening it directly in a new tab.')
+        // Fallback: open in new tab
+        window.open(cvUrl, '_blank')
+      } finally {
+        setCvLoading(false)
+      }
     }
   }
 
