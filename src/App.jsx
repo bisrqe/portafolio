@@ -214,12 +214,14 @@ function App() {
       if (existing) {
         const projects = JSON.parse(existing).filter(p => p.id !== id)
         localStorage.setItem('portfolio_projects', JSON.stringify(projects))
+        setProjects(projects)
       }
       return
     }
 
     try {
       await deleteDoc(doc(db, 'projects', id))
+      setProjects(prev => prev.filter(p => p.id !== id))
     } catch (error) {
       console.error('Error deleting project:', error)
       alert('Failed to delete project.')
@@ -260,12 +262,14 @@ function App() {
       if (existing) {
         const photos = JSON.parse(existing).filter(p => p.id !== id)
         localStorage.setItem('portfolio_photos', JSON.stringify(photos))
+        setPhotos(photos)
       }
       return
     }
 
     try {
       await deleteDoc(doc(db, 'photos', id))
+      setPhotos(prev => prev.filter(p => p.id !== id))
     } catch (error) {
       console.error('Error deleting photo:', error)
       alert('Failed to delete photo.')
