@@ -80,6 +80,21 @@ function HomeView({ homeContent, cvUrl }) {
         </div>
       </section>
 
+
+    {/* Summary Section */}
+      {homeContent?.fullBio && (
+        <section className="summary-section">
+          <div className="summary-container">
+            <div className="summary-label">ABOUT</div>
+            <h2>Who I Am</h2>
+            <div className="summary-content">
+              <p>{homeContent.fullBio}</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+
       {/* Stats Section */}
       {achievements.length > 0 && (
         <section className="stats-section">
@@ -93,19 +108,6 @@ function HomeView({ homeContent, cvUrl }) {
                   <div className="stat-label">{stat.label}</div>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Summary Section */}
-      {homeContent?.fullBio && (
-        <section className="summary-section">
-          <div className="summary-container">
-            <div className="summary-label">ABOUT</div>
-            <h2>Who I Am</h2>
-            <div className="summary-content">
-              <p>{homeContent.fullBio}</p>
             </div>
           </div>
         </section>
