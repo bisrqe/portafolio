@@ -21,6 +21,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
     description: '',
     link: '',
     image: '',
+    images: [],
     tags: [],
     positionX: 0,
     positionY: 0,
@@ -42,6 +43,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
     role: '',
     description: '',
     image: '',
+    images: [],
     link: '',
     tags: [],
     sdg: [],
@@ -59,6 +61,10 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
     abilities: []
   })
   const [currentCvUrl, setCurrentCvUrl] = useState(cvUrl)
+  const [projectsVisibleTags, setProjectsVisibleTags] = useState([])
+  const [leadershipVisibleTags, setLeadershipVisibleTags] = useState([])
+  const [allProjectTags, setAllProjectTags] = useState([])
+  const [allLeadershipTags, setAllLeadershipTags] = useState([])
 
   // Check if user is already logged in
   useEffect(() => {
@@ -83,6 +89,73 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
     }
   }, [homeContent, cvUrl])
 
+  // Initialize tag settings from localStorage and collect available tags
+  useEffect(() => {
+    // Collect all project tags
+    const projectTagSet = new Set()
+    projects.forEach(p => {
+      if (p.tags && Array.isArray(p.tags)) {
+        p.tags.forEach(tag => projectTagSet.add(tag))
+      }
+    })
+    const allProjTags = Array.from(projectTagSet).sort()
+    setAllProjectTags(allProjTags)
+
+    // Load visible project tags from localStorage
+    const savedProjTags = localStorage.getItem('portfolio_visible_tags_projects')
+    if (savedProjTags) {
+      try {
+        setProjectsVisibleTags(JSON.parse(savedProjTags))
+      } catch (e) {
+        setProjectsVisibleTags(['Simulation', 'Professional Experience', 'Student Groups', 'Personal Projects', 'Hackathons'])
+      }
+    } else {
+      setProjectsVisibleTags(['Simulation', 'Professional Experience', 'Student Groups', 'Personal Projects', 'Hackathons'])
+    }
+
+    // Collect all leadership tags
+    const leadershipTagSet = new Set()
+    leadership.forEach(l => {
+      if (l.tags && Array.isArray(l.tags)) {
+        l.tags.forEach(tag => leadershipTagSet.add(tag))
+      }
+    })
+    const allLeadTags = Array.from(leadershipTagSet).sort()
+    setAllLeadershipTags(allLeadTags)
+
+    // Load visible leadership tags from localStorage
+    const savedLeadTags = localStorage.getItem('portfolio_visible_tags_leadership')
+    if (savedLeadTags) {
+      try {
+        setLeadershipVisibleTags(JSON.parse(savedLeadTags))
+      } catch (e) {
+        setLeadershipVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service'])
+      }
+    } else {
+      setLeadershipVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service'])
+    }
+  }, [projects, leadership])
+
+  const handleToggleProjectTag = (tag) => {
+    setProjectsVisibleTags(prev => {
+      const updated = prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+      localStorage.setItem('portfolio_visible_tags_projects', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleToggleLeadershipTag = (tag) => {
+    setLeadershipVisibleTags(prev => {
+      const updated = prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+      localStorage.setItem('portfolio_visible_tags_leadership', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   // Project handlers
   const handleProjectInputChange = (e) => {
     const { name, value } = e.target
@@ -90,6 +163,46 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
       ...prev,
       [name]: value
     }))
+  }
+
+  const handleAddProjectImage = (uploadData) => {
+    const url = uploadData.url || uploadData.secure_url
+    setProjectForm(prev => ({
+      ...prev,
+      images: [...prev.images, url],
+      image: url // Also keep as primary image
+    }))
+  }
+
+  const handleRemoveProjectImage = (index) => {
+    setProjectForm(prev => {
+      const updatedImages = prev.images.filter((_, i) => i !== index)
+      return {
+        ...prev,
+        images: updatedImages,
+        image: updatedImages.length > 0 ? updatedImages[0] : '' // Set first as primary or clear
+      }
+    })
+  }
+
+  const handleAddLeadershipImage = (uploadData) => {
+    const url = uploadData.url || uploadData.secure_url
+    setLeadershipForm(prev => ({
+      ...prev,
+      images: [...prev.images, url],
+      image: url // Also keep as primary image
+    }))
+  }
+
+  const handleRemoveLeadershipImage = (index) => {
+    setLeadershipForm(prev => {
+      const updatedImages = prev.images.filter((_, i) => i !== index)
+      return {
+        ...prev,
+        images: updatedImages,
+        image: updatedImages.length > 0 ? updatedImages[0] : '' // Set first as primary or clear
+      }
+    })
   }
 
   const handleProjectSubmit = (e) => {
@@ -118,6 +231,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
       description: project.description,
       link: project.link,
       image: project.image,
+      images: project.images || [],
       tags: project.tags || [],
       positionX: project.positionX || 0,
       positionY: project.positionY || 0,
@@ -128,15 +242,17 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
 
   const handleCancelEdit = () => {
     setEditingProject(null)
-    setProjectForm({ title: '', description: '', link: '', image: '', tags: [], positionX: 0, positionY: 0, zoom: 1 })
+    setProjectForm({ title: '', description: '', link: '', image: '', images: [], tags: [], positionX: 0, positionY: 0, zoom: 1 })
     setShowForm(false)
     setShowProjectPositionControls(false)
   }
 
   const handleProjectUploadSuccess = (uploadData) => {
+    const url = uploadData.url || uploadData.secure_url
     setProjectForm(prev => ({
       ...prev,
-      image: uploadData.url
+      image: url,
+      images: [...(prev.images || []), url]
     }))
   }
 
@@ -361,6 +477,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
       role: item.role,
       description: item.description,
       image: item.image,
+      images: item.images || [],
       link: item.link || '',
       tags: item.tags || [],
       sdg: item.sdg || [],
@@ -373,15 +490,17 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
 
   const handleCancelLeadershipEdit = () => {
     setEditingLeadership(null)
-    setLeadershipForm({ title: '', role: '', description: '', image: '', link: '', tags: [], sdg: [], positionX: 0, positionY: 0, zoom: 1 })
+    setLeadershipForm({ title: '', role: '', description: '', image: '', images: [], link: '', tags: [], sdg: [], positionX: 0, positionY: 0, zoom: 1 })
     setShowLeadershipPositionControls(false)
     setShowForm(false)
   }
 
   const handleLeadershipUploadSuccess = (uploadData) => {
+    const url = uploadData.url || uploadData.secure_url
     setLeadershipForm(prev => ({
       ...prev,
-      image: uploadData.url
+      image: url,
+      images: [...(prev.images || []), url]
     }))
   }
 
@@ -534,6 +653,15 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
               }}
             >
               Photography ({photos.length})
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'tags' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('tags')
+                setShowForm(false)
+              }}
+            >
+              🏷️ Tag Settings
             </button>
           </div>
 
@@ -794,6 +922,34 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                     <div className="form-divider">or</div>
                     <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
+
+                  {projectForm.images && projectForm.images.length > 0 && (
+                    <div className="form-group">
+                      <label>📸 Uploaded Images ({projectForm.images.length}) - Carousel</label>
+                      <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)', margin: '5px 0 10px 0' }}>
+                        These images will be available in a carousel on the project card
+                      </p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
+                        {projectForm.images.map((img, idx) => (
+                          <div key={idx} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                            <img 
+                              src={img} 
+                              alt={`Project image ${idx + 1}`}
+                              style={{ width: '100%', height: '100px', objectFit: 'cover' }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveProjectImage(idx)}
+                              style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(255, 0, 0, 0.7)', color: '#fff', border: 'none', borderRadius: '3px', padding: '2px 6px', cursor: 'pointer', fontSize: '0.8rem' }}
+                              title="Remove this image"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {projectForm.image && (
                     <div className="form-group">
@@ -1238,6 +1394,34 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                     <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
 
+                  {leadershipForm.images && leadershipForm.images.length > 0 && (
+                    <div className="form-group">
+                      <label>📸 Uploaded Images ({leadershipForm.images.length}) - Carousel</label>
+                      <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)', margin: '5px 0 10px 0' }}>
+                        These images will be available in a carousel on the leadership card
+                      </p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
+                        {leadershipForm.images.map((img, idx) => (
+                          <div key={idx} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                            <img 
+                              src={img} 
+                              alt={`Leadership image ${idx + 1}`}
+                              style={{ width: '100%', height: '100px', objectFit: 'cover' }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveLeadershipImage(idx)}
+                              style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(255, 0, 0, 0.7)', color: '#fff', border: 'none', borderRadius: '3px', padding: '2px 6px', cursor: 'pointer', fontSize: '0.8rem' }}
+                              title="Remove this image"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {leadershipForm.image && (
                     <div className="form-group">
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -1417,6 +1601,66 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                     </div>
                   ))
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Tag Settings Tab */}
+          {activeTab === 'tags' && (
+            <div className="admin-content">
+              <div className="admin-header">
+                <h3>Tag Visibility Settings</h3>
+                <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem', margin: '5px 0 0 0' }}>
+                  Select which tags appear in the filter buttons on each page
+                </p>
+              </div>
+
+              {/* Projects Tags */}
+              <div style={{ marginBottom: '40px' }}>
+                <h4 style={{ color: '#DEC1FF', marginBottom: '15px', fontSize: '1.1rem' }}>📁 Professional Projects Tags</h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                  {allProjectTags.length === 0 ? (
+                    <p style={{ color: 'rgba(255, 255, 255, 0.5)' }}>No tags available</p>
+                  ) : (
+                    allProjectTags.map(tag => (
+                      <label key={tag} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 15px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', cursor: 'pointer', border: '1px solid rgba(255, 255, 255, 0.1)', transition: 'all 0.2s ease' }}>
+                        <input
+                          type="checkbox"
+                          checked={projectsVisibleTags.includes(tag)}
+                          onChange={() => handleToggleProjectTag(tag)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span style={{ color: projectsVisibleTags.includes(tag) ? '#DEC1FF' : 'rgba(255, 255, 255, 0.6)' }}>
+                          {tag}
+                        </span>
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Leadership Tags */}
+              <div>
+                <h4 style={{ color: '#DEC1FF', marginBottom: '15px', fontSize: '1.1rem' }}>🎯 Leadership & Impact Tags</h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                  {allLeadershipTags.length === 0 ? (
+                    <p style={{ color: 'rgba(255, 255, 255, 0.5)' }}>No tags available</p>
+                  ) : (
+                    allLeadershipTags.map(tag => (
+                      <label key={tag} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 15px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', cursor: 'pointer', border: '1px solid rgba(255, 255, 255, 0.1)', transition: 'all 0.2s ease' }}>
+                        <input
+                          type="checkbox"
+                          checked={leadershipVisibleTags.includes(tag)}
+                          onChange={() => handleToggleLeadershipTag(tag)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span style={{ color: leadershipVisibleTags.includes(tag) ? '#DEC1FF' : 'rgba(255, 255, 255, 0.6)' }}>
+                          {tag}
+                        </span>
+                      </label>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           )}

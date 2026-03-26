@@ -9,23 +9,31 @@ function HomeView({ homeContent, cvUrl }) {
       try {
         setCvLoading(true)
         
-        // For Cloudinary raw files, we need to fetch and create a blob to download properly
-        const response = await fetch(cvUrl)
-        if (!response.ok) throw new Error('Failed to download CV')
+        // For Cloudinary PDFs, use direct download link with ?attachment=true parameter
+        let downloadUrl = cvUrl
+        if (cvUrl.includes('cloudinary.com')) {
+          // Add attachment=true for force download on Cloudinary URLs
+          downloadUrl = cvUrl.includes('?') 
+            ? `${cvUrl}&attachment=true` 
+            : `${cvUrl}?attachment=true`
+        }
         
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
+        // Create a temporary anchor element to trigger download
         const link = document.createElement('a')
-        link.href = url
+        link.href = downloadUrl
         link.download = 'Sanjay_Adhithyan_CV.pdf'
+        link.style.display = 'none'
         document.body.appendChild(link)
+        
+        // Trigger the download
         link.click()
-        window.URL.revokeObjectURL(url)
+        
+        // Clean up
         document.body.removeChild(link)
       } catch (error) {
         console.error('Error downloading CV:', error)
-        alert('Failed to download CV. Try opening it directly in a new tab.')
-        // Fallback: open in new tab
+        alert('Failed to download CV. Opening in new tab...')
+        // Fallback: open in new tab without download attribute
         window.open(cvUrl, '_blank')
       } finally {
         setCvLoading(false)

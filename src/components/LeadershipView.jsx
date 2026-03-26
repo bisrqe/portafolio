@@ -1,9 +1,59 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import './LeadershipView.css'
 
 function LeadershipView({ leadership }) {
   const [activeTag, setActiveTag] = useState(null)
-  const visibleTags = ['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service']
+  const [visibleTags, setVisibleTags] = useState([])
+  const [carouselIndices, setCarouselIndices] = useState({})
+
+  // Load visible tags from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('portfolio_visible_tags_leadership')
+    if (saved) {
+      try {
+        setVisibleTags(JSON.parse(saved))
+      } catch (e) {
+        // Fallback to default
+        setVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service'])
+      }
+    } else {
+      // Set default tags on first load
+      setVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service'])
+    }
+  }, [])
+
+  const getLeadershipImages = (item) => {
+    // Support both single image (backward compatibility) and multiple images
+    if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+      return item.images
+    }
+    if (item.image) {
+      return [item.image]
+    }
+    return []
+  }
+
+  const nextImage = (itemId) => {
+    const item = leadership.find(l => l.id === itemId)
+    const images = getLeadershipImages(item)
+    if (images.length <= 1) return
+    
+    setCarouselIndices(prev => ({
+      ...prev,
+      [itemId]: ((prev[itemId] || 0) + 1) % images.length
+    }))
+  }
+
+  const prevImage = (itemId) => {
+    const item = leadership.find(l => l.id === itemId)
+    const images = getLeadershipImages(item)
+    if (images.length <= 1) return
+
+    setCarouselIndices(prev => ({
+      ...prev,
+      [itemId]: (prev[itemId] || 0) === 0 ? images.length - 1 : (prev[itemId] || 0) - 1
+    }))
+  }
   
   // Get all unique tags
   const allTags = useMemo(() => {
@@ -62,23 +112,68 @@ function LeadershipView({ leadership }) {
             <p>No leadership items in this category yet.</p>
           </div>
         ) : (
-          filteredLeadership.map(item => (
+          filteredLeadership.map(item => {
+            const images = getLeadershipImages(item)
+            const currentIndex = carouselIndices[item.id] || 0
+            const hasMultipleImages = images.length > 1
+
+            return (
             <div key={item.id} className="leadership-card">
-              {item.image && (
-                <div className="leadership-image">
-                  <img 
-                    src={item.image} 
-                    alt={item.title || 'Leadership'}
-                    style={{
-                      transform: `translate(${item.positionX || 0}%, ${item.positionY || 0}%) scale(${item.zoom || 1})`
-                    }}
-                  />
+              {images.length > 0 && (
+                <div className="leadership-image-container">
+                  <div className="leadership-image">
+                    <img 
+                      src={images[currentIndex]} 
+                      alt={item.title || 'Leadership'}
+                      style={{
+                        transform: `translate(${item.positionX || 0}%, ${item.positionY || 0}%) scale(${item.zoom || 1})`
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Carousel Controls */}
+                  {hasMultipleImages && (
+                    <>
+                      <button 
+                        className="carousel-btn carousel-prev"
+                        onClick={() => prevImage(item.id)}
+                        title="Previous image"
+                      >
+                        ‹
+                      </button>
+                      <button 
+                        className="carousel-btn carousel-next"
+                        onClick={() => nextImage(item.id)}
+                        title="Next image"
+                      >
+                        ›
+                      </button>
+                      
+                      {/* Carousel Indicators */}
+                      <div className="carousel-indicators">
+                        {images.map((_, idx) => (
+                          <button
+                            key={idx}
+                            className={`carousel-dot ${idx === currentIndex ? 'active' : ''}`}
+                            onClick={() => setCarouselIndices(prev => ({ ...prev, [item.id]: idx }))}
+                            title={`Go to image ${idx + 1}`}
+                            aria-label={`Image ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Image Counter */}
+                      <div className="carousel-counter">
+                        {currentIndex + 1} / {images.length}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
               <div className="leadership-content">
                 <h3>{item.title || 'Untitled'}</h3>
                 {item.role && <p className="role">{item.role}</p>}
-                {item.description && <p className="description">{item.description}</p>}
+                {item.description && <p className="leadership-description">{item.description}</p>}
                 {item.sdg && item.sdg.length > 0 && (
                   <div className="sdg-tags">
                     {item.sdg.map(goal => (
@@ -102,7 +197,8 @@ function LeadershipView({ leadership }) {
                 </div>
               </div>
             </div>
-          ))
+            )
+          })
         )}
       </div>
     </section>
