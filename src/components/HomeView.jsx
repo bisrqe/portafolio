@@ -64,8 +64,8 @@ function HomeView({ homeContent, cvUrl }) {
                   {cvLoading ? '⏳ Downloading...' : '📄 Download CV'}
                 </button>
               )}
-              <a href="#abilities" className="btn-explore">
-                Explore My Work ↓
+              <a href="https://www.linkedin.com/in/bisrqe" className="btn-explore">
+                Check my LinkedIn ↓
               </a>
             </div>
           </div>
