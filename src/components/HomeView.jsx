@@ -141,7 +141,7 @@ function HomeView({ homeContent, cvUrl }) {
         <div className="cta-container">
           <h2>Let's Create Something Amazing</h2>
           <p>Interested in collaborating? Let's chat about your next project.</p>
-          <a href="#contact" className="btn-get-started">
+          <a href="mailto:bismarck@bisrqe.com" className="btn-get-started">
             Get in Touch →
           </a>
         </div>
