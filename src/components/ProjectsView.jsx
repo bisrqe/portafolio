@@ -5,6 +5,7 @@ function ProjectsView({ projects }) {
   const [activeTag, setActiveTag] = useState(null)
   const [visibleTags, setVisibleTags] = useState([])
   const [carouselIndices, setCarouselIndices] = useState({})
+  const [expandedImage, setExpandedImage] = useState(null)
 
   // Load visible tags from localStorage on mount
   useEffect(() => {
@@ -21,6 +22,19 @@ function ProjectsView({ projects }) {
       setVisibleTags(['Simulation', 'Professional Experience', 'Student Groups', 'Personal Projects', 'Hackathons'])
     }
   }, [])
+
+  // Handle escape key to close expanded image
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setExpandedImage(null)
+      }
+    }
+    if (expandedImage) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [expandedImage])
 
   // Helper to get images for a project (supports both single image and images array)
   const getProjectImages = (project) => {
@@ -79,7 +93,8 @@ function ProjectsView({ projects }) {
   }, [projects, activeTag])
 
   return (
-    <section className="projects-view-section">
+    <>
+      <section className="projects-view-section">
       <div className="view-header">
         <h2>Professional Projects</h2>
         <p>Explore my latest work and projects I've worked on</p>
@@ -120,7 +135,7 @@ function ProjectsView({ projects }) {
             return (
             <div key={project.id} className="project-card">
               <div className="project-image-container">
-                <div className="project-image">
+                <div className="project-image" onClick={() => setExpandedImage(images[currentIndex])} style={{ cursor: 'pointer' }}>
                   <img 
                     src={images[currentIndex]} 
                     alt={project.title}
@@ -192,6 +207,29 @@ function ProjectsView({ projects }) {
         )}
       </div>
     </section>
+
+    {expandedImage && (
+      <div 
+        className="image-modal-overlay"
+        onClick={() => setExpandedImage(null)}
+      >
+        <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+          <button 
+            className="image-modal-close"
+            onClick={() => setExpandedImage(null)}
+            title="Close (or press Escape)"
+          >
+            ✕
+          </button>
+          <img 
+            src={expandedImage} 
+            alt="Expanded view"
+            className="image-modal-image"
+          />
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 
