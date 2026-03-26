@@ -5,39 +5,84 @@ function HomeView({ homeContent, cvUrl }) {
   const [cvLoading, setCvLoading] = useState(false)
 
   const handleDownloadCV = async () => {
-    if (cvUrl) {
+    if (!cvUrl) {
+      alert('CV URL not available')
+      return
+    }
+
+    try {
+      setCvLoading(true)
+      
+      // Ensure we have the correct Cloudinary URL format for PDFs
+      let finalUrl = cvUrl
+      
+      // If it's a Cloudinary URL without /raw/ and has pdf extension, convert it
+      if (cvUrl.includes('cloudinary.com') && !cvUrl.includes('/raw/')) {
+        // Replace /image/ with /raw/ to get the correct Cloudinary raw file endpoint
+        finalUrl = cvUrl.replace('/image/upload', '/raw/upload')
+      }
+      
+      // Add the attachment parameter to force download
+      if (!finalUrl.includes('?')) {
+        finalUrl = `${finalUrl}?attachment=true`
+      } else {
+        finalUrl = `${finalUrl}&attachment=true`
+      }
+      
+      // Try to download using fetch + blob for better reliability
       try {
-        setCvLoading(true)
+        const response = await fetch(finalUrl, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit'
+        })
         
-        // For Cloudinary PDFs, use direct download link with ?attachment=true parameter
-        let downloadUrl = cvUrl
-        if (cvUrl.includes('cloudinary.com')) {
-          // Add attachment=true for force download on Cloudinary URLs
-          downloadUrl = cvUrl.includes('?') 
-            ? `${cvUrl}&attachment=true` 
-            : `${cvUrl}?attachment=true`
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
         }
         
-        // Create a temporary anchor element to trigger download
+        const blob = await response.blob()
+        
+        // Check if we got a valid PDF
+        if (blob.type !== 'application/pdf') {
+          console.warn('Response is not a PDF. Type:', blob.type)
+        }
+        
+        // Create blob URL and download
+        const blobUrl = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
-        link.href = downloadUrl
+        link.href = blobUrl
+        link.download = 'Sanjay_Adhithyan_CV.pdf'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+      } catch (fetchError) {
+        console.error('Fetch error:', fetchError)
+        // Fallback: try direct download without fetch
+        const link = document.createElement('a')
+        link.href = finalUrl
         link.download = 'Sanjay_Adhithyan_CV.pdf'
         link.style.display = 'none'
         document.body.appendChild(link)
-        
-        // Trigger the download
         link.click()
-        
-        // Clean up
         document.body.removeChild(link)
-      } catch (error) {
-        console.error('Error downloading CV:', error)
-        alert('Failed to download CV. Opening in new tab...')
-        // Fallback: open in new tab without download attribute
-        window.open(cvUrl, '_blank')
-      } finally {
-        setCvLoading(false)
       }
+    } catch (error) {
+      console.error('Error downloading CV:', error)
+      alert('Failed to download CV. Trying to open in new tab...')
+      // Fallback: open in new tab
+      try {
+        let fallbackUrl = cvUrl
+        if (!fallbackUrl.includes('?')) {
+          fallbackUrl = `${fallbackUrl}?dl=1` // Alternative parameter
+        }
+        window.open(fallbackUrl, '_blank')
+      } catch (e) {
+        alert('Could not open CV. Please check if the file is properly uploaded.')
+      }
+    } finally {
+      setCvLoading(false)
     }
   }
 
