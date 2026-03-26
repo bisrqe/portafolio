@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import CloudinaryUpload from './CloudinaryUpload'
+import FirebaseUpload from './FirebaseUpload'
 import AdminAuth from './AdminAuth'
 import './AdminDashboard.css'
 
@@ -538,7 +538,6 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
   const handleCvUpload = async (file) => {
     if (!file) return
     
-    // For now, we'll use a simple approach - upload to Cloudinary via CloudinaryUpload
     // The actual CV URL will be set via the handleCvUploadSuccess callback
   }
 
@@ -729,12 +728,12 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                     onChange={handleHomeInputChange}
                   />
                   <div className="form-divider">or</div>
-                  <CloudinaryUpload onUploadSuccess={handleHomeHeroUploadSuccess} />
+                  <FirebaseUpload onUploadSuccess={handleHomeHeroUploadSuccess} />
                 </div>
 
                 <div className="form-group">
                   <label>CV Upload (PDF)</label>
-                  <CloudinaryUpload 
+                  <FirebaseUpload 
                     onUploadSuccess={handleCvUploadSuccess} 
                     acceptFiles=".pdf,application/pdf"
                     buttonLabel="📄 Upload CV (PDF)"
@@ -920,7 +919,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                       onChange={handleProjectInputChange}
                     />
                     <div className="form-divider">or</div>
-                    <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
+                    <FirebaseUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
                   {projectForm.images && projectForm.images.length > 0 && (
@@ -1176,7 +1175,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                       required
                     />
                     <div className="form-divider">or</div>
-                    <CloudinaryUpload onUploadSuccess={handlePhotoUploadSuccess} />
+                    <FirebaseUpload onUploadSuccess={handlePhotoUploadSuccess} />
                   </div>
 
                   {photoForm.image && (
@@ -1391,7 +1390,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                       onChange={handleLeadershipInputChange}
                     />
                     <div className="form-divider">or</div>
-                    <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
+                    <FirebaseUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
 
                   {leadershipForm.images && leadershipForm.images.length > 0 && (

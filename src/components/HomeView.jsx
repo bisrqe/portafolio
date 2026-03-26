@@ -13,74 +13,18 @@ function HomeView({ homeContent, cvUrl }) {
     try {
       setCvLoading(true)
       
-      // Ensure we have the correct Cloudinary URL format for PDFs
-      let finalUrl = cvUrl
-      
-      // If it's a Cloudinary URL without /raw/ and has pdf extension, convert it
-      if (cvUrl.includes('cloudinary.com') && !cvUrl.includes('/raw/')) {
-        // Replace /image/ with /raw/ to get the correct Cloudinary raw file endpoint
-        finalUrl = cvUrl.replace('/image/upload', '/raw/upload')
-      }
-      
-      // Add the attachment parameter to force download
-      if (!finalUrl.includes('?')) {
-        finalUrl = `${finalUrl}?attachment=true`
-      } else {
-        finalUrl = `${finalUrl}&attachment=true`
-      }
-      
-      // Try to download using fetch + blob for better reliability
-      try {
-        const response = await fetch(finalUrl, {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit'
-        })
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        
-        const blob = await response.blob()
-        
-        // Check if we got a valid PDF
-        if (blob.type !== 'application/pdf') {
-          console.warn('Response is not a PDF. Type:', blob.type)
-        }
-        
-        // Create blob URL and download
-        const blobUrl = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = blobUrl
-        link.download = 'Sanjay_Adhithyan_CV.pdf'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(blobUrl)
-      } catch (fetchError) {
-        console.error('Fetch error:', fetchError)
-        // Fallback: try direct download without fetch
-        const link = document.createElement('a')
-        link.href = finalUrl
-        link.download = 'Sanjay_Adhithyan_CV.pdf'
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      }
+      // Firebase Storage URLs are direct download links
+      const link = document.createElement('a')
+      link.href = cvUrl
+      link.download = 'Sanjay_Adhithyan_CV.pdf'
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     } catch (error) {
       console.error('Error downloading CV:', error)
-      alert('Failed to download CV. Trying to open in new tab...')
-      // Fallback: open in new tab
-      try {
-        let fallbackUrl = cvUrl
-        if (!fallbackUrl.includes('?')) {
-          fallbackUrl = `${fallbackUrl}?dl=1` // Alternative parameter
-        }
-        window.open(fallbackUrl, '_blank')
-      } catch (e) {
-        alert('Could not open CV. Please check if the file is properly uploaded.')
-      }
+      alert('Failed to download CV. Opening in new tab...')
+      window.open(cvUrl, '_blank')
     } finally {
       setCvLoading(false)
     }
