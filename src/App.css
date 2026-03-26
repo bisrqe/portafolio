@@ -86,8 +86,8 @@
 
 .image-modal-content {
   position: relative;
-  max-width: 75vw;
-  max-height: 75vh;
+  max-width: 37.5vw;
+  max-height: 37.5vh;
   display: flex;
   align-items: center;
   justify-content: center;
