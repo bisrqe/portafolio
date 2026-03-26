@@ -82,7 +82,7 @@ function ProjectsView({ projects }) {
     })
 
     return Array.from(tags).sort()
-    }, [projects])
+    }, [projects, visibleTags])
 
   // Filter projects by selected tag
   const filteredProjects = useMemo(() => {

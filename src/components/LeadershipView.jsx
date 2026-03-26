@@ -84,7 +84,7 @@ function LeadershipView({ leadership }) {
   })
 
   return Array.from(tags).sort()
-}, [leadership])
+}, [leadership, visibleTags])
 
   // Filter leadership by selected tag
   const filteredLeadership = activeTag
