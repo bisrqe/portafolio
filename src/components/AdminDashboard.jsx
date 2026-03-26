@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import CloudinaryUpload from './CloudinaryUpload'
 import FirebaseUpload from './FirebaseUpload'
 import AdminAuth from './AdminAuth'
 import './AdminDashboard.css'
@@ -728,14 +729,13 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                     onChange={handleHomeInputChange}
                   />
                   <div className="form-divider">or</div>
-                  <FirebaseUpload onUploadSuccess={handleHomeHeroUploadSuccess} />
+                  <CloudinaryUpload onUploadSuccess={handleHomeHeroUploadSuccess} />
                 </div>
 
                 <div className="form-group">
                   <label>CV Upload (PDF)</label>
                   <FirebaseUpload 
                     onUploadSuccess={handleCvUploadSuccess} 
-                    acceptFiles=".pdf,application/pdf"
                     buttonLabel="📄 Upload CV (PDF)"
                   />
                   {currentCvUrl && (
@@ -919,7 +919,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                       onChange={handleProjectInputChange}
                     />
                     <div className="form-divider">or</div>
-                    <FirebaseUpload onUploadSuccess={handleProjectUploadSuccess} />
+                    <CloudinaryUpload onUploadSuccess={handleProjectUploadSuccess} />
                   </div>
 
                   {projectForm.images && projectForm.images.length > 0 && (
@@ -1175,7 +1175,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                       required
                     />
                     <div className="form-divider">or</div>
-                    <FirebaseUpload onUploadSuccess={handlePhotoUploadSuccess} />
+                    <CloudinaryUpload onUploadSuccess={handlePhotoUploadSuccess} />
                   </div>
 
                   {photoForm.image && (
@@ -1390,7 +1390,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
                       onChange={handleLeadershipInputChange}
                     />
                     <div className="form-divider">or</div>
-                    <FirebaseUpload onUploadSuccess={handleLeadershipUploadSuccess} />
+                    <CloudinaryUpload onUploadSuccess={handleLeadershipUploadSuccess} />
                   </div>
 
                   {leadershipForm.images && leadershipForm.images.length > 0 && (

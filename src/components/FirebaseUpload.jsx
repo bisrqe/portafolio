@@ -1,22 +1,21 @@
 import { useRef, useState } from 'react'
 import { db, storage } from '../firebase'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { collection, addDoc } from 'firebase/firestore'
 
-function FirebaseUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', buttonLabel = '📸 Upload Image' }) {
+function FirebaseUpload({ onUploadSuccess, buttonLabel = '📄 Upload PDF' }) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef(null)
 
-  const uploadToStorage = async (file) => {
+  const uploadPdfToStorage = async (file) => {
     if (!storage) {
       throw new Error('Firebase Storage not initialized')
     }
 
     const timestamp = Date.now()
     const fileName = `${timestamp}_${file.name}`
-    const fileRef = ref(storage, `portfolio/${fileName}`)
+    const fileRef = ref(storage, `portfolio_pdfs/${fileName}`)
 
-    console.log('Uploading to Storage:', `portfolio/${fileName}`)
+    console.log('Uploading PDF to Storage:', `portfolio_pdfs/${fileName}`)
 
     const uploadPromise = uploadBytes(fileRef, file)
     
@@ -31,78 +30,33 @@ function FirebaseUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', butt
     return downloadUrl
   }
 
-  const uploadToFirestore = async (file) => {
-    if (!db) {
-      throw new Error('Firestore not initialized')
-    }
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      
-      reader.onload = async (e) => {
-        try {
-          const base64 = e.target.result.split(',')[1]
-          
-          // Store metadata in Firestore
-          const docRef = await addDoc(collection(db, 'portfolio_files'), {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            uploadedAt: new Date(),
-            data: base64
-          })
-
-          // Return a Data URL
-          resolve(e.target.result)
-        } catch (error) {
-          reject(error)
-        }
-      }
-
-      reader.onerror = () => reject(new Error('Failed to read file'))
-      reader.readAsDataURL(file)
-    })
-  }
-
   const handleFileSelect = async (event) => {
     const file = event.target.files?.[0]
     if (!file) return
 
+    // Validate PDF file
+    if (file.type !== 'application/pdf') {
+      alert('⚠️ Please upload a PDF file')
+      return
+    }
+
     setIsUploading(true)
 
     try {
-      console.log('Starting upload:', file.name, file.size, 'bytes')
+      console.log('Starting PDF upload:', file.name, file.size, 'bytes')
       
-      let downloadUrl
-      let method = 'storage'
-
-      // Try Firebase Storage first
-      try {
-        downloadUrl = await uploadToStorage(file)
-        method = 'storage'
-        console.log('✅ Uploaded to Firebase Storage')
-      } catch (storageError) {
-        console.warn('Storage upload failed, trying Firestore:', storageError.message)
-        
-        // Fall back to Firestore
-        try {
-          downloadUrl = await uploadToFirestore(file)
-          method = 'firestore'
-          console.log('✅ Uploaded to Firestore (base64)')
-        } catch (firestoreError) {
-          throw new Error(`Both upload methods failed. Storage: ${storageError.message}, Firestore: ${firestoreError.message}`)
-        }
-      }
+      const downloadUrl = await uploadPdfToStorage(file)
+      console.log('✅ PDF uploaded to Firebase Storage')
 
       onUploadSuccess({
         url: downloadUrl,
         name: file.name,
         size: file.size,
         type: file.type,
-        uploadMethod: method
+        uploadMethod: 'firebase-storage'
       })
 
-      alert(`✅ File uploaded successfully!${method === 'firestore' ? ' (via Firestore)' : ''}`)
+      alert('✅ PDF uploaded successfully!')
       
       // Reset input
       fileInputRef.current.value = ''
@@ -131,7 +85,7 @@ function FirebaseUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', butt
       <input
         ref={fileInputRef}
         type="file"
-        accept={acceptFiles}
+        accept=".pdf"
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
@@ -140,7 +94,7 @@ function FirebaseUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', butt
         className="btn-upload-image"
         onClick={handleClick}
         disabled={isUploading}
-        title={isUploading ? 'Uploading...' : `Click to upload`}
+        title={isUploading ? 'Uploading...' : 'Click to upload'}
       >
         {isUploading ? '⏳ Uploading...' : buttonLabel}
       </button>
