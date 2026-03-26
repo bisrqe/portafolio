@@ -1,9 +1,23 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import './PhotographyView.css'
 
 function PhotographyView({ photos }) {
   const [activeLabel, setActiveLabel] = useState(null)
   const [activeTag, setActiveTag] = useState(null)
+  const [expandedImage, setExpandedImage] = useState(null)
+
+  // Handle escape key to close expanded image
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setExpandedImage(null)
+      }
+    }
+    if (expandedImage) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [expandedImage])
 
   // Group photos by label
   const photosByLabel = useMemo(() => {
@@ -95,7 +109,7 @@ function PhotographyView({ photos }) {
         ) : (
           displayPhotos.map(photo => (
             <div key={photo.id} className="gallery-item">
-              <div className="gallery-image">
+              <div className="gallery-image" onClick={() => setExpandedImage(photo.image)} style={{ cursor: 'pointer' }}>
                 <img 
                   src={photo.image} 
                   alt={photo.title || 'Photography'}
@@ -123,6 +137,28 @@ function PhotographyView({ photos }) {
           ))
         )}
       </div>
+
+      {expandedImage && (
+        <div 
+          className="image-modal-overlay"
+          onClick={() => setExpandedImage(null)}
+        >
+          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="image-modal-close"
+              onClick={() => setExpandedImage(null)}
+              title="Close (or press Escape)"
+            >
+              ✕
+            </button>
+            <img 
+              src={expandedImage} 
+              alt="Expanded view"
+              className="image-modal-image"
+            />
+          </div>
+        </div>
+      )}
     </section>
   )
 }
