@@ -15,11 +15,11 @@ function LeadershipView({ leadership }) {
         setVisibleTags(JSON.parse(saved))
       } catch (e) {
         // Fallback to default
-        setVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service'])
+        setVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service', 'Student Groups'])
       }
     } else {
       // Set default tags on first load
-      setVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service'])
+      setVisibleTags(['EGS', 'Leadership Iniciatives', 'International Events', 'Social Service', 'Student Groups'])
     }
   }, [])
 
