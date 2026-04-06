@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // PDF files (CV documents)
+    match /portfolio_pdfs/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Image folder (for future use)
+    match /portfolio/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Helper function
+    function isAdmin() {
+      // Current: false (password-protected on frontend)
+      // Future: return request.auth != null && request.auth.token.admin == true;
+      return false;
+    }
+  }
+}

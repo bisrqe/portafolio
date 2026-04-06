@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Public portfolio data - readable by everyone
+    match /projects/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /leadership/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /photos/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /homeContent/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Backup stored files (base64)
+    match /portfolio_files/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Helper function for admin checks
+    function isAdmin() {
+      // Current: false (password-protected on frontend)
+      // Future: return request.auth != null && request.auth.token.admin == true;
+      return false;
+    }
+    
+    function hasAdminRole() {
+      return request.auth.token.admin == true;
+    }
+  }
+}
