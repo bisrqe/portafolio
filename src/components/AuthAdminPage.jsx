@@ -10,11 +10,12 @@ function AuthAdminPage({ projects, photos, leadership, homeContent, cvUrl, onAdd
   const [isAuthLoading, setIsAuthLoading] = useState(true)
   const [accessDenied, setAccessDenied] = useState(false)
 
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const tokenResult = await user.getIdTokenResult()
-        if (tokenResult.claims.admin === true) {
+        if (user.email === ADMIN_EMAIL) {
           setIsAdmin(true)
           setAccessDenied(false)
         } else {

@@ -7,6 +7,8 @@ function AdminAuth({ onLoginSuccess, onExit, accessDenied }) {
   const [error, setError] = useState(accessDenied ? 'Access denied. Your account does not have admin privileges.' : '')
   const [isLoading, setIsLoading] = useState(false)
 
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL
+
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     setError('')
@@ -14,12 +16,10 @@ function AdminAuth({ onLoginSuccess, onExit, accessDenied }) {
     try {
       const provider = new GoogleAuthProvider()
       const result = await signInWithPopup(auth, provider)
-      const tokenResult = await result.user.getIdTokenResult()
 
-      if (tokenResult.claims.admin === true) {
+      if (result.user.email === ADMIN_EMAIL) {
         onLoginSuccess(result.user)
       } else {
-        // Signed in but no admin claim — sign out immediately
         await signOut(auth)
         setError('Access denied. Your account does not have admin privileges.')
       }
