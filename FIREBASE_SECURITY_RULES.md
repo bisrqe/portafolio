@@ -53,11 +53,8 @@ service cloud.firestore {
     
     // Helper function for admin checks
     function isAdmin() {
-      // Implementation note:
-      // Currently: false (password-protected on frontend)
-      // Future: Use Firebase Authentication
-      // return request.auth != null && hasAdminRole();
-      return false;
+      // Updated: Now uses Firebase Authentication
+      return request.auth != null && request.auth.token.admin == true;
     }
     
     function hasAdminRole() {
@@ -67,11 +64,18 @@ service cloud.firestore {
 }
 ```
 
-### Current Implementation (Frontend-Protected):
-Since the app doesn't use Firebase Authentication yet, admin protection is handled on the frontend with:
-- Password verification in `AdminDashboard.jsx`
-- LocalStorage token management
-- Route protection in `App.jsx`
+### Current Implementation (Firebase Authentication Enabled):
+The app now uses **Firebase Authentication with admin custom claims** for secure verification:
+- ✅ Firestore rules check `request.auth.token.admin`
+- ✅ Storage rules require authenticated admin
+- ✅ Frontend password still works as backup
+- ⚠️ Admin custom claims must be set in Firebase Console
+
+**Setup Steps:**
+1. Go to Firebase Console → Authentication → Users
+2. Select admin user → Add Custom Claim: `{admin: true}`
+3. Deploy updated security rules
+4. Frontend continues to work with existing password until auth is integrated
 
 ---
 
@@ -79,7 +83,8 @@ Since the app doesn't use Firebase Authentication yet, admin protection is handl
 
 ### Rule Strategy:
 - ✅ **Portfolio PDFs:** Public read (CVs downloadable)
-- ✅ **Write Protection:** Disabled (uploaded via frontend with password)
+- ✅ **Write Protection:** Admin-only with Firebase Auth
+- ✅ **Delete Protection:** Admin-only
 
 ```
 rules_version = '2';
@@ -93,7 +98,7 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
     
-    // Image folder (for future use if needed)
+    // Image folder (for future use)
     match /portfolio/{allPaths=**} {
       allow read: if true;
       allow write: if isAdmin();
@@ -102,58 +107,58 @@ service firebase.storage {
     
     // Helper function
     function isAdmin() {
-      // Currently: false (password-protected on frontend)
-      // Future: Use Firebase Authentication
-      return false;
+      return request.auth != null && request.auth.token.admin == true;
     }
   }
 }
 ```
 
+### Current Status:
+- ✅ Rules require Firebase Authentication
+- ✅ Admin custom claims enabled
+- ✅ Public read access maintained
+- ⚠️ Uploads currently handled via frontend (password still works)
+
 ---
 
-## 3. Transition to Firebase Authentication (Recommended)
+## 3. Firebase Authentication Migration Status
 
-### Implementation Steps:
+### ✅ Rules Updated (April 7, 2026)
+Security rules now authenticate with Firebase Authentication and check for `admin` custom claim.
 
-#### Step 1: Enable Authentication
-```javascript
-// In firebase.js
-import { getAuth } from 'firebase/auth'
-export const auth = getAuth(app)
-```
+### Implementation Checklist:
 
-#### Step 2: Create Admin Role Claims
-```javascript
-// Admin setup (run once in Firebase Console)
-// Custom Claims:
-{
-  "admin": true
-}
-```
+- [x] Firestore rules updated to use `request.auth.token.admin`
+- [x] Storage rules updated to require admin authentication
+- [ ] Set admin custom claims in Firebase Console
+- [ ] (Optional) Add Firebase Auth UI to frontend admin login
+- [ ] (Optional) Update AdminDashboard to use Firebase Email/Password auth
 
-#### Step 3: Update Security Rules
-```
-function isAdmin() {
-  return request.auth != null && 
-         request.auth.token.admin == true;
-}
-```
+### To Complete Setup:
 
-#### Step 4: Admin Login Component
-```javascript
-// Replace password with email/password authentication
-import { signInWithEmailAndPassword } from 'firebase/auth'
+**In Firebase Console:**
+1. Go to **Authentication** → **Users**
+2. Select your admin user
+3. Click **Custom claims** (or ⚙ icon)
+4. Add this JSON:
+   ```json
+   {
+     "admin": true
+   }
+   ```
+5. Click **Save**
 
-const handleAdminLogin = async (email, password) => {
-  try {
-    await signInWithEmailAndPassword(auth, email, password)
-    setIsAdmin(true)
-  } catch (error) {
-    alert('Login failed: ' + error.message)
-  }
-}
-```
+**Deploy Rules:**
+1. Go to **Firestore Database** → **Rules**
+2. Copy all content from `FIRESTORE_RULES.txt` into the editor
+3. Click **Publish**
+
+Then:
+1. Go to **Storage** → **Rules**
+2. Copy all content from `FIREBASE_STORAGE_RULES.txt` into the editor
+3. Click **Publish**
+
+### Optional: Add Firebase Authentication to Frontend
 
 ---
 
