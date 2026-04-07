@@ -1,38 +1,67 @@
 import { useState, useEffect } from 'react'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { auth } from '../firebase'
 import AdminAuth from './AdminAuth'
 import AdminDashboard from './AdminDashboard'
 import './AdminAuth.css'
 
 function AuthAdminPage({ projects, photos, leadership, homeContent, cvUrl, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership, onUpdateHomeContent, onUpdateCvUrl }) {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isAuthLoading, setIsAuthLoading] = useState(true)
+  const [accessDenied, setAccessDenied] = useState(false)
 
-  // Check if user is already logged in
   useEffect(() => {
-    const token = localStorage.getItem('portfolio_admin_token')
-    if (token) {
-      setIsAdmin(true)
-    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const tokenResult = await user.getIdTokenResult()
+        if (tokenResult.claims.admin === true) {
+          setIsAdmin(true)
+          setAccessDenied(false)
+        } else {
+          setIsAdmin(false)
+          setAccessDenied(true)
+        }
+      } else {
+        setIsAdmin(false)
+        setAccessDenied(false)
+      }
+      setIsAuthLoading(false)
+    })
+
+    return () => unsubscribe()
   }, [])
 
   const handleLoginSuccess = () => {
     setIsAdmin(true)
+    setAccessDenied(false)
   }
 
-  const handleExit = () => {
-    localStorage.removeItem('portfolio_admin_token')
+  const handleExit = async () => {
+    await signOut(auth)
     setIsAdmin(false)
     window.location.href = '/'
+  }
+
+  if (isAuthLoading) {
+    return (
+      <div className="auth-admin-page">
+        <div style={{ color: 'white', textAlign: 'center', paddingTop: '50px' }}>
+          Loading...
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="auth-admin-page">
       {!isAdmin ? (
-        <AdminAuth 
+        <AdminAuth
           onLoginSuccess={handleLoginSuccess}
           onExit={() => window.location.href = '/'}
+          accessDenied={accessDenied}
         />
       ) : (
-        <AdminDashboard 
+        <AdminDashboard
           projects={projects}
           photos={photos}
           leadership={leadership}

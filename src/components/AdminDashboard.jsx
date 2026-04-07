@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import CloudinaryUpload from './CloudinaryUpload'
 import FirebaseUpload from './FirebaseUpload'
-import AdminAuth from './AdminAuth'
 import './AdminDashboard.css'
 
 function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAddProject, onDeleteProject, onAddPhoto, onDeletePhoto, onUpdateProject, onUpdatePhoto, onAddLeadership, onDeleteLeadership, onUpdateLeadership, onUpdateHomeContent, onUpdateCvUrl, onExit }) {
   const [activeTab, setActiveTab] = useState('projects')
-  const [isAdmin, setIsAdmin] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingProject, setEditingProject] = useState(null)
   const [editingPhoto, setEditingPhoto] = useState(null)
@@ -66,14 +64,6 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
   const [leadershipVisibleTags, setLeadershipVisibleTags] = useState([])
   const [allProjectTags, setAllProjectTags] = useState([])
   const [allLeadershipTags, setAllLeadershipTags] = useState([])
-
-  // Check if user is already logged in
-  useEffect(() => {
-    const token = localStorage.getItem('portfolio_admin_token')
-    if (token) {
-      setIsAdmin(true)
-    }
-  }, [])
 
   useEffect(() => {
     setCurrentCvUrl(cvUrl)
@@ -316,8 +306,6 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
   }
 
   const handleExit = () => {
-    localStorage.removeItem('portfolio_admin_token')
-    setIsAdmin(false)
     setShowForm(false)
     setEditingProject(null)
     setEditingPhoto(null)
@@ -598,10 +586,7 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
 
   return (
     <>
-      {!isAdmin && <AdminAuth onLoginSuccess={() => setIsAdmin(true)} onExit={onExit} />}
-      
-      {isAdmin && (
-        <section className="admin-dashboard-section">
+      <section className="admin-dashboard-section">
           <div className="dashboard-header">
             <div className="header-title">
               <h2>Admin Dashboard</h2>
@@ -1664,7 +1649,6 @@ function AdminDashboard({ projects, photos, leadership, homeContent, cvUrl, onAd
             </div>
           )}
         </section>
-      )}
     </>
   )
 }

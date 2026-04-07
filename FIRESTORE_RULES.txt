@@ -32,9 +32,7 @@ service cloud.firestore {
     
     // Helper function for admin checks
     function isAdmin() {
-      // Current: false (password-protected on frontend)
-      // Future: return request.auth != null && request.auth.token.admin == true;
-      return false;
+      return request.auth != null && request.auth.token.admin == true;
     }
     
     function hasAdminRole() {

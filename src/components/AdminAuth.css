@@ -77,31 +77,6 @@
   gap: 1rem;
 }
 
-.admin-auth-modal input {
-  padding: 0.75rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-.admin-auth-modal input:focus {
-  outline: none;
-  background: rgba(222, 193, 255, 0.15);
-  border-color: #DEC1FF;
-}
-
-.admin-auth-modal input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.admin-auth-modal input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .auth-error {
   color: #ff3b30;
   font-size: 0.9rem;
@@ -109,26 +84,40 @@
   background: rgba(255, 59, 48, 0.1);
   border-radius: 4px;
   border-left: 3px solid #ff3b30;
+  margin-bottom: 0.5rem;
 }
 
-.admin-auth-modal button {
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #DEC1FF 0%, #c9a6ff 100%);
-  color: #1a1a2e;
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: white;
+  color: #3c4043;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 0.5rem;
 }
 
-.admin-auth-modal button:hover:not(:disabled) {
+.btn-google:hover:not(:disabled) {
+  background: #f5f5f5;
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.admin-auth-modal button:disabled {
+.btn-google:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
