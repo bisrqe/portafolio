@@ -61,13 +61,23 @@ function FirebaseUpload({ onUploadSuccess, buttonLabel = '📄 Upload PDF' }) {
       // Reset input
       fileInputRef.current.value = ''
     } catch (error) {
-      console.error('Upload error:', error)
+      console.error('Upload error details:', {
+        message: error.message,
+        code: error.code,
+        name: error.name,
+        stack: error.stack
+      })
       
       let userMessage = error.message
+      
       if (error.code === 'storage/unauthorized') {
-        userMessage = 'Storage permission denied. Check Firebase Storage rules allow uploads.'
+        userMessage = '❌ Permission denied. Firebase Storage rules may be too restrictive.'
       } else if (error.code === 'storage/unauthenticated') {
-        userMessage = 'Need authentication. Ensure Firebase is properly configured.'
+        userMessage = '❌ Authentication error. Check your Firebase configuration.'
+      } else if (error.name === 'AbortError' || error.message.includes('timeout')) {
+        userMessage = '❌ Upload timeout. File may be too large or network is slow.'
+      } else if (!navigator.onLine) {
+        userMessage = '❌ No internet connection'
       }
       
       alert(`Upload failed: ${userMessage}`)

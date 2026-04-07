@@ -31,16 +31,28 @@ function CloudinaryUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', bu
     }
 
     try {
+      console.log('Starting Cloudinary upload:', file.name, file.size, 'bytes')
+      console.log('Upload endpoint:', uploadEndpoint)
+
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 60000) // 60 second timeout
+
       const response = await fetch(uploadEndpoint, {
         method: 'POST',
-        body: formData
+        body: formData,
+        signal: controller.signal
       })
 
+      clearTimeout(timeout)
+
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Cloudinary error response:', errorData)
+        throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorData.error?.message || 'Unknown error'}`)
       }
 
       const data = await response.json()
+      console.log('✅ Upload successful:', data.public_id)
 
       onUploadSuccess({
         url: data.secure_url,
@@ -48,11 +60,20 @@ function CloudinaryUpload({ onUploadSuccess, acceptFiles = 'image/*,video/*', bu
         alt: data.original_filename || file.name
       })
 
+      alert('✅ Image uploaded successfully!')
       // Reset input
       fileInputRef.current.value = ''
     } catch (error) {
       console.error('Upload error:', error)
-      alert(`Upload failed: ${error.message}`)
+      
+      let userMessage = error.message
+      if (error.name === 'AbortError') {
+        userMessage = 'Upload timeout. File may be too large or network is slow.'
+      } else if (!navigator.onLine) {
+        userMessage = 'No internet connection'
+      }
+      
+      alert(`Upload failed: ${userMessage}`)
     } finally {
       setIsUploading(false)
     }
