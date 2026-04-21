@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Timeless FTS — commission a shoot or get in touch.">
+  <title>Contact | Timeless</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo" aria-label="Timeless home"><span class="logo-text">timeless</span></a>
+    <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links" role="list">
+      <li><a href="about.html">About</a></li>
+      <li><a href="personal-work.html">Personal Work</a></li>
+      <li><a href="day2day.html">Day2Day</a></li>
+      <li><a href="canon.html">Canon</a></li>
+      <li><a href="digicam.html">Digicam</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <header class="page-hero">
+    <h1>Get in Touch</h1>
+  </header>
+
+  <main class="contact-wrapper">
+    <p>Commission a shoot, ask a question, or just say hi.</p>
+
+    <!--
+      ACTION: Replace the Formspree endpoint below with your own.
+      1. Sign up free at https://formspree.io
+      2. Create a new form (target: bismarck@bisrqe.com)
+      3. Copy the endpoint URL and paste it into the action attribute below.
+      It will look like: https://formspree.io/f/xxxxxxxx
+    -->
+    <form
+      id="contact-form"
+      class="contact-form"
+      action="https://formspree.io/f/YOUR_FORM_ID"
+      method="POST"
+      novalidate
+    >
+      <div class="form-group">
+        <label for="field-name">Name</label>
+        <input
+          type="text"
+          id="field-name"
+          name="name"
+          placeholder="Your name"
+          autocomplete="name"
+          required
+          aria-required="true"
+          aria-describedby="err-name"
+        >
+        <span class="field-error" id="err-name" role="alert"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="field-email">Email</label>
+        <input
+          type="email"
+          id="field-email"
+          name="email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          required
+          aria-required="true"
+          aria-describedby="err-email"
+        >
+        <span class="field-error" id="err-email" role="alert"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="field-message">Message</label>
+        <textarea
+          id="field-message"
+          name="message"
+          rows="6"
+          placeholder="Tell me about your project or just say hello…"
+          required
+          aria-required="true"
+          aria-describedby="err-message"
+        ></textarea>
+        <span class="field-error" id="err-message" role="alert"></span>
+      </div>
+
+      <div id="form-feedback" class="form-feedback" role="status" aria-live="polite"></div>
+
+      <button type="submit" class="btn-send">Send</button>
+
+    </form>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Timeless FTS &mdash; <a href="mailto:bismarck@bisrqe.com">bismarck@bisrqe.com</a></p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

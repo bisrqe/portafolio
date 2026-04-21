@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Timeless — Photography portfolio by Bismarck. Capturing moments that last forever.">
+  <title>Timeless | Photography Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Hero subtitle */
+    .carousel-caption {
+      position: absolute;
+      bottom: 3rem;
+      left: 2.5rem;
+      color: rgba(244,233,205,0.92);
+      z-index: 5;
+      pointer-events: none;
+    }
+    .carousel-caption h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    }
+    .carousel-caption p {
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.35rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+    }
+    @media (max-width: 480px) {
+      .carousel-caption { left: 1.25rem; bottom: 2.5rem; }
+      .carousel-caption h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo" aria-label="Timeless home">
+      <span class="logo-text">timeless</span>
+    </a>
+    <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links" role="list">
+      <li><a href="about.html">About</a></li>
+      <li><a href="personal-work.html">Personal Work</a></li>
+      <li><a href="day2day.html">Day2Day</a></li>
+      <li><a href="canon.html">Canon</a></li>
+      <li><a href="digicam.html">Digicam</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- =================== CAROUSEL =================== -->
+  <section class="carousel" aria-label="Featured photography">
+    <div class="carousel-track" role="list">
+
+      <div class="carousel-slide" role="listitem">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80&auto=format&fit=crop"
+             alt="Mountain landscape at golden hour" loading="eager">
+        <div class="carousel-caption">
+          <h1>Light & Time</h1>
+          <p>Landscapes · Portraits · Stories</p>
+        </div>
+      </div>
+
+      <div class="carousel-slide" role="listitem">
+        <img src="https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1400&q=80&auto=format&fit=crop"
+             alt="Misty forest with soft morning light" loading="lazy">
+        <div class="carousel-caption">
+          <h1>Into the Quiet</h1>
+          <p>Nature &amp; Atmosphere</p>
+        </div>
+      </div>
+
+      <div class="carousel-slide" role="listitem">
+        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1400&q=80&auto=format&fit=crop"
+             alt="Travel photography — coastal road" loading="lazy">
+        <div class="carousel-caption">
+          <h1>Wandering Eye</h1>
+          <p>Travel &amp; Documentary</p>
+        </div>
+      </div>
+
+      <div class="carousel-slide" role="listitem">
+        <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1400&q=80&auto=format&fit=crop"
+             alt="Wildflower meadow in warm afternoon light" loading="lazy">
+        <div class="carousel-caption">
+          <h1>In Full Bloom</h1>
+          <p>Color &amp; Texture</p>
+        </div>
+      </div>
+
+      <div class="carousel-slide" role="listitem">
+        <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1400&q=80&auto=format&fit=crop"
+             alt="Person silhouette at sunset" loading="lazy">
+        <div class="carousel-caption">
+          <h1>Human &amp; Horizon</h1>
+          <p>Portraits &amp; Stillness</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-btn prev" aria-label="Previous slide">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="carousel-btn next" aria-label="Next slide">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="carousel-dots" role="group" aria-label="Slide indicators"></div>
+  </section>
+
+  <!-- =================== FAQ =================== -->
+  <section class="faq-section" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">Frequently Asked Questions</h2>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-1">
+        <h3>How do I commission a shoot?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-1" role="region">
+        <p>Reach out via the <a href="contact.html" style="color:var(--plum);text-decoration:underline;">Contact page</a> with your idea, preferred date, and location. I'll usually reply within 48 hours to discuss the project and next steps.</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-2">
+        <h3>What's your typical turnaround time?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-2" role="region">
+        <p>For most portrait and lifestyle sessions, expect a 7–14 day turnaround for the final edited gallery. Larger projects like events or multi-day shoots may take 2–4 weeks. Rush delivery options are available upon request.</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-3">
+        <h3>Do you shoot in film or digital?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-3" role="region">
+        <p>Both! The Canon and Digicam sections showcase distinct camera systems I work with. I love the warmth and grain of film for personal projects, while I rely on digital for client work requiring reliable, high-resolution results.</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-4">
+        <h3>What's included in a photo package?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-4" role="region">
+        <p>Every package includes a pre-shoot consultation, the selected number of edited high-resolution images, and delivery via a private online gallery with download access. Print options can be arranged at an additional cost.</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-5">
+        <h3>Can I use the photos on social media?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-5" role="region">
+        <p>Yes — personal use including social media is always included. For commercial or brand use, please mention this when booking so we can discuss the appropriate licensing for your project.</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-6">
+        <h3>Do you travel for shoots?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-6" role="region">
+        <p>Absolutely. Travel photography is at the heart of what I do. For shoots outside my local area, travel costs are covered by the client at cost. Let me know your destination and we can work out the details.</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-trigger" aria-expanded="false" aria-controls="faq-7">
+        <h3>What if the weather is bad on shoot day?</h3>
+        <svg class="accordion-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="accordion-body" id="faq-7" role="region">
+        <p>Overcast and moody skies often make for the most interesting shots! That said, if conditions are truly prohibitive, we'll reschedule at no extra charge. I always monitor the forecast ahead of any outdoor session.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- =================== FOOTER =================== -->
+  <footer class="footer">
+    <p>&copy; 2026 Timeless FTS &mdash; <a href="contact.html">bismarck@bisrqe.com</a></p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
