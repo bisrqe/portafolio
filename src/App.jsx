@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { db } from './firebase'
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc, setDoc } from 'firebase/firestore'
 import Navigation from './components/Navigation'
+import TimelessApp from './timelessfts/TimelessApp'
 import HomeView from './components/HomeView'
 import ProjectsView from './components/ProjectsView'
 import PhotographyView from './components/PhotographyView'
@@ -481,6 +482,11 @@ function App() {
       setCvUrl(url)
       throw error
     }
+  }
+
+  // Render Timeless sub-site for /timelessfts paths before loading check
+  if (currentPath.startsWith('/timelessfts')) {
+    return <TimelessApp />
   }
 
   if (isLoading) {

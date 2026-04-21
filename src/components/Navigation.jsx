@@ -42,6 +42,14 @@ function Navigation({ currentPath }) {
               Photography
             </a>
           </li>
+          <li className="nav-item">
+            <a 
+              href="/timelessfts" 
+              className={`nav-link ${currentPath.startsWith('/timelessfts') ? 'active' : ''}`}
+            >
+              Timeless
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
