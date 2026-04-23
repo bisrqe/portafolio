@@ -318,7 +318,7 @@
   font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(2rem, 5vw, 3rem);
   color: var(--tl-plum);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.02em;
 }
 .tl .page-hero p {
