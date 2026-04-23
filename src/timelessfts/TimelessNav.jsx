@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 const NAV_LINKS = [
   { href: '/timelessfts/about', label: 'About' },
-  { href: '/timelessfts/personal-work', label: 'Personal Work' },
-  { href: '/timelessfts/day2day', label: 'Day2Day' },
-  { href: '/timelessfts/canon', label: 'Canon' },
-  { href: '/timelessfts/digicam', label: 'Digicam' },
+  { href: '/timelessfts/portraits', label: 'Portraits' },
+  { href: '/timelessfts/concept', label: 'Concept Photos' },
+  { href: '/timelessfts/travel', label: 'Travel' },
+  { href: '/timelessfts/events', label: 'Events' },
   { href: '/timelessfts/contact', label: 'Contact' },
 ]
 
@@ -26,7 +26,7 @@ export default function TimelessNav({ path, navigate }) {
         aria-label="Timeless home"
         onClick={e => handleLink(e, '/timelessfts')}
       >
-        <span className="logo-text">timeless</span>
+        <span className="logo-text">timelessfts</span>
       </a>
 
       <button
