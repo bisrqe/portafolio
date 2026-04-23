@@ -311,7 +311,7 @@
    PAGE HERO (inner pages)
 ============================================================ */
 .tl .page-hero {
-  padding: 4rem 2.5rem;
+  padding: 4rem 2.5rem 0.05rem;
   text-align: center;
 }
 .tl .page-hero h1 {
