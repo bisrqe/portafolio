@@ -12,10 +12,10 @@ const GALLERIES = {
     title: 'Portraits',
     subtitle: 'Raw, immediate, unpolished — life as it moves through time',
     images: [
-      { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910283/CDMX_Jan_26_Edited_lrokc3.jpg', alt: 'Aerial view of green valley' },
+      { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910440/cdmx_jan_26_edited_lrokc3_71f701.jpg', alt: 'Aerial view of green valley' },
       { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910274/CDMX_Jan_26_Edited_1_ka8lz3.jpg', alt: 'Aerial view of green valley' },
       { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910271/CDMX_Jan_26_Edited_2_yiw3w4.jpg', alt: 'Aerial view of green valley' },
-      { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910157/Edited_Image_7676_from_People_bn7ymv.jpg', alt: 'Aerial view of green valley' },
+      { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910480/copy_of_edited_image_7676_from_people_bn7ymv_321f70.jpg', alt: 'Aerial view of green valley' },
       { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910153/People_Edited_Photo_tkamwz.jpg', alt: 'Aerial view of green valley' },
       { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776910150/Edited_Image_from_People_awykgj.jpg', alt: 'Aerial view of green valley' },
       { src: 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776909980/Canon_IMG_9906_1_jg8nc9.jpg', alt: 'Person standing on a mountain ridge' },
