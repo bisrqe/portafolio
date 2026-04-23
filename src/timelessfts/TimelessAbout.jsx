@@ -3,7 +3,6 @@ export default function TimelessAbout({ navigate }) {
     <>
       <header className="page-hero">
         <h1>About</h1>
-        <p>The person behind the lens</p>
       </header>
 
       <main className="about-wrapper">
