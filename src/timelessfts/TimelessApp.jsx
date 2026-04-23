@@ -8,9 +8,9 @@ import TimelessContact from './TimelessContact'
 import './Timeless.css'
 
 const GALLERIES = {
-  'personal-work': {
-    title: 'Personal Work',
-    subtitle: 'Self-directed projects and long-form visual essays',
+  'portraits': {
+    title: 'Portraits',
+    subtitle: 'Raw, immediate, unpolished — life as it moves through time',
     images: [
       { src: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=80&auto=format&fit=crop', alt: 'Aerial view of green valley' },
       { src: 'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=900&q=80&auto=format&fit=crop', alt: 'Person standing on a mountain ridge' },
@@ -24,9 +24,9 @@ const GALLERIES = {
       { src: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=700&q=80&auto=format&fit=crop', alt: 'Forest path in autumn' },
     ],
   },
-  'day2day': {
-    title: 'Day2Day',
-    subtitle: 'Everyday moments captured between places and people',
+  'concept': {
+    title: 'Concept Photos',
+    subtitle: 'Self-directed projects and long-form visual essays',
     images: [
       { src: 'https://images.unsplash.com/photo-1541695267696-c4d0f8a7e905?w=900&q=80&auto=format&fit=crop', alt: 'Coffee cup on a wooden table' },
       { src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=700&q=80&auto=format&fit=crop', alt: 'People around a table having a meeting' },
@@ -40,9 +40,9 @@ const GALLERIES = {
       { src: 'https://images.unsplash.com/photo-1455651512895-775706c9e38a?w=700&q=80&auto=format&fit=crop', alt: 'Rainy window in a café' },
     ],
   },
-  'canon': {
-    title: 'Canon',
-    subtitle: 'Deliberate frames from a camera I trust completely',
+  'travel': {
+    title: 'Travel',
+    subtitle: 'Everyday moments captured between places and people',
     images: [
       { src: 'https://images.unsplash.com/photo-1414086019778-2667d8511bb6?w=900&q=80&auto=format&fit=crop', alt: 'Dramatic mountain glacier landscape' },
       { src: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=700&q=80&auto=format&fit=crop', alt: 'Forest with sunlight streaming through trees' },
@@ -56,9 +56,9 @@ const GALLERIES = {
       { src: 'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=700&q=80&auto=format&fit=crop', alt: 'Snow-covered path through pines' },
     ],
   },
-  'digicam': {
-    title: 'Digicam',
-    subtitle: 'Raw, immediate, unpolished — life as it moves',
+  'events': {
+    title: 'Events',
+    subtitle: 'Capturing the energy and atmosphere of gatherings, celebrations, and everyday life',
     images: [
       { src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=900&q=80&auto=format&fit=crop', alt: 'Crowded city street at night' },
       { src: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=700&q=80&auto=format&fit=crop', alt: 'Friends laughing at a table' },
