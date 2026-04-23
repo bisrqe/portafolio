@@ -452,7 +452,7 @@
   break-inside: avoid;
   display: block;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 .tl .gallery-item img {
   width: 100%;
