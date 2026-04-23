@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mzdykjla'
 
 export default function TimelessContact() {
   const [fields, setFields] = useState({ name: '', email: '', message: '' })
@@ -53,11 +53,12 @@ export default function TimelessContact() {
     <>
       <header className="page-hero">
         <h1>Get in Touch</h1>
+        <h2>
+          IG: <a href="https://www.instagram.com/timelessfts/" target="_blank" rel="noopener noreferrer">@timelessfts</a>
+        </h2>
       </header>
-
       <main className="contact-wrapper">
         <p>Commission a shoot, ask a question, or just say hi.</p>
-
         <form className="contact-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="tl-name">Name</label>
@@ -114,7 +115,7 @@ export default function TimelessContact() {
             >
               {feedback === 'success'
                 ? "Message sent! I'll get back to you within 48 hours."
-                : 'Something went wrong. Please try again or email me directly.'}
+                : 'Something went wrong. Please try again or email me directly at: bismarck@bisrqe.com.'}
             </div>
           )}
 
