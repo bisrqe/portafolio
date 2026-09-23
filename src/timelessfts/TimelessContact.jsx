@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useLanguage } from '../i18n/LanguageContext'
 
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mzdykjla'
 
 export default function TimelessContact() {
+  const { t } = useLanguage()
   const [fields, setFields] = useState({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState({})
   const [feedback, setFeedback] = useState(null) // null | 'success' | 'error'
@@ -12,13 +14,13 @@ export default function TimelessContact() {
 
   const validate = () => {
     const e = {}
-    if (!fields.name.trim()) e.name = 'Name is required.'
+    if (!fields.name.trim()) e.name = t('timeless.contact.errName')
     if (!fields.email.trim()) {
-      e.email = 'Email is required.'
+      e.email = t('timeless.contact.errEmail')
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
-      e.email = 'Enter a valid email address.'
+      e.email = t('timeless.contact.errEmailFormat')
     }
-    if (!fields.message.trim()) e.message = 'Message is required.'
+    if (!fields.message.trim()) e.message = t('timeless.contact.errMessage')
     return e
   }
 
@@ -52,23 +54,23 @@ export default function TimelessContact() {
   return (
     <>
       <header className="page-hero">
-        <h1>Get in Touch</h1>
+        <h1>{t('timeless.contact.title')}</h1>
         <h2>
           IG: <a href="https://www.instagram.com/timelessfts/" target="_blank" rel="noopener noreferrer">@timelessfts</a>
         </h2>
       </header>
       <main className="contact-wrapper">
-        <p>Commission a shoot, ask a question, or just say hi.</p>
+        <p>{t('timeless.contact.intro')}</p>
         <form className="contact-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
-            <label htmlFor="tl-name">Name</label>
+            <label htmlFor="tl-name">{t('timeless.contact.name')}</label>
             <input
               id="tl-name"
               type="text"
               name="name"
               value={fields.name}
               onChange={set('name')}
-              placeholder="Your name"
+              placeholder={t('timeless.contact.namePh')}
               autoComplete="name"
               className={errors.name ? 'error' : ''}
               aria-describedby="tl-err-name"
@@ -77,14 +79,14 @@ export default function TimelessContact() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="tl-email">Email</label>
+            <label htmlFor="tl-email">{t('timeless.contact.email')}</label>
             <input
               id="tl-email"
               type="email"
               name="email"
               value={fields.email}
               onChange={set('email')}
-              placeholder="your@email.com"
+              placeholder={t('timeless.contact.emailPh')}
               autoComplete="email"
               className={errors.email ? 'error' : ''}
               aria-describedby="tl-err-email"
@@ -93,14 +95,14 @@ export default function TimelessContact() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="tl-message">Message</label>
+            <label htmlFor="tl-message">{t('timeless.contact.message')}</label>
             <textarea
               id="tl-message"
               name="message"
               rows={6}
               value={fields.message}
               onChange={set('message')}
-              placeholder="Tell me about your project or just say hello…"
+              placeholder={t('timeless.contact.messagePh')}
               className={errors.message ? 'error' : ''}
               aria-describedby="tl-err-message"
             />
@@ -114,13 +116,13 @@ export default function TimelessContact() {
               aria-live="polite"
             >
               {feedback === 'success'
-                ? "Message sent! I'll get back to you within 48 hours."
-                : 'Something went wrong. Please try again or email me directly at: bismarck@bisrqe.com.'}
+                ? t('timeless.contact.success')
+                : t('timeless.contact.error')}
             </div>
           )}
 
           <button type="submit" className="btn-send" disabled={sending}>
-            {sending ? 'Sending…' : 'Send'}
+            {sending ? t('timeless.contact.sending') : t('timeless.contact.send')}
           </button>
         </form>
       </main>
