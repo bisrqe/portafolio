@@ -1,24 +1,17 @@
 rules_version = '2';
+// Paste into Firebase Console → Storage → Rules, then Publish.
 service firebase.storage {
   match /b/{bucket}/o {
-    
-    // PDF files (CV documents)
-    match /portfolio_pdfs/{allPaths=**} {
-      allow read: if true;
-      allow write: if isAdmin();
-      allow delete: if isAdmin();
-    }
-    
-    // Image folder (for future use)
-    match /portfolio/{allPaths=**} {
-      allow read: if true;
-      allow write: if isAdmin();
-      allow delete: if isAdmin();
-    }
-    
-    // Helper function
+
     function isAdmin() {
       return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // CV (PDF) — public read, admin-only write
+    match /portfolio_pdfs/{allPaths=**} {
+      allow read: if true;
+      allow write, delete: if isAdmin()
+        && (request.resource == null || request.resource.contentType == 'application/pdf');
     }
   }
 }

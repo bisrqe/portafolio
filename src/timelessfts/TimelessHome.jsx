@@ -1,70 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useLanguage } from '../i18n/LanguageContext'
+import { SLIDES, cld } from './galleries'
 
-const SLIDES = [
-  {
-    src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80&auto=format&fit=crop',
-    alt: 'Mountain landscape at golden hour',
-    title: 'Light & Time',
-    subtitle: 'Landscapes · Portraits · Stories',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1400&q=80&auto=format&fit=crop',
-    alt: 'Misty forest with soft morning light',
-    title: 'Into the Quiet',
-    subtitle: 'Nature & Atmosphere',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1400&q=80&auto=format&fit=crop',
-    alt: 'Travel photography — coastal road',
-    title: 'Wandering Eye',
-    subtitle: 'Travel & Documentary',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1400&q=80&auto=format&fit=crop',
-    alt: 'Wildflower meadow in warm afternoon light',
-    title: 'In Full Bloom',
-    subtitle: 'Color & Texture',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1400&q=80&auto=format&fit=crop',
-    alt: 'Person silhouette at sunset',
-    title: 'Human & Horizon',
-    subtitle: 'Portraits & Stillness',
-  },
-]
-
-const FAQ_ITEMS = [
-  {
-    q: 'How do I commission a shoot?',
-    a: 'Reach out via the Contact page with your idea, preferred date, and location. I\'ll usually reply within 48 hours to discuss the project and next steps.',
-  },
-  {
-    q: "What's your typical turnaround time?",
-    a: 'For most portrait and lifestyle sessions, expect a 7–14 day turnaround for the final edited gallery. Larger projects like events or multi-day shoots may take 2–4 weeks. Rush delivery options are available upon request.',
-  },
-  {
-    q: 'Do you shoot in film or digital?',
-    a: 'Both! The Canon and Digicam sections showcase distinct camera systems I work with. I love the warmth and grain of film for personal projects, while I rely on digital for client work requiring reliable, high-resolution results.',
-  },
-  {
-    q: "What's included in a photo package?",
-    a: 'Every package includes a pre-shoot consultation, the selected number of edited high-resolution images, and delivery via a private online gallery with download access. Print options can be arranged at an additional cost.',
-  },
-  {
-    q: 'Can I use the photos on social media?',
-    a: 'Yes — personal use including social media is always included. For commercial or brand use, please mention this when booking so we can discuss the appropriate licensing for your project.',
-  },
-  {
-    q: 'Do you travel for shoots?',
-    a: 'Absolutely. Travel photography is at the heart of what I do. For shoots outside my local area, travel costs are covered by the client at cost. Let me know your destination and we can work out the details.',
-  },
-  {
-    q: 'What if the weather is bad on shoot day?',
-    a: "Overcast and moody skies often make for the most interesting shots! That said, if conditions are truly prohibitive, we'll reschedule at no extra charge. I always monitor the forecast ahead of any outdoor session.",
-  },
-]
-
-function Carousel() {
+function Carousel({ navigate }) {
+  const { t } = useLanguage()
+  const captions = t('timeless.carousel.slides')
   const [current, setCurrent] = useState(0)
   const timerRef = useRef(null)
   const touchStartRef = useRef(0)
@@ -110,7 +50,7 @@ function Carousel() {
   return (
     <section
       className="carousel"
-      aria-label="Featured photography"
+      aria-label={t('timeless.carousel.label')}
       tabIndex={0}
       onMouseEnter={stopAutoplay}
       onMouseLeave={startAutoplay}
@@ -126,31 +66,39 @@ function Carousel() {
         {SLIDES.map((slide, i) => (
           <div key={i} className="carousel-slide" role="listitem" aria-hidden={i !== current}>
             <img
-              src={slide.src}
-              alt={slide.alt}
+              src={cld(slide.src, 1800)}
+              alt={`${captions[i]?.title} — ${t(`timeless.galleries.${slide.gallery}.title`)}`}
               loading={i === 0 ? 'eager' : 'lazy'}
             />
             <div className="carousel-caption">
-              <h1>{slide.title}</h1>
-              <p>{slide.subtitle}</p>
+              {i === 0 ? <h1>{captions[i]?.title}</h1> : <h2>{captions[i]?.title}</h2>}
+              <p>{captions[i]?.subtitle}</p>
+              <a
+                href={`/timelessfts/${slide.gallery}`}
+                className="carousel-link"
+                tabIndex={i === current ? 0 : -1}
+                onClick={e => { e.preventDefault(); navigate(`/timelessfts/${slide.gallery}`) }}
+              >
+                {t('timeless.carousel.explore')} →
+              </a>
             </div>
           </div>
         ))}
       </div>
 
-      <button className="carousel-btn prev" aria-label="Previous slide" onClick={handlePrev}>
+      <button className="carousel-btn prev" aria-label={t('timeless.carousel.prev')} onClick={handlePrev}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6" /></svg>
       </button>
-      <button className="carousel-btn next" aria-label="Next slide" onClick={handleNext}>
+      <button className="carousel-btn next" aria-label={t('timeless.carousel.next')} onClick={handleNext}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6" /></svg>
       </button>
 
-      <div className="carousel-dots" role="group" aria-label="Slide indicators">
+      <div className="carousel-dots" role="group" aria-label={t('timeless.carousel.indicators')}>
         {SLIDES.map((_, i) => (
           <button
             key={i}
             className={`carousel-dot${i === current ? ' active' : ''}`}
-            aria-label={`Go to slide ${i + 1}`}
+            aria-label={t('timeless.carousel.goTo', { n: i + 1 })}
             onClick={() => { stopAutoplay(); goTo(i); startAutoplay() }}
           />
         ))}
@@ -160,13 +108,15 @@ function Carousel() {
 }
 
 function Accordion({ navigate }) {
+  const { t } = useLanguage()
+  const items = t('timeless.faq.items')
   const [openIndex, setOpenIndex] = useState(null)
 
   return (
     <section className="faq-section" aria-labelledby="faq-heading">
-      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <h2 id="faq-heading">{t('timeless.faq.title')}</h2>
 
-      {FAQ_ITEMS.map((item, i) => (
+      {items.map((item, i) => (
         <div key={i} className="accordion-item">
           <button
             className="accordion-trigger"
@@ -186,13 +136,13 @@ function Accordion({ navigate }) {
             role="region"
           >
             <p>
-              {i === 0 ? (
+              {item.a.includes('{contact}') ? (
                 <>
-                  Reach out via the{' '}
+                  {item.a.split('{contact}')[0]}
                   <a href="/timelessfts/contact" onClick={e => { e.preventDefault(); navigate('/timelessfts/contact') }}>
-                    Contact page
-                  </a>{' '}
-                  with your idea, preferred date, and location. I'll usually reply within 48 hours to discuss the project and next steps.
+                    {t('timeless.faq.contactLink')}
+                  </a>
+                  {item.a.split('{contact}')[1]}
                 </>
               ) : item.a}
             </p>
@@ -206,7 +156,7 @@ function Accordion({ navigate }) {
 export default function TimelessHome({ navigate }) {
   return (
     <>
-      <Carousel />
+      <Carousel navigate={navigate} />
       <Accordion navigate={navigate} />
     </>
   )

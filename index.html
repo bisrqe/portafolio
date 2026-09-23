@@ -1,32 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bismarck Animas — Portfolio</title>
+    <meta name="description" content="Digital transformation, data and leadership projects by Bismarck Animas." />
+    <meta name="author" content="Bismarck Animas Roque" />
+    <meta name="theme-color" content="#0a0f1c" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)" />
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-                sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-    </style>
-</head>
-<body>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bismarck Animas — Portfolio" />
+    <meta property="og:description" content="Digital transformation, data and leadership projects by Bismarck Animas." />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Apply the saved theme before first paint to avoid a flash -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('portfolio_theme');
+          var theme = saved === 'light' || saved === 'dark'
+            ? saved
+            : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>This portfolio requires JavaScript.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-</body>
+  </body>
 </html>
