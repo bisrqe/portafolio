@@ -11,6 +11,6 @@
   },
   "settings": { "react": { "version": "detect" } },
   "overrides": [
-    { "files": ["scripts/**/*.cjs", "vite.config.js"], "env": { "node": true, "browser": false } }
+    { "files": ["scripts/**/*.cjs", "vite.config.js", "api/**/*.js"], "env": { "node": true, "browser": false } }
   ]
 }

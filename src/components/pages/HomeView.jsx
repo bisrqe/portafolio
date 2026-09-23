@@ -7,6 +7,7 @@ import ItemCard from '../shared/ItemCard'
 import Lightbox from '../shared/Lightbox'
 import Icon from '../shared/Icon'
 import { featuredItems } from '../shared/sort'
+import { resolveHome, splitItems } from '../../content/homeContent'
 import '../shared/shared.css'
 import './home.css'
 
@@ -78,33 +79,53 @@ function Hero({ home, cvUrl }) {
 function About({ home }) {
   const { t, pick } = useLanguage()
   const bio = pick(home, 'fullBio')
-  if (!bio) return null
+  const areas = home.expertiseAreas || []
+  if (!bio && areas.length === 0) return null
   return (
     <section className="section" id="about">
-      <div className="container about-grid">
-        <div>
-          <p className="eyebrow">{t('about.label')}</p>
-          <h2 className="section-title">{t('about.title')}</h2>
-          <div className="about-text">
-            {bio.split(/\n{2,}/).map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+      <div className="container">
+        <div className="about-grid">
+          <div>
+            <p className="eyebrow">{t('about.label')}</p>
+            <h2 className="section-title">{t('about.title')}</h2>
+            {bio && (
+              <div className="about-text">
+                {bio.split(/\n{2,}/).map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+              </div>
+            )}
           </div>
+          <aside className="facts card">
+            <p className="panel-title">{t('about.facts')}</p>
+            <dl>
+              <div><dt>{t('about.basedIn')}</dt><dd>{t('hero.location')}</dd></div>
+              <div><dt>{t('about.speaks')}</dt><dd>{t('hero.languages')}</dd></div>
+              <div><dt>{t('about.email')}</dt><dd><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></dd></div>
+            </dl>
+          </aside>
         </div>
-        <aside className="facts card">
-          <p className="facts-title">{t('about.facts')}</p>
-          <dl>
-            <div><dt>{t('about.basedIn')}</dt><dd>{t('hero.location')}</dd></div>
-            <div><dt>{t('about.speaks')}</dt><dd>{t('hero.languages')}</dd></div>
-            <div><dt>{t('about.email')}</dt><dd><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></dd></div>
-          </dl>
-        </aside>
+
+        {areas.length > 0 && (
+          <div className="areas card">
+            <p className="panel-title">{t('about.keyAreas')}</p>
+            <div className="areas-grid">
+              {areas.map((area, i) => (
+                <article key={area.id ?? i} className="area">
+                  <span className="skill-index">{String(i + 1).padStart(2, '0')}</span>
+                  <h3>{pick(area, 'title')}</h3>
+                  <p>{pick(area, 'description')}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )
 }
 
-function Metrics({ achievements }) {
+function Highlights({ items }) {
   const { t, pick } = useLanguage()
-  if (achievements.length === 0) return null
+  if (items.length === 0) return null
   return (
     <section className="section section--tight metrics-section">
       <div className="container">
@@ -112,22 +133,30 @@ function Metrics({ achievements }) {
           <p className="eyebrow">{t('metrics.label')}</p>
           <h2 className="section-title">{t('metrics.title')}</h2>
         </div>
-        <div className="metrics">
-          {achievements.map((stat, i) => (
-            <div key={stat.id ?? i} className="metric">
-              <span className="metric-value">{stat.number}</span>
-              <span className="metric-label">{pick(stat, 'label')}</span>
-            </div>
-          ))}
+        <div className="highlights">
+          {items.map((item, i) => {
+            const value = pick(item, 'value')
+            const detail = pick(item, 'detail')
+            return (
+              <article key={item.id ?? i} className={`highlight highlight--${item.kind === 'metric' ? 'metric' : 'award'}`}>
+                <div className="highlight-top">
+                  {item.kind !== 'metric' && <span className="highlight-icon"><Icon name="award" size={18} /></span>}
+                  {value && <span className="highlight-value">{value}</span>}
+                </div>
+                <h3 className="highlight-label">{pick(item, 'label')}</h3>
+                {detail && <p className="highlight-detail">{detail}</p>}
+              </article>
+            )
+          })}
         </div>
       </div>
     </section>
   )
 }
 
-function Expertise({ abilities }) {
+function Expertise({ abilities, toolkit }) {
   const { t, pick } = useLanguage()
-  if (abilities.length === 0) return null
+  if (abilities.length === 0 && toolkit.length === 0) return null
   return (
     <section className="section" id="expertise">
       <div className="container">
@@ -135,20 +164,37 @@ function Expertise({ abilities }) {
           <p className="eyebrow">{t('expertise.label')}</p>
           <h2 className="section-title">{t('expertise.title')}</h2>
         </div>
-        <div className="skills">
-          {abilities.map((ability, i) => (
-            <article key={ability.id ?? i} className="skill card">
-              <span className="skill-index">{String(i + 1).padStart(2, '0')}</span>
-              <h3>{pick(ability, 'title')}</h3>
-              {pick(ability, 'description') && <p>{pick(ability, 'description')}</p>}
-              {ability.tags?.length > 0 && (
-                <div className="chips">
-                  {ability.tags.map(tag => <span key={tag} className="chip">{tag}</span>)}
+        {abilities.length > 0 && (
+          <div className="skills">
+            {abilities.map((ability, i) => (
+              <article key={ability.id ?? i} className="skill card">
+                <span className="skill-index">{String(i + 1).padStart(2, '0')}</span>
+                <h3>{pick(ability, 'title')}</h3>
+                {pick(ability, 'description') && <p>{pick(ability, 'description')}</p>}
+                {ability.tags?.length > 0 && (
+                  <div className="chips">
+                    {ability.tags.map(tag => <span key={tag} className="chip">{tag}</span>)}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
+        {toolkit.length > 0 && (
+          <div className="toolkit card">
+            <p className="panel-title">{t('expertise.toolkit')}</p>
+            <dl>
+              {toolkit.map((row, i) => (
+                <div key={row.id ?? i} className="toolkit-row">
+                  <dt>{pick(row, 'label')}</dt>
+                  <dd className="chips">
+                    {splitItems(pick(row, 'items')).map(item => <span key={item} className="chip">{item}</span>)}
+                  </dd>
                 </div>
-              )}
-            </article>
-          ))}
-        </div>
+              ))}
+            </dl>
+          </div>
+        )}
       </div>
     </section>
   )
@@ -198,7 +244,8 @@ function CallToAction() {
   )
 }
 
-export default function HomeView({ home, projects, leadership }) {
+export default function HomeView({ home: rawHome, projects, leadership }) {
+  const home = resolveHome(rawHome)
   const [expanded, setExpanded] = useState(null)
   const closeLightbox = useCallback(() => setExpanded(null), [])
 
@@ -206,8 +253,8 @@ export default function HomeView({ home, projects, leadership }) {
     <>
       <Hero home={home} cvUrl={home.cvUrl} />
       <About home={home} />
-      <Metrics achievements={home.achievements || []} />
-      <Expertise abilities={home.abilities || []} />
+      <Highlights items={home.highlights} />
+      <Expertise abilities={home.abilities} toolkit={home.toolkit} />
       <Featured items={featuredItems(projects)} kind="projects" to="/professional-projects" onExpand={setExpanded} />
       <Featured items={featuredItems(leadership)} kind="leadership" to="/leadership" onExpand={setExpanded} />
       <CallToAction />

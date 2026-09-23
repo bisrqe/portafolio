@@ -140,3 +140,20 @@
   .adm-list-actions { grid-column: 1 / -1; }
   .adm-repeat { grid-template-columns: 80px 1fr auto; }
 }
+
+/* Translation status & list editors */
+.adm-ttext { display: grid; gap: 6px; }
+.adm-ttext-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.adm-textbtn { font-size: 0.78rem; font-weight: 600; color: var(--accent); padding: 0; }
+.adm-textbtn:hover:not(:disabled) { text-decoration: underline; }
+.adm-textbtn:disabled { opacity: 0.6; cursor: wait; }
+.adm-badge--warn { border-color: color-mix(in srgb, #f59e0b 60%, transparent); color: #d97706; }
+.adm-listeditor { display: grid; gap: 12px; }
+.adm-card-head { display: flex; justify-content: space-between; align-items: center; }
+.adm-grid-1 { display: grid; gap: 14px; }
+.adm-btn--icon { width: 32px; padding: 0; height: 32px; }
+.adm-select {
+  width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font-size: 0.93rem;
+}
+.adm-subhead .adm-small { font-weight: 400; }

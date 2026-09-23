@@ -8,7 +8,7 @@ Built with React 18 + Vite, Firebase (Firestore, Auth, Storage) and Cloudinary; 
 ## Features
 
 - **Pages:** Home (`/`), Projects (`/professional-projects`), Leadership (`/leadership`), Timeless FTS (`/timelessfts/*`) and the admin dashboard (`/admin`).
-- **Three languages:** interface strings live in `src/i18n/`. Firestore content (titles, descriptions, bio, metrics, skills and tag names) is translated from the dashboard; empty translations fall back to the original text. The language is detected from the browser, remembered per visitor and can be forced with `?lang=es|en|fr`.
+- **Three languages:** interface strings live in `src/i18n/`. Content is written in **English** in the dashboard and translated **automatically** into Spanish and French when saved (see *Automatic translation*). Translations can be corrected by hand; manual edits are never overwritten and are flagged for review if the English text changes. The language is detected from the browser, remembered per visitor and can be forced with `?lang=es|en|fr`.
 - **Light / dark theme** with a toggle, remembered per visitor (defaults to the system setting).
 - **Admin dashboard** (Google sign-in): edit the home page, projects, leadership items, image framing, featured items, ordering, visible tag filters and tag translations. Settings are stored in Firestore, so every visitor sees them.
 
@@ -53,13 +53,27 @@ Collections used: `home/content`, `projects`, `leadership`, `settings/site`.
 
 ### Admin access
 
-Writes are allowed only for users with the `admin` custom claim:
+Writes are allowed for the owner's verified Google account (the email written in both rules files) or any user with
+the `admin` custom claim. The claim is optional; to set it, run `node scripts/set-admin-claim.cjs you@example.com` with a
+service-account key saved as `scripts/serviceAccountKey.json` (git-ignored), then sign in again.
 
-1. *Project settings → Service accounts → Generate new private key*; save it as `scripts/serviceAccountKey.json` (git-ignored).
-2. Run `node scripts/set-admin-claim.cjs you@example.com`.
-3. Sign out and sign back in at `/admin`.
+`VITE_ADMIN_EMAIL` lets that account open the dashboard.
 
-`VITE_ADMIN_EMAIL` is optional: it only lets that account open the dashboard before the claim exists.
+## Automatic translation
+
+`api/translate.js` is a Vercel serverless function (served by Vite middleware during `npm run dev`). It only accepts
+requests signed in as the portfolio owner (Firebase ID token with the `admin` claim or the owner's verified email).
+
+Configure one provider in *Vercel → Settings → Environment Variables* (server-only, no `VITE_` prefix):
+
+| Variable | Provider | Notes |
+|---|---|---|
+| `DEEPL_API_KEY` | DeepL | Recommended; the free plan includes 500,000 characters/month |
+| `GOOGLE_TRANSLATE_API_KEY` | Google Cloud Translation v2 | API key (not a service-account key); requires billing |
+| *(none)* | MyMemory | No key; lower quality and a daily quota |
+
+Home-page sections added in code (`src/content/homeContent.js`: key areas, highlights & recognitions, technical toolkit)
+are shown until they are saved from the dashboard; from then on Firestore is the source of truth.
 
 ## Cloudinary
 

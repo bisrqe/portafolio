@@ -55,24 +55,52 @@
 .about-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 56px; align-items: start; }
 .about-text { margin-top: 20px; display: grid; gap: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 680px; }
 .facts { padding: 24px; }
-.facts-title { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; }
+.panel-title { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; }
 .facts dl { display: grid; }
 .facts dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border); }
 .facts dt { color: var(--text-soft); font-size: 0.9rem; }
 .facts dd { font-weight: 500; font-size: 0.92rem; text-align: right; overflow-wrap: anywhere; }
 .facts dd a:hover { color: var(--accent); }
 
-/* ---------- Metrics ---------- */
+/* ---------- Key areas (About) ---------- */
+.areas { margin-top: 24px; padding: 24px; }
+.areas:hover, .facts:hover, .toolkit:hover { transform: none; }
+.areas-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 4px; }
+.area { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 6px; border-top: 1px solid var(--border); }
+.area + .area { border-left: 1px solid var(--border); }
+.area:first-child { padding-left: 0; }
+.area:last-child { padding-right: 0; }
+.area h3 { font-size: 1.02rem; font-weight: 650; }
+.area p { color: var(--text-muted); font-size: 0.93rem; }
+
+/* ---------- Highlights & recognitions ---------- */
 .metrics-section { background: var(--bg-elev); }
-.metrics {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface);
+.highlights { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.highlight {
+  display: flex; flex-direction: column; gap: 8px; padding: 22px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  transition: border-color 0.25s, transform 0.25s var(--ease);
 }
-.metric { display: flex; flex-direction: column; gap: 6px; padding: 28px 24px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 -1px -1px 0; }
-.metric-value {
-  font-family: var(--font-mono); font-size: clamp(1.9rem, 3.4vw, 2.5rem); font-weight: 700; letter-spacing: -0.03em; color: var(--accent);
+.highlight:hover { border-color: var(--accent); transform: translateY(-2px); }
+.highlight-top { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+.highlight-icon {
+  display: inline-grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0;
+  border-radius: 9px; background: var(--accent-soft); color: var(--accent);
 }
-.metric-label { color: var(--text-muted); font-size: 0.92rem; }
+.highlight-value {
+  font-family: var(--font-mono); font-weight: 700; letter-spacing: -0.02em; color: var(--accent);
+  font-size: 1.15rem; line-height: 1.2;
+}
+.highlight--metric .highlight-value { font-size: clamp(1.8rem, 3.2vw, 2.3rem); }
+.highlight-label { font-size: 1rem; font-weight: 650; line-height: 1.35; }
+.highlight-detail { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ---------- Technical toolkit ---------- */
+.toolkit { margin-top: 20px; padding: 24px; }
+.toolkit dl { display: grid; }
+.toolkit-row { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+.toolkit-row dt { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-soft); letter-spacing: 0.02em; }
+.toolkit-row .chip { font-size: 0.76rem; color: var(--text); }
 
 /* ---------- Skills ---------- */
 .skills { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
@@ -93,11 +121,14 @@
 @media (max-width: 900px) {
   .hero-inner, .about-grid { grid-template-columns: 1fr; gap: 40px; }
   .hero-visual { max-width: 440px; }
+  .areas-grid { grid-template-columns: 1fr; }
+  .area, .area:first-child, .area:last-child { padding: 16px 0; }
+  .area + .area { border-left: 0; }
 }
 @media (max-width: 640px) {
   .hero { padding: calc(var(--nav-h) + 48px) 0 72px; }
   .hero-actions .btn { flex: 1 1 auto; }
-  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .metric { padding: 20px 16px; }
+  .toolkit-row { grid-template-columns: 1fr; gap: 8px; }
+  .areas, .toolkit { padding: 20px 18px; }
   .cta { padding: 36px 20px; }
 }

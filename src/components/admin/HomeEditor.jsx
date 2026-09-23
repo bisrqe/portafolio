@@ -1,58 +1,93 @@
 import { useEffect, useState } from 'react'
-import { firestoreApi } from '../../hooks/useFirestore'
-import { HOME_PATH } from '../../hooks/useFirestore'
+import { deleteField } from 'firebase/firestore'
+import { firestoreApi, HOME_PATH } from '../../hooks/useFirestore'
+import {
+  ABILITY_FIELDS, EXPERTISE_FIELDS, HIGHLIGHT_FIELDS, TOOLKIT_FIELDS, resolveHome,
+} from '../../content/homeContent'
 import CloudinaryUpload from './CloudinaryUpload'
 import FirebaseUpload from './FirebaseUpload'
-import { Field, LangTabs, ListInput, TText } from './fields'
-import { cleanTranslations } from './translate'
+import { Field, LangTabs, ListEditor, ListInput, TText } from './fields'
+import { cleanI18n, migrateLegacy } from './translate'
+import { autoTranslate, countPending } from './autoTranslate'
 
-const EMPTY = { name: '', tagline: '', description: '', fullBio: '', heroImage: '', achievements: [], abilities: [], translations: {} }
-const uid = () => Date.now() + Math.floor(Math.random() * 1000)
+const TOP_FIELDS = ['tagline', 'description', 'fullBio']
+export const HOME_SCHEMA = {
+  fields: TOP_FIELDS,
+  lists: { expertiseAreas: EXPERTISE_FIELDS, highlights: HIGHLIGHT_FIELDS, toolkit: TOOLKIT_FIELDS, abilities: ABILITY_FIELDS },
+}
 
 function fromDoc(home) {
+  const resolved = resolveHome(home)
+  const top = migrateLegacy({
+    name: resolved.name || '',
+    tagline: resolved.tagline || '',
+    description: resolved.description || '',
+    fullBio: resolved.fullBio || '',
+    heroImage: resolved.heroImage || '',
+    translations: resolved.translations || {},
+    i18nMeta: resolved.i18nMeta || {},
+  }, TOP_FIELDS)
+  const list = (items, fields) => items.map((x, i) => migrateLegacy({ ...x, id: x.id ?? `i${i}`, translations: x.translations || {}, i18nMeta: x.i18nMeta || {} }, fields))
   return {
-    ...EMPTY,
-    name: home.name || '',
-    tagline: home.tagline || '',
-    description: home.description || '',
-    fullBio: home.fullBio || '',
-    heroImage: home.heroImage || '',
-    translations: home.translations || {},
-    achievements: (home.achievements || []).map(a => ({ id: a.id ?? uid(), number: a.number || '', label: a.label || '', translations: a.translations || {} })),
-    // The old "icon" field is no longer shown on the site and is dropped on save
-    abilities: (home.abilities || []).map(a => ({ id: a.id ?? uid(), title: a.title || '', description: a.description || '', tags: a.tags || [], translations: a.translations || {} })),
+    ...top,
+    expertiseAreas: list(resolved.expertiseAreas, EXPERTISE_FIELDS),
+    highlights: list(resolved.highlights, HIGHLIGHT_FIELDS),
+    toolkit: list(resolved.toolkit, TOOLKIT_FIELDS),
+    // The old emoji "icon" field is no longer shown and is dropped on save
+    abilities: list(resolved.abilities, ABILITY_FIELDS).map(a => ({
+      id: a.id, title: a.title || '', description: a.description || '', tags: a.tags || [], translations: a.translations, i18nMeta: a.i18nMeta,
+    })),
+  }
+}
+
+function toPayload(form) {
+  const clean = items => items.map(cleanI18n)
+  return {
+    ...cleanI18n(form),
+    expertiseAreas: clean(form.expertiseAreas),
+    highlights: clean(form.highlights),
+    toolkit: clean(form.toolkit),
+    abilities: clean(form.abilities),
+    achievements: deleteField(), // replaced by "highlights"
   }
 }
 
 export default function HomeEditor({ home, notify }) {
   const [form, setForm] = useState(() => fromDoc(home))
-  const [lang, setLang] = useState('orig')
-  const [saving, setSaving] = useState(false)
+  const [lang, setLang] = useState('base')
+  const [busy, setBusy] = useState('') // '' | 'saving' | 'translating'
   const [dirty, setDirty] = useState(false)
 
   // Refresh from Firestore when nothing is being edited
   useEffect(() => { if (!dirty) setForm(fromDoc(home)) }, [home, dirty])
 
   const update = next => { setForm(next); setDirty(true) }
-  const updateList = (key, index, next) => update({ ...form, [key]: form[key].map((x, i) => (i === index ? next : x)) })
-  const removeFromList = (key, index) => update({ ...form, [key]: form[key].filter((_, i) => i !== index) })
+  const setList = key => items => update({ ...form, [key]: items })
+  const pending = countPending(form, HOME_SCHEMA)
+
+  const translateNow = async () => {
+    setBusy('translating')
+    const { result, count, error } = await autoTranslate(form, HOME_SCHEMA)
+    update(result)
+    setBusy('')
+    if (error) notify(`Traducción automática incompleta: ${error}`, 'error')
+    else notify(count ? `${count === 1 ? '1 texto traducido' : `${count} textos traducidos`}. Revísalos en las pestañas ES y FR.` : 'No había textos pendientes de traducir.')
+  }
 
   const save = async e => {
     e.preventDefault()
-    setSaving(true)
+    setBusy('saving')
+    const { result, count, error } = await autoTranslate(form, HOME_SCHEMA)
+    setForm(result)
     try {
-      await firestoreApi.save(HOME_PATH, {
-        ...form,
-        translations: cleanTranslations(form.translations),
-        achievements: form.achievements.map(a => ({ ...a, translations: cleanTranslations(a.translations) })),
-        abilities: form.abilities.map(a => ({ ...a, translations: cleanTranslations(a.translations) })),
-      })
+      await firestoreApi.save(HOME_PATH, toPayload(result))
       setDirty(false)
-      notify('Página de inicio guardada.')
+      if (error) notify(`Guardado, pero la traducción automática falló (${error}). Se mostrará el inglés hasta traducir.`, 'error')
+      else notify(count ? `Página de inicio guardada; ${count === 1 ? '1 texto traducido' : `${count} textos traducidos`} automáticamente.` : 'Página de inicio guardada.')
     } catch (err) {
       notify(`No se pudo guardar: ${err.message}`, 'error')
     } finally {
-      setSaving(false)
+      setBusy('')
     }
   }
 
@@ -65,10 +100,16 @@ export default function HomeEditor({ home, notify }) {
     <form className="adm-panel" onSubmit={save}>
       <div className="adm-panel-head">
         <h2>Página de inicio</h2>
-        <LangTabs value={lang} onChange={setLang} />
+        <div className="adm-row">
+          <button type="button" className="adm-btn" onClick={translateNow} disabled={Boolean(busy) || pending === 0}>
+            {busy === 'translating' ? 'Traduciendo…' : `Traducir ahora${pending ? ` (${pending})` : ''}`}
+          </button>
+          <LangTabs value={lang} onChange={setLang} />
+        </div>
       </div>
       <p className="adm-hint">
-        «Original» es el texto base. Las pestañas EN, ES y FR guardan traducciones; si una está vacía, el sitio muestra el texto original.
+        Escribe en inglés (pestaña «EN · base»). Al guardar, el español y el francés se traducen automáticamente; puedes corregirlos
+        en sus pestañas y tus cambios se conservan. Si luego modificas el inglés, esos textos se marcan para revisión.
       </p>
 
       <div className="adm-grid-2">
@@ -82,8 +123,8 @@ export default function HomeEditor({ home, notify }) {
       <Field label="Descripción breve (hero)">
         <TText obj={form} field="description" lang={lang} onChange={update} multiline rows={3} />
       </Field>
-      <Field label="Biografía completa (sección «Quién soy»)" hint="Separa los párrafos con una línea en blanco.">
-        <TText obj={form} field="fullBio" lang={lang} onChange={update} multiline rows={7} />
+      <Field label="Biografía («Quién soy»)" hint="Separa los párrafos con una línea en blanco.">
+        <TText obj={form} field="fullBio" lang={lang} onChange={update} multiline rows={6} />
       </Field>
 
       <div className="adm-grid-2">
@@ -102,42 +143,78 @@ export default function HomeEditor({ home, notify }) {
         </Field>
       </div>
 
-      <h3 className="adm-subhead">Logros (cifras)</h3>
-      {form.achievements.map((a, i) => (
-        <div key={a.id} className="adm-repeat">
-          <input type="text" className="adm-w-sm" value={a.number} placeholder="30+" onChange={e => updateList('achievements', i, { ...a, number: e.target.value })} />
-          <TText obj={a} field="label" lang={lang} onChange={next => updateList('achievements', i, next)} placeholder="Proyectos entregados" />
-          <button type="button" className="adm-btn adm-btn--danger" onClick={() => removeFromList('achievements', i)} aria-label="Eliminar logro">✕</button>
-        </div>
-      ))}
-      <button type="button" className="adm-btn" onClick={() => update({ ...form, achievements: [...form.achievements, { id: uid(), number: '', label: '', translations: {} }] })}>
-        + Agregar logro
-      </button>
+      <h3 className="adm-subhead">Áreas clave de especialización <span className="adm-muted adm-small">(sección «Quién soy»)</span></h3>
+      <ListEditor
+        items={form.expertiseAreas}
+        onChange={setList('expertiseAreas')}
+        lang={lang}
+        columns={1}
+        fields={[
+          { field: 'title', label: 'Título', placeholder: 'Data & Machine Learning' },
+          { field: 'description', label: 'Descripción', multiline: true },
+        ]}
+        newItem={() => ({ title: '', description: '', translations: {}, i18nMeta: {} })}
+        addLabel="Agregar área"
+      />
 
-      <h3 className="adm-subhead">Habilidades</h3>
-      {form.abilities.map((a, i) => (
-        <div key={a.id} className="adm-card">
-          <div className="adm-grid-2">
-            <Field label={`Título ${String(i + 1).padStart(2, '0')}`}>
-              <TText obj={a} field="title" lang={lang} onChange={next => updateList('abilities', i, next)} />
-            </Field>
-            <Field label="Etiquetas (separadas por comas)">
-              <ListInput value={a.tags} onChange={tags => updateList('abilities', i, { ...a, tags })} placeholder="Python, Power BI, SQL" />
-            </Field>
-          </div>
-          <Field label="Descripción">
-            <TText obj={a} field="description" lang={lang} onChange={next => updateList('abilities', i, next)} multiline rows={2} />
+      <h3 className="adm-subhead">Logros y reconocimientos</h3>
+      <ListEditor
+        items={form.highlights}
+        onChange={setList('highlights')}
+        lang={lang}
+        fields={[
+          { field: 'value', label: 'Dato destacado', placeholder: '2nd place · Top 5 · 30+' },
+          { field: 'label', label: 'Título', placeholder: 'Hey Banco Datathon 2026' },
+          { field: 'detail', label: 'Detalle (opcional)', multiline: true, rows: 2 },
+        ]}
+        renderExtra={(item, set) => (
+          <Field label="Tipo">
+            <select className="adm-select" value={item.kind || 'award'} onChange={e => set({ ...item, kind: e.target.value })}>
+              <option value="award">Reconocimiento (con ícono)</option>
+              <option value="metric">Cifra (número grande)</option>
+            </select>
           </Field>
-          <button type="button" className="adm-btn adm-btn--danger" onClick={() => removeFromList('abilities', i)}>Eliminar habilidad</button>
-        </div>
-      ))}
-      <button type="button" className="adm-btn" onClick={() => update({ ...form, abilities: [...form.abilities, { id: uid(), title: '', description: '', tags: [], translations: {} }] })}>
-        + Agregar habilidad
-      </button>
+        )}
+        newItem={() => ({ kind: 'award', value: '', label: '', detail: '', translations: {}, i18nMeta: {} })}
+        addLabel="Agregar logro o reconocimiento"
+      />
+
+      <h3 className="adm-subhead">Habilidades <span className="adm-muted adm-small">(tarjetas)</span></h3>
+      <ListEditor
+        items={form.abilities}
+        onChange={setList('abilities')}
+        lang={lang}
+        fields={[
+          { field: 'title', label: 'Título' },
+          { field: 'description', label: 'Descripción', multiline: true, rows: 2 },
+        ]}
+        renderExtra={(item, set) => (
+          <Field label="Etiquetas (separadas por comas)">
+            <ListInput value={item.tags} onChange={tags => set({ ...item, tags })} placeholder="Python, Power BI, SQL" />
+          </Field>
+        )}
+        newItem={() => ({ title: '', description: '', tags: [], translations: {}, i18nMeta: {} })}
+        addLabel="Agregar habilidad"
+      />
+
+      <h3 className="adm-subhead">Herramientas técnicas</h3>
+      <ListEditor
+        items={form.toolkit}
+        onChange={setList('toolkit')}
+        lang={lang}
+        fields={[
+          { field: 'label', label: 'Categoría', placeholder: 'Programming' },
+          { field: 'items', label: 'Elementos (separados por comas)', placeholder: 'Python, SQL, Java' },
+        ]}
+        newItem={() => ({ label: '', items: '', translations: {}, i18nMeta: {} })}
+        addLabel="Agregar categoría"
+      />
 
       <div className="adm-actions">
         {dirty && <span className="adm-muted adm-small">Cambios sin guardar</span>}
-        <button type="submit" className="adm-btn adm-btn--primary adm-btn--lg" disabled={saving}>{saving ? 'Guardando…' : 'Guardar inicio'}</button>
+        <button type="submit" className="adm-btn adm-btn--primary adm-btn--lg" disabled={Boolean(busy)}>
+          {busy === 'saving' ? 'Guardando y traduciendo…' : 'Guardar inicio'}
+        </button>
       </div>
     </form>
   )

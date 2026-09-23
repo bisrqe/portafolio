@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { firestoreApi } from '../../hooks/useFirestore'
 import { SETTINGS_PATH, useSiteSettings } from '../../hooks/useSiteSettings'
+import { translateStrings } from './autoTranslate'
 
-const LANGS = ['en', 'es', 'fr']
+const LANGS = ['es', 'fr']
 const collectTags = items => [...new Set(items.flatMap(item => item.tags || []))].sort((a, b) => a.localeCompare(b))
 
 export default function TagSettings({ projects, leadership, notify }) {
@@ -37,12 +38,52 @@ export default function TagSettings({ projects, leadership, notify }) {
     setDirty(true)
   }
 
-  const save = async () => {
+  const allTags = [...new Set(groups.flatMap(g => g.tags))]
+
+  // Machine-translates the tag names that have no Spanish/French label yet
+  const fillMissing = async current => {
+    let next = current
+    let count = 0
+    for (const lang of LANGS) {
+      const missing = allTags.filter(tag => !next[tag]?.[lang]?.trim())
+      if (missing.length === 0) continue
+      const translated = await translateStrings(missing, lang)
+      missing.forEach((tag, i) => {
+        next = { ...next, [tag]: { ...(next[tag] || {}), [lang]: translated[i] } }
+        count++
+      })
+    }
+    return { next, count }
+  }
+
+  const translateNow = async () => {
     setSaving(true)
     try {
-      await firestoreApi.save(SETTINGS_PATH, { visibleTags: visible, tagLabels: labels })
+      const { next, count } = await fillMissing(labels)
+      setLabels(next)
+      setDirty(true)
+      notify(count ? `${count} nombres traducidos. Revísalos antes de guardar.` : 'Todas las etiquetas ya tienen traducción.')
+    } catch (err) {
+      notify(`Traducción automática fallida: ${err.message}`, 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const save = async () => {
+    setSaving(true)
+    let toSave = labels
+    let warning = ''
+    try {
+      toSave = (await fillMissing(labels)).next
+      setLabels(toSave)
+    } catch (err) {
+      warning = ` (la traducción automática falló: ${err.message})`
+    }
+    try {
+      await firestoreApi.save(SETTINGS_PATH, { visibleTags: visible, tagLabels: toSave })
       setDirty(false)
-      notify('Configuración de etiquetas guardada para todos los visitantes.')
+      notify(`Configuración de etiquetas guardada para todos los visitantes${warning}.`, warning ? 'error' : 'success')
     } catch (err) {
       notify(`No se pudo guardar: ${err.message}`, 'error')
     } finally {
@@ -54,10 +95,11 @@ export default function TagSettings({ projects, leadership, notify }) {
     <section className="adm-panel">
       <div className="adm-panel-head">
         <h2>Etiquetas</h2>
+        <button type="button" className="adm-btn" onClick={translateNow} disabled={saving}>Traducir vacías</button>
       </div>
       <p className="adm-hint">
-        Marca qué etiquetas aparecen como filtros en cada página y, si quieres, escribe su nombre en cada idioma
-        (si lo dejas vacío, se muestra el nombre original).
+        Marca qué etiquetas aparecen como filtros en cada página. Los nombres se escriben en inglés; al guardar, los que no tengan
+        traducción al español o al francés se traducen automáticamente y puedes corregirlos aquí.
       </p>
 
       {groups.map(group => (
@@ -69,7 +111,7 @@ export default function TagSettings({ projects, leadership, notify }) {
             <div className="adm-table-wrap">
               <table className="adm-table">
                 <thead>
-                  <tr><th>Filtro visible</th><th>Etiqueta</th>{LANGS.map(l => <th key={l}>{l.toUpperCase()}</th>)}</tr>
+                  <tr><th>Filtro visible</th><th>Etiqueta (EN)</th>{LANGS.map(l => <th key={l}>{l.toUpperCase()}</th>)}</tr>
                 </thead>
                 <tbody>
                   {group.tags.map(tag => (

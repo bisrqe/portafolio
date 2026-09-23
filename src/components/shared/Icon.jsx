@@ -16,6 +16,7 @@ const PATHS = {
   pin: <><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10" r="2.5" /></>,
   globe: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z" /></>,
   camera: <><path d="M4 8h3l2-3h6l2 3h3v11H4Z" /><circle cx="12" cy="13" r="3.5" /></>,
+  award: <><circle cx="12" cy="9" r="6" /><path d="m8.5 13.5-1.5 7.5 5-3 5 3-1.5-7.5" /></>,
   terminal: <><path d="m5 8 4 4-4 4" /><path d="M12 16h7" /></>,
   plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
   edit: <><path d="M4 20h4L19 9l-4-4L4 16Z" /><path d="m13 7 4 4" /></>,

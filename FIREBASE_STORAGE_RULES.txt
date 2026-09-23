@@ -3,8 +3,13 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // Admin = the `admin` custom claim (scripts/set-admin-claim.cjs)
+    // or the owner's verified Google account
     function isAdmin() {
-      return request.auth != null && request.auth.token.admin == true;
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        (request.auth.token.email == 'bismarck@bisrqe.com' && request.auth.token.email_verified == true)
+      );
     }
 
     // CV (PDF) — public read, admin-only write

@@ -10,7 +10,7 @@ const TABS = [
   { id: 'tags', label: 'Etiquetas' },
 ]
 
-export default function AdminDashboard({ home, projects, leadership, user, hasClaim, onSignOut }) {
+export default function AdminDashboard({ home, projects, leadership, user, onSignOut }) {
   const [tab, setTab] = useState('projects')
   const [notice, setNotice] = useState(null)
 
@@ -37,13 +37,6 @@ export default function AdminDashboard({ home, projects, leadership, user, hasCl
           <button type="button" className="adm-btn" onClick={onSignOut}>Cerrar sesión</button>
         </div>
       </header>
-
-      {!hasClaim && (
-        <p className="adm-warning">
-          Tu cuenta entró por correo, pero no tiene el claim <code>admin</code>. Las reglas de Firestore y Storage rechazarán
-          los cambios hasta que ejecutes <code>node scripts/set-admin-claim.cjs</code> (consulta el README).
-        </p>
-      )}
 
       <nav className="adm-tabs" role="tablist">
         {TABS.map(t => (
