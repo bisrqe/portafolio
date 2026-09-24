@@ -5,6 +5,8 @@ import { sortItems } from '../shared/sort'
 import { Field, FramingEditor, ImagesField, LangTabs, ListInput, TText } from './fields'
 import { migrateLegacy, toPayload } from './translate'
 import { autoTranslate, countPending } from './autoTranslate'
+import { schedulePublish } from './publish'
+import { KIND_BASE, resolveSlugs, slugify } from '../../content/items'
 
 const CONFIG = {
   projects: { singular: 'proyecto', title: 'Proyectos', hasRole: false, hasSdg: false },
@@ -12,17 +14,32 @@ const CONFIG = {
 }
 
 const emptyItem = () => ({
-  title: '', role: '', description: '', link: '', images: [], tags: [], sdg: [],
+  title: '', role: '', summary: '', description: '', slug: '', link: '', images: [], tags: [], sdg: [],
   featured: false, order: '', positionX: 0, positionY: 0, zoom: 1, translations: {}, i18nMeta: {},
 })
 
-const schemaFor = cfg => ({ fields: cfg.hasRole ? ['title', 'role', 'description'] : ['title', 'description'] })
+const schemaFor = cfg => ({ fields: cfg.hasRole ? ['title', 'role', 'summary', 'description'] : ['title', 'summary', 'description'] })
 
-function toForm(item) {
+// Existing entries without a saved slug get the one the public site already uses
+function toForm(item, slugs) {
   const images = getImages(item)
-  const form = { ...emptyItem(), ...item, images, order: item.order ?? '', translations: item.translations || {}, i18nMeta: item.i18nMeta || {} }
-  return migrateLegacy(form, ['title', 'role', 'description'])
+  const form = {
+    ...emptyItem(), ...item, images, order: item.order ?? '', slug: item.slug || slugs?.get(item.id) || '',
+    translations: item.translations || {}, i18nMeta: item.i18nMeta || {},
+  }
+  return migrateLegacy(form, ['title', 'role', 'summary', 'description'])
 }
+
+// Unique URL slug among the other entries of the collection
+function uniqueSlug(form, items) {
+  const base = slugify(form.slug || form.title) || 'item'
+  const taken = new Set([...resolveSlugs(items.filter(i => i.id !== form.id)).values()])
+  let slug = base
+  for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`
+  return slug
+}
+
+const SUMMARY_MAX = 220
 
 export default function ItemsEditor({ collectionName, items, notify }) {
   const cfg = CONFIG[collectionName]
@@ -31,10 +48,11 @@ export default function ItemsEditor({ collectionName, items, notify }) {
   const [busy, setBusy] = useState('') // '' | 'saving' | 'translating' | 'bulk'
   const sorted = useMemo(() => sortItems(items), [items])
   const schema = useMemo(() => schemaFor(cfg), [cfg])
-  const pendingItems = useMemo(() => sorted.map(toForm).filter(item => countPending(item, schema) > 0), [sorted, schema])
+  const slugs = useMemo(() => resolveSlugs(items), [items])
+  const pendingItems = useMemo(() => sorted.map(i => toForm(i, slugs)).filter(item => countPending(item, schema) > 0), [sorted, schema, slugs])
 
   const openNew = () => { setForm(emptyItem()); setLang('base') }
-  const openEdit = item => { setForm(toForm(item)); setLang('base') }
+  const openEdit = item => { setForm(toForm(item, slugs)); setLang('base') }
   const close = () => setForm(null)
 
   const translateNow = async () => {
@@ -58,6 +76,7 @@ export default function ItemsEditor({ collectionName, items, notify }) {
       try {
         await firestoreApi.update(collectionName, item.id, { translations, i18nMeta })
         done++
+        schedulePublish()
       } catch (err) {
         failed = err.message
         break
@@ -74,6 +93,7 @@ export default function ItemsEditor({ collectionName, items, notify }) {
     const { result: translated, count, error } = await autoTranslate(form, schema)
     setForm(translated)
     const payload = toPayload(translated)
+    payload.slug = uniqueSlug(translated, items)
     payload.image = payload.images[0] || ''
     payload.order = payload.order === '' ? null : Number(payload.order)
     if (!cfg.hasRole) delete payload.role
@@ -81,6 +101,7 @@ export default function ItemsEditor({ collectionName, items, notify }) {
     try {
       if (form.id) await firestoreApi.update(collectionName, form.id, payload)
       else await firestoreApi.add(collectionName, payload)
+      schedulePublish()
       const base = form.id ? 'Cambios guardados' : `Nuevo ${cfg.singular} publicado`
       if (error) notify(`${base}, pero la traducción automática falló (${error}). Se mostrará el inglés hasta traducir.`, 'error')
       else notify(count ? `${base}; ${count === 1 ? '1 texto traducido' : `${count} textos traducidos`} automáticamente.` : `${base}.`)
@@ -96,6 +117,7 @@ export default function ItemsEditor({ collectionName, items, notify }) {
     if (!window.confirm(`¿Eliminar «${item.title || 'sin título'}»? Esta acción no se puede deshacer.`)) return
     try {
       await firestoreApi.remove(collectionName, item.id)
+      schedulePublish()
       notify('Elemento eliminado.')
     } catch (err) {
       notify(`No se pudo eliminar: ${err.message}`, 'error')
@@ -130,12 +152,21 @@ export default function ItemsEditor({ collectionName, items, notify }) {
             </Field>
           )}
         </div>
-        <Field label="Descripción">
-          <TText obj={form} field="description" lang={lang} onChange={setForm} multiline rows={5} />
+        <Field
+          label="Resumen corto (tarjetas y buscadores)"
+          hint={`Opcional, hasta ~${SUMMARY_MAX} caracteres (${(lang === 'base' ? form.summary : form.translations?.[lang]?.summary || '').length}). Si está vacío, se usa el inicio de la descripción.`}
+        >
+          <TText obj={form} field="summary" lang={lang} onChange={setForm} multiline rows={2} />
+        </Field>
+        <Field label="Descripción completa (página del proyecto)" hint="Separa los párrafos con una línea en blanco.">
+          <TText obj={form} field="description" lang={lang} onChange={setForm} multiline rows={8} />
         </Field>
 
         <div className="adm-grid-2">
-          <Field label="Enlace">
+          <Field label="Dirección de la página" hint={`${KIND_BASE[collectionName]}/${slugify(form.slug || form.title) || '…'}  ·  cambiarla rompe los enlaces ya compartidos`}>
+            <input type="text" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} placeholder={slugify(form.title)} />
+          </Field>
+          <Field label="Enlace externo">
             <input type="url" value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
           </Field>
           <Field label="Etiquetas (separadas por comas)" hint="Los nombres de las etiquetas se traducen en la pestaña «Etiquetas».">

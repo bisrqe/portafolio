@@ -10,15 +10,29 @@
   color: var(--accent);
 }
 .item-title { font-size: 1.15rem; line-height: 1.35; font-weight: 650; letter-spacing: -0.01em; }
-.item-desc { color: var(--text-muted); font-size: 0.95rem; white-space: pre-line; }
+.item-title-link { transition: color 0.2s; }
+.item-title-link:hover { color: var(--accent); }
+.item-desc { color: var(--text-muted); font-size: 0.95rem; }
+.chip--more { color: var(--text-soft); }
 .item-card--compact .item-desc {
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .item-link { margin-top: auto; padding-top: 4px; }
 
+/* Entries without images keep the same card rhythm */
+.media--placeholder {
+  display: grid; justify-items: center; background-color: var(--surface-2);
+}
+.media--placeholder { align-content: center; gap: 12px; }
+.media-placeholder-icon {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; justify-self: center;
+  border-radius: 12px; background: var(--accent-soft); color: var(--accent);
+}
+.media-placeholder-text { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--text); text-align: center; padding: 0 16px; }
+
 /* ---------- Media carousel ---------- */
 .media { position: relative; aspect-ratio: 16 / 10; background: var(--surface-2); overflow: hidden; border-bottom: 1px solid var(--border); }
-.media-frame { display: block; width: 100%; height: 100%; cursor: zoom-in; }
+.media-frame { display: block; width: 100%; height: 100%; cursor: pointer; }
 .media-frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); }
 .media-nav {
   position: absolute; top: 50%; transform: translateY(-50%);

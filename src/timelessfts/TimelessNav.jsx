@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '../router'
 import { useLanguage } from '../i18n/LanguageContext'
 import { LanguageSwitcher } from '../components/layout/Controls'
 
@@ -10,21 +11,17 @@ const NAV_LINKS = [
   { href: '/timelessfts/contact', key: 'contact' },
 ]
 
-export default function TimelessNav({ path, navigate }) {
+export default function TimelessNav({ path }) {
   const { t } = useLanguage()
   const [open, setOpen] = useState(false)
 
-  const handleLink = (e, href) => {
-    e.preventDefault()
-    setOpen(false)
-    navigate(href)
-  }
+  const close = () => setOpen(false)
 
   return (
     <nav className="nav" aria-label="Timeless">
-      <a href="/timelessfts" className="nav-logo" aria-label={t('timeless.nav.home')} onClick={e => handleLink(e, '/timelessfts')}>
+      <Link to="/timelessfts" className="nav-logo" aria-label={t('timeless.nav.home')} onClick={close}>
         <span className="logo-text">timelessfts</span>
-      </a>
+      </Link>
 
       <button
         className={`hamburger${open ? ' open' : ''}`}
@@ -39,13 +36,13 @@ export default function TimelessNav({ path, navigate }) {
       <ul className={`nav-links${open ? ' open' : ''}`} id="tl-nav-links">
         {NAV_LINKS.map(({ href, key }) => (
           <li key={href}>
-            <a href={href} className={path === href ? 'active' : ''} onClick={e => handleLink(e, href)}>
+            <Link to={href} className={path === href ? 'active' : ''} onClick={close}>
               {t(`timeless.nav.${key}`)}
-            </a>
+            </Link>
           </li>
         ))}
         <li className="nav-extras">
-          <a href="/" className="nav-back" onClick={e => handleLink(e, '/')}>← {t('timeless.nav.back')}</a>
+          <Link to="/" className="nav-back" onClick={close}>← {t('timeless.nav.back')}</Link>
           <LanguageSwitcher className="tl-lang" />
         </li>
       </ul>

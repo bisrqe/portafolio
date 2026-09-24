@@ -2,15 +2,14 @@ import { Link } from '../../router'
 import { useLanguage } from '../../i18n/LanguageContext'
 import Icon from '../shared/Icon'
 
-export const CONTACT = {
-  email: 'bismarck@bisrqe.com',
-  linkedin: 'https://www.linkedin.com/in/bisrqe',
-  instagram: 'https://www.instagram.com/timelessfts/',
-}
+import { PROFILE } from '../../content/profile'
+
+// Kept for existing imports
+export const CONTACT = { email: PROFILE.email, linkedin: PROFILE.linkedin, instagram: PROFILE.instagram, github: PROFILE.github }
 
 export default function Footer() {
   const { t } = useLanguage()
-  const year = new Date().getFullYear()
+  const year = __BUILD_YEAR__ // build-time constant (vite.config.js) so prerendered HTML hydrates identically
   return (
     <footer className="site-footer">
       <div className="container site-footer-inner">
@@ -31,12 +30,13 @@ export default function Footer() {
 
         <div className="site-footer-social">
           <a href={`mailto:${CONTACT.email}`} className="icon-btn" aria-label="Email"><Icon name="mail" size={18} /></a>
-          <a href={CONTACT.linkedin} className="icon-btn" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
+          <a href={CONTACT.linkedin} className="icon-btn" target="_blank" rel="noopener noreferrer me" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
+          <a href={CONTACT.github} className="icon-btn" target="_blank" rel="noopener noreferrer me" aria-label="GitHub"><Icon name="github" size={18} /></a>
           <a href={CONTACT.instagram} className="icon-btn" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Icon name="instagram" size={18} /></a>
         </div>
       </div>
       <div className="container site-footer-bottom">
-        <span>© {year} Bismarck Animas. {t('footer.rights')}</span>
+        <span>© {year} {PROFILE.name}. {t('footer.rights')}</span>
         <span className="site-footer-mono">Monterrey, MX</span>
       </div>
     </footer>

@@ -45,6 +45,9 @@
   background: var(--surface);
   transition: color 0.2s, border-color 0.2s;
 }
+.theme-toggle .icon-moon { display: none; }
+:root[data-theme='light'] .theme-toggle .icon-sun { display: none; }
+:root[data-theme='light'] .theme-toggle .icon-moon { display: block; }
 .icon-btn:hover { color: var(--accent); border-color: var(--accent); }
 
 .lang-switch {

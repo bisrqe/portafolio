@@ -1,9 +1,10 @@
+import { Link } from '../router'
 import { useLanguage } from '../i18n/LanguageContext'
 import { cld } from './galleries'
 
 const PORTRAIT = 'https://res.cloudinary.com/dobiuvljw/image/upload/v1776904888/personal_portrait_bc2p1y_7e0f4f.jpg'
 
-export default function TimelessAbout({ navigate }) {
+export default function TimelessAbout() {
   const { t } = useLanguage()
   const [before, after] = t('timeless.about.closing').split('{link}')
 
@@ -23,9 +24,9 @@ export default function TimelessAbout({ navigate }) {
           {t('timeless.about.paragraphs').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
           <p>
             {before}
-            <a href="/timelessfts/contact" onClick={e => { e.preventDefault(); navigate('/timelessfts/contact') }}>
+            <Link to="/timelessfts/contact">
               {t('timeless.about.closingLink')}
-            </a>
+            </Link>
             {after}
           </p>
         </section>

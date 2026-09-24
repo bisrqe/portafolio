@@ -183,6 +183,9 @@ input, textarea, select { font: inherit; color: inherit; }
 .page-header { padding: calc(var(--nav-h) + 72px) 0 48px; border-bottom: 1px solid var(--border); }
 .page-header .section-title { font-size: clamp(2rem, 4.5vw, 3rem); }
 
+/* Small uppercase heading inside cards (Quick facts, Toolkit, Details…) */
+.panel-title { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; }
+
 /* ==========================================================================
    Misc
    ========================================================================== */

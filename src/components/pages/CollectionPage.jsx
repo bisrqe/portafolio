@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSiteSettings } from '../../hooks/useSiteSettings'
 import ItemCard from '../shared/ItemCard'
 import TagFilter from '../shared/TagFilter'
-import Lightbox from '../shared/Lightbox'
 import { sortItems } from '../shared/sort'
+import { itemPath, resolveSlugs } from '../../content/items'
 import '../shared/shared.css'
 
 /**
@@ -15,10 +15,8 @@ export default function CollectionPage({ kind, items }) {
   const { t } = useLanguage()
   const { visibleTags, tagLabel } = useSiteSettings()
   const [activeTag, setActiveTag] = useState(null)
-  const [expanded, setExpanded] = useState(null)
-  const closeLightbox = useCallback(() => setExpanded(null), [])
-
   const sorted = useMemo(() => sortItems(items), [items])
+  const slugs = useMemo(() => resolveSlugs(items), [items])
 
   const tags = useMemo(() => {
     const allowed = visibleTags[kind]
@@ -28,7 +26,6 @@ export default function CollectionPage({ kind, items }) {
   }, [sorted, visibleTags, kind, tagLabel])
 
   const filtered = activeTag ? sorted.filter(item => item.tags?.includes(activeTag)) : sorted
-  const cardKind = kind === 'leadership' ? 'leadership' : 'project'
   const emptyText = kind === 'leadership'
     ? t('leadership.empty')
     : (activeTag ? t('projects.emptyTag', { tag: tagLabel(activeTag) }) : t('projects.empty'))
@@ -51,14 +48,13 @@ export default function CollectionPage({ kind, items }) {
           ) : (
             <div className="item-grid">
               {filtered.map(item => (
-                <ItemCard key={item.id} item={item} kind={cardKind} tagLabel={tagLabel} onExpand={setExpanded} />
+                <ItemCard key={item.id} item={item} kind={kind} href={itemPath(kind, slugs.get(item.id))} tagLabel={tagLabel} />
               ))}
             </div>
           )}
         </div>
       </section>
 
-      <Lightbox src={expanded} onClose={closeLightbox} />
     </>
   )
 }

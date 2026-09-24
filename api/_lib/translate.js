@@ -5,37 +5,11 @@
 //   DEEPL_API_KEY             → DeepL (best quality; the free plan covers 500,000 characters/month)
 //   GOOGLE_TRANSLATE_API_KEY  → Google Cloud Translation v2 (API key, not a service-account key)
 //   (none)                    → MyMemory public API (no key, lower quality, daily quota)
-import { createRemoteJWKSet, jwtVerify } from 'jose'
+import { authorize } from './auth.js'
 
 const TARGETS = ['es', 'fr']
 const MAX_TEXTS = 60
 const MAX_CHARS = 30000
-const GOOGLE_JWKS = createRemoteJWKSet(
-  new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'),
-)
-
-// Only the portfolio owner may use the endpoint: a valid Firebase ID token with the
-// `admin` claim, or the owner's verified email.
-async function authorize(headers, env) {
-  const projectId = env.FIREBASE_PROJECT_ID || env.VITE_FIREBASE_PROJECT_ID
-  const adminEmail = (env.ADMIN_EMAIL || env.VITE_ADMIN_EMAIL || '').toLowerCase()
-  const header = headers.authorization || headers.Authorization || ''
-  const token = header.startsWith('Bearer ') ? header.slice(7) : ''
-  if (!projectId) return { ok: false, status: 500, error: 'FIREBASE_PROJECT_ID is not configured on the server.' }
-  if (!token) return { ok: false, status: 401, error: 'Missing sign-in token.' }
-  try {
-    const { payload } = await jwtVerify(token, GOOGLE_JWKS, {
-      issuer: `https://securetoken.google.com/${projectId}`,
-      audience: projectId,
-    })
-    const isOwner = adminEmail && payload.email?.toLowerCase() === adminEmail && payload.email_verified === true
-    if (payload.admin === true || isOwner) return { ok: true }
-    return { ok: false, status: 403, error: 'This account cannot use automatic translation.' }
-  } catch {
-    return { ok: false, status: 401, error: 'Invalid or expired sign-in token.' }
-  }
-}
-
 async function deepl(texts, target, key) {
   const host = key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com'
   const res = await fetch(`${host}/v2/translate`, {

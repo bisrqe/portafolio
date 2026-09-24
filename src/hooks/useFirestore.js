@@ -1,8 +1,16 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 
 export const HOME_PATH = 'home/content'
+
+/**
+ * Data embedded in prerendered pages (window.__PORTFOLIO_DATA__), keyed by collection name or
+ * document path. The first render uses it so it matches the static HTML exactly; live Firestore
+ * updates replace it afterwards.
+ */
+const InitialDataContext = createContext(null)
+export const InitialDataProvider = InitialDataContext.Provider
 
 const cacheKey = name => `portfolio_cache_${name.replace(/\//g, '_')}`
 
@@ -29,7 +37,8 @@ function plain(data) {
  * still renders the last known content if Firestore is unreachable.
  */
 export function useCollection(name) {
-  const [items, setItems] = useState(() => readCache(name, []))
+  const initial = useContext(InitialDataContext)
+  const [items, setItems] = useState(() => initial?.[name] ?? readCache(name, []))
   const [loading, setLoading] = useState(Boolean(db))
 
   useEffect(() => {
@@ -54,7 +63,8 @@ export function useCollection(name) {
 
 /** Live subscription to a single Firestore document (e.g. "home/content"). */
 export function useDocument(path) {
-  const [data, setData] = useState(() => readCache(path, {}))
+  const initial = useContext(InitialDataContext)
+  const [data, setData] = useState(() => initial?.[path] ?? readCache(path, {}))
   const [loading, setLoading] = useState(Boolean(db))
 
   useEffect(() => {

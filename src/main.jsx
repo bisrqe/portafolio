@@ -1,19 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import { RouterProvider } from './router'
-import { LanguageProvider } from './i18n/LanguageContext'
-import { ThemeProvider } from './theme/ThemeContext'
+import { StrictMode } from 'react'
+import { createRoot, hydrateRoot } from 'react-dom/client'
+import AppRoot from './AppRoot'
 import './styles/global.css'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <LanguageProvider>
-        <RouterProvider>
-          <App />
-        </RouterProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  </React.StrictMode>,
+const container = document.getElementById('root')
+// Prerendered pages embed the data they were built with, so the first render matches the HTML
+const initialData = window.__PORTFOLIO_DATA__ || null
+const app = (
+  <StrictMode>
+    <AppRoot initialData={initialData} />
+  </StrictMode>
 )
+
+if (initialData && container.hasChildNodes()) hydrateRoot(container, app)
+else createRoot(container).render(app)

@@ -1,11 +1,12 @@
-export default function TimelessFooter({ navigate }) {
+import { Link } from '../router'
+export default function TimelessFooter() {
   return (
     <footer className="footer">
       <p>
-        &copy; {new Date().getFullYear()} Timeless FTS &mdash;{' '}
-        <a href="/timelessfts/contact" onClick={e => { e.preventDefault(); navigate('/timelessfts/contact') }}>
+        &copy; {__BUILD_YEAR__} Timeless FTS &mdash;{' '}
+        <Link to="/timelessfts/contact">
           bismarck@bisrqe.com
-        </a>
+        </Link>
       </p>
     </footer>
   )

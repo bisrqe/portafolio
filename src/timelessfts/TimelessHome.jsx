@@ -1,8 +1,9 @@
+import { Link } from '../router'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { SLIDES, cld } from './galleries'
 
-function Carousel({ navigate }) {
+function Carousel() {
   const { t } = useLanguage()
   const captions = t('timeless.carousel.slides')
   const [current, setCurrent] = useState(0)
@@ -73,14 +74,9 @@ function Carousel({ navigate }) {
             <div className="carousel-caption">
               {i === 0 ? <h1>{captions[i]?.title}</h1> : <h2>{captions[i]?.title}</h2>}
               <p>{captions[i]?.subtitle}</p>
-              <a
-                href={`/timelessfts/${slide.gallery}`}
-                className="carousel-link"
-                tabIndex={i === current ? 0 : -1}
-                onClick={e => { e.preventDefault(); navigate(`/timelessfts/${slide.gallery}`) }}
-              >
+              <Link to={`/timelessfts/${slide.gallery}`} className="carousel-link" tabIndex={i === current ? 0 : -1}>
                 {t('timeless.carousel.explore')} →
-              </a>
+              </Link>
             </div>
           </div>
         ))}
@@ -107,7 +103,7 @@ function Carousel({ navigate }) {
   )
 }
 
-function Accordion({ navigate }) {
+function Accordion() {
   const { t } = useLanguage()
   const items = t('timeless.faq.items')
   const [openIndex, setOpenIndex] = useState(null)
@@ -139,9 +135,9 @@ function Accordion({ navigate }) {
               {item.a.includes('{contact}') ? (
                 <>
                   {item.a.split('{contact}')[0]}
-                  <a href="/timelessfts/contact" onClick={e => { e.preventDefault(); navigate('/timelessfts/contact') }}>
+                  <Link to="/timelessfts/contact">
                     {t('timeless.faq.contactLink')}
-                  </a>
+                  </Link>
                   {item.a.split('{contact}')[1]}
                 </>
               ) : item.a}
@@ -153,11 +149,11 @@ function Accordion({ navigate }) {
   )
 }
 
-export default function TimelessHome({ navigate }) {
+export default function TimelessHome() {
   return (
     <>
-      <Carousel navigate={navigate} />
-      <Accordion navigate={navigate} />
+      <Carousel />
+      <Accordion />
     </>
   )
 }

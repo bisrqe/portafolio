@@ -1,23 +1,30 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Serves /api/translate during `npm run dev` (in production it is a Vercel function)
-function translateApiDev(env) {
+// Serves the /api/* functions during `npm run dev` (in production they are Vercel functions)
+const API_HANDLERS = {
+  '/api/translate': () => import('./api/_lib/translate.js').then(m => m.handleTranslate),
+  '/api/rebuild': () => import('./api/_lib/rebuild.js').then(m => m.handleRebuild),
+}
+
+function apiDev(env) {
   return {
-    name: 'translate-api-dev',
+    name: 'api-dev',
     configureServer(server) {
-      server.middlewares.use('/api/translate', async (req, res) => {
-        const { handleTranslate } = await import('./api/_lib/translate.js')
-        let raw = ''
-        for await (const chunk of req) raw += chunk
-        let body = {}
-        try { body = JSON.parse(raw || '{}') } catch { /* invalid JSON → handled as bad request */ }
-        const result = req.method === 'POST'
-          ? await handleTranslate({ headers: req.headers, body, env })
-          : { status: 405, body: { error: 'Method not allowed' } }
-        res.statusCode = result.status
-        res.setHeader('Content-Type', 'application/json')
-        res.end(JSON.stringify(result.body))
+      Object.entries(API_HANDLERS).forEach(([route, load]) => {
+        server.middlewares.use(route, async (req, res) => {
+          const handler = await load()
+          let raw = ''
+          for await (const chunk of req) raw += chunk
+          let body = {}
+          try { body = JSON.parse(raw || '{}') } catch { /* invalid JSON → handled as bad request */ }
+          const result = req.method === 'POST'
+            ? await handler({ headers: req.headers, body, env })
+            : { status: 405, body: { error: 'Method not allowed' } }
+          res.statusCode = result.status
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify(result.body))
+        })
       })
     },
   }
@@ -26,7 +33,11 @@ function translateApiDev(env) {
 export default defineConfig(({ mode }) => {
   const env = { ...process.env, ...loadEnv(mode, process.cwd(), '') }
   return {
-    plugins: [react(), translateApiDev(env)],
+    plugins: [react(), apiDev(env)],
+    define: {
+      // Same value in the browser bundle and the prerender bundle, so the footer hydrates cleanly
+      __BUILD_YEAR__: JSON.stringify(new Date().getFullYear()),
+    },
     server: { port: 3000 },
     build: {
       // Firestore alone is ~450 kB; the admin area is split into its own chunk

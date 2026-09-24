@@ -3,7 +3,7 @@ import { useLanguage } from '../../i18n/LanguageContext'
 import Icon from './Icon'
 import { framingStyle } from './media'
 
-export default function ImageCarousel({ images, alt, item, onExpand }) {
+export default function ImageCarousel({ images, alt, item, onExpand, frameLabel }) {
   const { t } = useLanguage()
   const [index, setIndex] = useState(0)
   if (images.length === 0) return null
@@ -14,7 +14,7 @@ export default function ImageCarousel({ images, alt, item, onExpand }) {
 
   return (
     <div className="media">
-      <button type="button" className="media-frame" onClick={() => onExpand?.(images[current])} aria-label={t('common.expand')}>
+      <button type="button" className="media-frame" onClick={() => onExpand?.(images[current])} aria-label={frameLabel || t('common.expand')}>
         <img src={images[current]} alt={alt} loading="lazy" style={framingStyle(item)} />
       </button>
       {multiple && (

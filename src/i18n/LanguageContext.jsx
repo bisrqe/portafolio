@@ -1,5 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { translations } from './translations'
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
+import { pickField, translate } from './t'
+import { LANG_STORAGE_KEY } from './paths'
+import { useRouter } from '../router'
 
 export const LANGUAGES = [
   { code: 'en', label: 'EN', name: 'English' },
@@ -8,53 +10,24 @@ export const LANGUAGES = [
 ]
 
 const SUPPORTED = LANGUAGES.map(l => l.code)
-const STORAGE_KEY = 'portfolio_lang'
-
-function detectInitialLanguage() {
-  const fromUrl = new URLSearchParams(window.location.search).get('lang')
-  if (SUPPORTED.includes(fromUrl)) return fromUrl
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (SUPPORTED.includes(saved)) return saved
-  } catch { /* storage unavailable */ }
-  const browser = (navigator.language || 'en').slice(0, 2).toLowerCase()
-  return SUPPORTED.includes(browser) ? browser : 'en'
-}
-
-// Resolves a dotted key ("home.hero.cta") inside a nested dictionary
-function lookup(dict, key) {
-  return key.split('.').reduce((node, part) => (node == null ? undefined : node[part]), dict)
-}
 
 const LanguageContext = createContext(null)
 
+// The active language comes from the URL (/, /es, /fr); see src/i18n/paths.js
 export function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState(detectInitialLanguage)
+  const { lang, switchLanguage } = useRouter()
 
-  useEffect(() => {
-    document.documentElement.lang = lang
-    try { localStorage.setItem(STORAGE_KEY, lang) } catch { /* storage unavailable */ }
-  }, [lang])
+  useEffect(() => { document.documentElement.lang = lang }, [lang])
 
+  // Explicit choice: remembered so the next visit opens in this language (see index.html)
   const setLang = useCallback(code => {
-    if (SUPPORTED.includes(code)) setLangState(code)
-  }, [])
+    if (!SUPPORTED.includes(code)) return
+    try { localStorage.setItem(LANG_STORAGE_KEY, code) } catch { /* storage unavailable */ }
+    switchLanguage(code)
+  }, [switchLanguage])
 
-  // t('nav.home') → string in the active language, falling back to English, then to the key
-  const t = useCallback((key, vars) => {
-    let value = lookup(translations[lang], key) ?? lookup(translations.en, key) ?? key
-    if (vars && typeof value === 'string') {
-      Object.entries(vars).forEach(([k, v]) => { value = value.replaceAll(`{${k}}`, v) })
-    }
-    return value
-  }, [lang])
-
-  // pick(item, 'title') → item.translations[lang].title when present, otherwise item.title
-  const pick = useCallback((item, field) => {
-    if (!item) return ''
-    const translated = item.translations?.[lang]?.[field]
-    return (typeof translated === 'string' && translated.trim()) ? translated : (item[field] ?? '')
-  }, [lang])
+  const t = useCallback((key, vars) => translate(lang, key, vars), [lang])
+  const pick = useCallback((item, field) => pickField(item, field, lang), [lang])
 
   const value = useMemo(() => ({ lang, setLang, t, pick }), [lang, setLang, t, pick])
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>

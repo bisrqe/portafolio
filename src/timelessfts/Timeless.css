@@ -465,8 +465,6 @@
   transform: scale(1.035);
   opacity: 0.92;
 }
-.tl .gallery-item img[data-src] { opacity: 0; }
-.tl .gallery-item img.loaded     { opacity: 1; }
 
 /* ============================================================
    CONTACT PAGE

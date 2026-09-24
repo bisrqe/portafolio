@@ -9,6 +9,7 @@ import FirebaseUpload from './FirebaseUpload'
 import { Field, LangTabs, ListEditor, ListInput, TText } from './fields'
 import { cleanI18n, migrateLegacy } from './translate'
 import { autoTranslate, countPending } from './autoTranslate'
+import { schedulePublish } from './publish'
 
 const TOP_FIELDS = ['tagline', 'description', 'fullBio']
 export const HOME_SCHEMA = {
@@ -82,6 +83,7 @@ export default function HomeEditor({ home, notify }) {
     try {
       await firestoreApi.save(HOME_PATH, toPayload(result))
       setDirty(false)
+      schedulePublish()
       if (error) notify(`Guardado, pero la traducción automática falló (${error}). Se mostrará el inglés hasta traducir.`, 'error')
       else notify(count ? `Página de inicio guardada; ${count === 1 ? '1 texto traducido' : `${count} textos traducidos`} automáticamente.` : 'Página de inicio guardada.')
     } catch (err) {
@@ -93,6 +95,7 @@ export default function HomeEditor({ home, notify }) {
 
   const saveCv = async ({ url }) => {
     await firestoreApi.save(HOME_PATH, { cvUrl: url })
+    schedulePublish()
     notify('CV actualizado.')
   }
 

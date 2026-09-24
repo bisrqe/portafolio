@@ -1,13 +1,12 @@
-import { useCallback, useState } from 'react'
 import { Link } from '../../router'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useSiteSettings } from '../../hooks/useSiteSettings'
 import { CONTACT } from '../layout/Footer'
 import ItemCard from '../shared/ItemCard'
-import Lightbox from '../shared/Lightbox'
 import Icon from '../shared/Icon'
 import { featuredItems } from '../shared/sort'
 import { resolveHome, splitItems } from '../../content/homeContent'
+import { itemPath, resolveSlugs } from '../../content/items'
 import '../shared/shared.css'
 import './home.css'
 
@@ -200,10 +199,11 @@ function Expertise({ abilities, toolkit }) {
   )
 }
 
-function Featured({ items, kind, to, onExpand }) {
+function Featured({ items, all, kind, to }) {
   const { t } = useLanguage()
   const { tagLabel } = useSiteSettings()
   if (items.length === 0) return null
+  const slugs = resolveSlugs(all)
   const isLeadership = kind === 'leadership'
   return (
     <section className="section">
@@ -217,7 +217,7 @@ function Featured({ items, kind, to, onExpand }) {
         </div>
         <div className="item-grid item-grid--3">
           {items.map(item => (
-            <ItemCard key={item.id} item={item} kind={isLeadership ? 'leadership' : 'project'} tagLabel={tagLabel} onExpand={onExpand} variant="compact" />
+            <ItemCard key={item.id} item={item} kind={kind} href={itemPath(kind, slugs.get(item.id))} tagLabel={tagLabel} variant="compact" />
           ))}
         </div>
       </div>
@@ -246,8 +246,6 @@ function CallToAction() {
 
 export default function HomeView({ home: rawHome, projects, leadership }) {
   const home = resolveHome(rawHome)
-  const [expanded, setExpanded] = useState(null)
-  const closeLightbox = useCallback(() => setExpanded(null), [])
 
   return (
     <>
@@ -255,10 +253,9 @@ export default function HomeView({ home: rawHome, projects, leadership }) {
       <About home={home} />
       <Highlights items={home.highlights} />
       <Expertise abilities={home.abilities} toolkit={home.toolkit} />
-      <Featured items={featuredItems(projects)} kind="projects" to="/professional-projects" onExpand={setExpanded} />
-      <Featured items={featuredItems(leadership)} kind="leadership" to="/leadership" onExpand={setExpanded} />
+      <Featured items={featuredItems(projects)} all={projects} kind="projects" to="/professional-projects" />
+      <Featured items={featuredItems(leadership)} all={leadership} kind="leadership" to="/leadership" />
       <CallToAction />
-      <Lightbox src={expanded} onClose={closeLightbox} />
     </>
   )
 }

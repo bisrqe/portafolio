@@ -23,13 +23,15 @@ export function LanguageSwitcher({ className = '' }) {
   )
 }
 
+// Both icons are rendered; CSS shows the right one for the current [data-theme]
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme()
+  const { toggleTheme } = useTheme()
   const { t } = useLanguage()
-  const label = theme === 'dark' ? t('nav.toLight') : t('nav.toDark')
+  const label = t('nav.toggleTheme')
   return (
-    <button type="button" className="icon-btn" onClick={toggleTheme} aria-label={label} title={label}>
-      <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={18} />
+    <button type="button" className="icon-btn theme-toggle" onClick={toggleTheme} aria-label={label} title={label}>
+      <Icon name="sun" size={18} className="icon-sun" />
+      <Icon name="moon" size={18} className="icon-moon" />
     </button>
   )
 }

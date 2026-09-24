@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import HomeEditor from './HomeEditor'
 import ItemsEditor from './ItemsEditor'
 import TagSettings from './TagSettings'
+import { onPublishState, publishNow } from './publish'
 
 const TABS = [
   { id: 'home', label: 'Inicio' },
@@ -24,6 +25,17 @@ export default function AdminDashboard({ home, projects, leadership, user, onSig
 
   const counts = { projects: projects.length, leadership: leadership.length }
 
+  // Status of the static-site rebuild that follows each save (see publish.js)
+  const [publish, setPublish] = useState({ state: 'idle' })
+  useEffect(() => { onPublishState(setPublish) }, [])
+  const PUBLISH_TEXT = {
+    scheduled: 'Versión pública: se actualizará en unos segundos…',
+    running: 'Versión pública: solicitando actualización…',
+    done: 'Versión pública: actualizándose en Vercel (1–2 min).',
+    disabled: 'Versión pública sin actualización automática: configura VERCEL_DEPLOY_HOOK_URL en Vercel.',
+    error: `No se pudo actualizar la versión pública: ${publish.reason || ''}`,
+  }
+
   return (
     <div className="adm">
       <header className="adm-header">
@@ -37,6 +49,14 @@ export default function AdminDashboard({ home, projects, leadership, user, onSig
           <button type="button" className="adm-btn" onClick={onSignOut}>Cerrar sesión</button>
         </div>
       </header>
+
+      {publish.state !== 'idle' && (
+        <div className={`adm-publish adm-publish--${publish.state}`} role="status">
+          <span>{PUBLISH_TEXT[publish.state]}</span>
+          {publish.state === 'scheduled' && <button type="button" className="adm-textbtn" onClick={publishNow}>Actualizar ahora</button>}
+          {publish.state === 'error' && <button type="button" className="adm-textbtn" onClick={publishNow}>Reintentar</button>}
+        </div>
+      )}
 
       <nav className="adm-tabs" role="tablist">
         {TABS.map(t => (

@@ -3,16 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bismarck Animas — Portfolio</title>
-    <meta name="description" content="Digital transformation, data and leadership projects by Bismarck Animas." />
     <meta name="author" content="Bismarck Animas Roque" />
     <meta name="theme-color" content="#0a0f1c" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)" />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Bismarck Animas — Portfolio" />
-    <meta property="og:description" content="Digital transformation, data and leadership projects by Bismarck Animas." />
-    <meta name="twitter:card" content="summary" />
+    <!--app-head-->
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,22 +16,50 @@
       rel="stylesheet"
     />
 
-    <!-- Apply the saved theme before first paint to avoid a flash -->
     <script>
       (function () {
-        try {
-          var saved = localStorage.getItem('portfolio_theme');
-          var theme = saved === 'light' || saved === 'dark'
-            ? saved
-            : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-          document.documentElement.dataset.theme = theme;
-        } catch (e) {}
+        var store;
+        try { store = window.localStorage; } catch (e) { store = null; }
+        var get = function (k) { try { return store && store.getItem(k); } catch (e) { return null; } };
+
+        // Theme before first paint (avoids a flash of the wrong theme)
+        var saved = get('portfolio_theme');
+        document.documentElement.dataset.theme = saved === 'light' || saved === 'dark'
+          ? saved
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+
+        // Language: English at /, Spanish at /es, French at /fr. Open the visitor's language
+        // (explicit choice, ?lang=, or browser language on the English pages) before rendering.
+        var path = location.pathname;
+        if (/^\/admin/.test(path)) return;
+        var m = path.match(/^\/(es|fr)(?=\/|$)/);
+        var current = m ? m[1] : 'en';
+        var params = new URLSearchParams(location.search);
+        var wanted = params.get('lang');
+        if (wanted === 'en' || wanted === 'es' || wanted === 'fr') {
+          try { store.setItem('portfolio_lang', wanted); } catch (e) {}
+          params.delete('lang');
+        } else {
+          wanted = get('portfolio_lang');
+          if (!wanted && current === 'en') {
+            var nav = (navigator.language || '').slice(0, 2).toLowerCase();
+            if (nav === 'es' || nav === 'fr') wanted = nav;
+          }
+        }
+        var query = params.toString();
+        if (wanted && wanted !== current && (wanted === 'en' || wanted === 'es' || wanted === 'fr')) {
+          var rest = m ? (path.slice(m[0].length) || '/') : path;
+          var target = wanted === 'en' ? rest : '/' + wanted + (rest === '/' ? '' : rest);
+          location.replace(target + (query ? '?' + query : '') + location.hash);
+        } else if (query !== location.search.replace(/^\?/, '')) {
+          history.replaceState(null, '', path + (query ? '?' + query : '') + location.hash);
+        }
       })();
     </script>
   </head>
   <body>
-    <noscript>This portfolio requires JavaScript.</noscript>
-    <div id="root"></div>
+    <div id="root"><!--app-html--></div>
+    <!--app-data-->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

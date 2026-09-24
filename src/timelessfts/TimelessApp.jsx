@@ -10,20 +10,20 @@ import './Timeless.css'
 
 // Timeless FTS — photography sub-site served under /timelessfts
 export default function TimelessApp() {
-  const { path, navigate } = useRouter()
+  const { path } = useRouter()
   const sub = path.replace(/^\/timelessfts\/?/, '').replace(/\/$/, '')
 
   let page
-  if (sub === 'about') page = <TimelessAbout navigate={navigate} />
+  if (sub === 'about') page = <TimelessAbout />
   else if (sub === 'contact') page = <TimelessContact />
   else if (GALLERIES[sub]) page = <TimelessGallery key={sub} gallery={sub} images={GALLERIES[sub]} />
-  else page = <TimelessHome navigate={navigate} />
+  else page = <TimelessHome />
 
   return (
     <div className="tl">
-      <TimelessNav path={path} navigate={navigate} />
+      <TimelessNav path={path} />
       {page}
-      <TimelessFooter navigate={navigate} />
+      <TimelessFooter />
     </div>
   )
 }

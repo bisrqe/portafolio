@@ -2,6 +2,10 @@
 
 export const timeless = {
   en: {
+    meta: {
+      title: 'Timeless FTS — Photography by Bismarck Animas',
+      description: 'Portraits, concept photography and events by Bismarck Animas (Timeless FTS), based in Monterrey, Mexico.',
+    },
     nav: {
       about: 'About',
       portraits: 'Portraits',
@@ -85,6 +89,10 @@ export const timeless = {
   },
 
   es: {
+    meta: {
+      title: 'Timeless FTS — Fotografía de Bismarck Animas',
+      description: 'Retratos, fotografía conceptual y eventos de Bismarck Animas (Timeless FTS), desde Monterrey, México.',
+    },
     nav: {
       about: 'Sobre mí',
       portraits: 'Retratos',
@@ -168,6 +176,10 @@ export const timeless = {
   },
 
   fr: {
+    meta: {
+      title: 'Timeless FTS — Photographie de Bismarck Animas',
+      description: 'Portraits, photographie conceptuelle et événements par Bismarck Animas (Timeless FTS), basé à Monterrey, au Mexique.',
+    },
     nav: {
       about: 'À propos',
       portraits: 'Portraits',

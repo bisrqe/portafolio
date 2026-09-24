@@ -6,8 +6,32 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
+      "source": "/admin",
+      "destination": "/app-shell.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/app-shell.html"
+    },
+    {
+      "source": "/:lang(es|fr)/:section(professional-projects|leadership)/:slug",
+      "destination": "/app-shell.html"
+    },
+    {
+      "source": "/:section(professional-projects|leadership)/:slug",
+      "destination": "/app-shell.html"
+    }
+  ],
+  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

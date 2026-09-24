@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { firestoreApi } from '../../hooks/useFirestore'
 import { SETTINGS_PATH, useSiteSettings } from '../../hooks/useSiteSettings'
 import { translateStrings } from './autoTranslate'
+import { schedulePublish } from './publish'
 
 const LANGS = ['es', 'fr']
 const collectTags = items => [...new Set(items.flatMap(item => item.tags || []))].sort((a, b) => a.localeCompare(b))
@@ -83,6 +84,7 @@ export default function TagSettings({ projects, leadership, notify }) {
     try {
       await firestoreApi.save(SETTINGS_PATH, { visibleTags: visible, tagLabels: toSave })
       setDirty(false)
+      schedulePublish()
       notify(`Configuración de etiquetas guardada para todos los visitantes${warning}.`, warning ? 'error' : 'success')
     } catch (err) {
       notify(`No se pudo guardar: ${err.message}`, 'error')
