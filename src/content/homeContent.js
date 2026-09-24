@@ -136,6 +136,100 @@ export const DEFAULT_TOOLKIT = [
     } },
 ].map(item => reviewed(item, TOOLKIT_FIELDS))
 
+export const QUICK_FACT_FIELDS = ['label', 'value']
+export const EDUCATION_FIELDS = ['program', 'dates', 'location', 'detail']
+
+// Rows of the "Quick facts" card. A value that is an email address is shown as a mailto link.
+export const DEFAULT_QUICK_FACTS = [
+  { id: 'location', label: 'Based in', value: 'Monterrey, MX',
+    translations: { es: { label: 'Ubicación', value: 'Monterrey, MX' }, fr: { label: 'Basé à', value: 'Monterrey, MX' } } },
+  { id: 'education', label: 'Education', value: 'Digital Transformation Engineering, Tec de Monterrey',
+    translations: {
+      es: { label: 'Formación', value: 'Ingeniería en Transformación Digital, Tec de Monterrey' },
+      fr: { label: 'Formation', value: 'Ingénierie en transformation numérique, Tec de Monterrey' },
+    } },
+  { id: 'languages', label: 'Languages', value: 'ES · EN · FR · DE',
+    translations: { es: { label: 'Idiomas', value: 'ES · EN · FR · DE' }, fr: { label: 'Langues', value: 'ES · EN · FR · DE' } } },
+  { id: 'hobbies', label: 'Hobbies', value: 'Reading, dancing, photography',
+    translations: {
+      es: { label: 'Pasatiempos', value: 'Lectura, baile y fotografía' },
+      fr: { label: 'Loisirs', value: 'Lecture, danse et photographie' },
+    } },
+  { id: 'email', label: 'Email', value: 'bismarck@bisrqe.com',
+    translations: { es: { label: 'Correo', value: 'bismarck@bisrqe.com' }, fr: { label: 'E-mail', value: 'bismarck@bisrqe.com' } } },
+].map(item => reviewed(item, QUICK_FACT_FIELDS))
+
+// Education timeline (institution names are not translated)
+export const DEFAULT_EDUCATION = [
+  {
+    id: 'tec',
+    institution: 'Tecnológico de Monterrey',
+    program: 'B.S. in Digital Transformation Engineering (ITD)',
+    dates: 'Aug 2024 – Jun 2028 (expected)',
+    location: 'Monterrey, Mexico',
+    detail: 'Academic Talent Scholarship.',
+    url: 'https://tec.mx',
+    translations: {
+      es: {
+        program: 'Ingeniería en Transformación Digital (ITD)',
+        dates: 'ago. 2024 – jun. 2028 (esperado)',
+        location: 'Monterrey, México',
+        detail: 'Beca al Talento Académico.',
+      },
+      fr: {
+        program: 'Diplôme d’ingénieur en transformation numérique (ITD)',
+        dates: 'août 2024 – juin 2028 (prévu)',
+        location: 'Monterrey, Mexique',
+        detail: 'Bourse du talent académique.',
+      },
+    },
+  },
+  {
+    id: 'gci',
+    institution: 'The University of Tokyo — Matsuo-Iwasawa Lab',
+    program: 'GCI World: AI and Data Science',
+    dates: 'Sep – Dec 2026',
+    location: 'Online',
+    detail: '14-week program covering machine learning, feature engineering, SQL, time series and marketing analytics.',
+    url: '',
+    translations: {
+      es: {
+        program: 'GCI World: IA y ciencia de datos',
+        dates: 'sep. – dic. 2026',
+        location: 'En línea',
+        detail: 'Programa de 14 semanas sobre aprendizaje automático, ingeniería de variables, SQL, series de tiempo y analítica de marketing.',
+      },
+      fr: {
+        program: 'GCI World : IA et science des données',
+        dates: 'sept. – déc. 2026',
+        location: 'En ligne',
+        detail: 'Programme de 14 semaines : apprentissage automatique, ingénierie des variables, SQL, séries temporelles et analyse marketing.',
+      },
+    },
+  },
+  {
+    id: 'egs',
+    institution: 'Tecnológico de Monterrey',
+    program: 'Eugenio Garza Sada Global Leadership Program (EGS)',
+    dates: '',
+    location: 'Mexico',
+    detail: 'Graduate. Leadership development program with a national social-impact phase.',
+    url: '',
+    translations: {
+      es: {
+        program: 'Programa de Liderazgo Global Eugenio Garza Sada (EGS)',
+        location: 'México',
+        detail: 'Egresado. Programa de desarrollo de liderazgo con una fase nacional de impacto social.',
+      },
+      fr: {
+        program: 'Programme de leadership mondial Eugenio Garza Sada (EGS)',
+        location: 'Mexique',
+        detail: 'Diplômé. Programme de développement du leadership avec une phase nationale d’impact social.',
+      },
+    },
+  },
+].map(item => reviewed(item, EDUCATION_FIELDS))
+
 /**
  * Normalises the Firestore home document into what the page renders,
  * filling new sections with the defaults above until they are saved from /admin.
@@ -154,6 +248,8 @@ export function resolveHome(home = {}) {
     expertiseAreas: home.expertiseAreas ?? DEFAULT_EXPERTISE_AREAS,
     highlights: home.highlights ?? [...DEFAULT_HIGHLIGHTS, ...legacyMetrics],
     toolkit: home.toolkit ?? DEFAULT_TOOLKIT,
+    quickFacts: home.quickFacts ?? DEFAULT_QUICK_FACTS,
+    education: home.education ?? DEFAULT_EDUCATION,
     abilities: home.abilities || [],
   }
 }

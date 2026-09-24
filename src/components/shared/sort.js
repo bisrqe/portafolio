@@ -5,6 +5,10 @@ export function sortItems(items) {
     const ao = Number.isFinite(Number(a.order)) && a.order !== '' && a.order != null ? Number(a.order) : Infinity
     const bo = Number.isFinite(Number(b.order)) && b.order !== '' && b.order != null ? Number(b.order) : Infinity
     if (ao !== bo) return ao - bo
+    // Then by project dates (ongoing and most recent first), then by creation date
+    const ad = a.current ? '9999' : (a.endDate || a.startDate || '')
+    const bd = b.current ? '9999' : (b.endDate || b.startDate || '')
+    if (ad !== bd) return bd.localeCompare(ad)
     return time(b.createdAt) - time(a.createdAt)
   })
 }

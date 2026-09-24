@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import { firestoreApi } from '../../hooks/useFirestore'
 import { getImages } from '../shared/media'
 import { sortItems } from '../shared/sort'
-import { Field, FramingEditor, ImagesField, LangTabs, ListInput, TText } from './fields'
-import { migrateLegacy, toPayload } from './translate'
+import { Field, FramingEditor, ImagesField, LangTabs, ListEditor, ListInput, TText } from './fields'
+import { cleanI18n, migrateLegacy, toPayload } from './translate'
+import BlocksEditor, { BLOCK_TEXT_FIELDS } from './BlocksEditor'
 import { autoTranslate, countPending } from './autoTranslate'
 import { schedulePublish } from './publish'
 import { KIND_BASE, resolveSlugs, slugify } from '../../content/items'
@@ -15,10 +16,15 @@ const CONFIG = {
 
 const emptyItem = () => ({
   title: '', role: '', summary: '', description: '', slug: '', link: '', images: [], tags: [], sdg: [],
+  startDate: '', endDate: '', current: false, skills: '', collaborators: [], blocks: [],
   featured: false, order: '', positionX: 0, positionY: 0, zoom: 1, translations: {}, i18nMeta: {},
 })
 
-const schemaFor = cfg => ({ fields: cfg.hasRole ? ['title', 'role', 'summary', 'description'] : ['title', 'summary', 'description'] })
+const TEXT_FIELDS = ['title', 'role', 'summary', 'description', 'skills']
+const schemaFor = cfg => ({
+  fields: TEXT_FIELDS.filter(f => cfg.hasRole || f !== 'role'),
+  lists: { collaborators: ['role'], blocks: BLOCK_TEXT_FIELDS },
+})
 
 // Existing entries without a saved slug get the one the public site already uses
 function toForm(item, slugs) {
@@ -27,7 +33,9 @@ function toForm(item, slugs) {
     ...emptyItem(), ...item, images, order: item.order ?? '', slug: item.slug || slugs?.get(item.id) || '',
     translations: item.translations || {}, i18nMeta: item.i18nMeta || {},
   }
-  return migrateLegacy(form, ['title', 'role', 'summary', 'description'])
+  form.collaborators = (form.collaborators || []).map((c, i) => ({ id: c.id ?? `c${i}`, name: '', url: '', role: '', translations: {}, i18nMeta: {}, ...c }))
+  form.blocks = (form.blocks || []).map((b, i) => ({ id: b.id ?? `b${i}`, translations: {}, i18nMeta: {}, ...b }))
+  return migrateLegacy(form, TEXT_FIELDS)
 }
 
 // Unique URL slug among the other entries of the collection
@@ -93,6 +101,9 @@ export default function ItemsEditor({ collectionName, items, notify }) {
     const { result: translated, count, error } = await autoTranslate(form, schema)
     setForm(translated)
     const payload = toPayload(translated)
+    payload.collaborators = translated.collaborators.filter(c => c.name?.trim()).map(cleanI18n)
+    payload.blocks = translated.blocks.map(cleanI18n)
+    if (payload.current) payload.endDate = ''
     payload.slug = uniqueSlug(translated, items)
     payload.image = payload.images[0] || ''
     payload.order = payload.order === '' ? null : Number(payload.order)
@@ -142,13 +153,14 @@ export default function ItemsEditor({ collectionName, items, notify }) {
           Imágenes, enlaces y etiquetas son comunes a todos los idiomas.
         </p>
 
+        <h3 className="adm-subhead">Información principal</h3>
         <div className={cfg.hasRole ? 'adm-grid-2' : ''}>
           <Field label="Título *">
             <TText obj={form} field="title" lang={lang} onChange={setForm} required />
           </Field>
           {cfg.hasRole && (
             <Field label="Rol *">
-              <TText obj={form} field="role" lang={lang} onChange={setForm} required placeholder="Coordinador de iniciativas" />
+              <TText obj={form} field="role" lang={lang} onChange={setForm} required placeholder="Initiatives Coordinator" />
             </Field>
           )}
         </div>
@@ -158,44 +170,81 @@ export default function ItemsEditor({ collectionName, items, notify }) {
         >
           <TText obj={form} field="summary" lang={lang} onChange={setForm} multiline rows={2} />
         </Field>
-        <Field label="Descripción completa (página del proyecto)" hint="Separa los párrafos con una línea en blanco.">
-          <TText obj={form} field="description" lang={lang} onChange={setForm} multiline rows={8} />
+
+        <h3 className="adm-subhead">Detalles</h3>
+        <div className="adm-grid-3">
+          <Field label="Inicio">
+            <input type="month" value={form.startDate || ''} onChange={e => setForm({ ...form, startDate: e.target.value })} />
+          </Field>
+          <Field label="Fin">
+            <input type="month" value={form.current ? '' : (form.endDate || '')} disabled={form.current} onChange={e => setForm({ ...form, endDate: e.target.value })} />
+          </Field>
+          <label className="adm-check">
+            <input type="checkbox" checked={Boolean(form.current)} onChange={e => setForm({ ...form, current: e.target.checked })} />
+            Sigue en curso
+          </label>
+        </div>
+        <Field label="Habilidades desarrolladas (separadas por comas)" hint="Se muestran como etiquetas en «Detalles» y se traducen automáticamente.">
+          <TText obj={form} field="skills" lang={lang} onChange={setForm} placeholder="Stakeholder management, Curriculum design, Public speaking" />
+        </Field>
+        <Field label="Colaboradores (personas u organizaciones)">
+          <ListEditor
+            items={form.collaborators}
+            onChange={collaborators => setForm({ ...form, collaborators })}
+            lang={lang}
+            fields={[
+              { field: 'name', label: 'Nombre', translatable: false, placeholder: 'Tec de Monterrey · Ruta Azul' },
+              { field: 'role', label: 'Rol o relación (opcional)', placeholder: 'Partner organization' },
+            ]}
+            renderExtra={(person, set) => (
+              <Field label="Enlace (opcional)">
+                <input type="url" value={person.url || ''} placeholder="https://linkedin.com/in/…" onChange={e => set({ ...person, url: e.target.value })} />
+              </Field>
+            )}
+            newItem={() => ({ name: '', role: '', url: '', translations: {}, i18nMeta: {} })}
+            addLabel="Agregar colaborador"
+          />
         </Field>
 
-        <div className="adm-grid-2">
-          <Field label="Dirección de la página" hint={`${KIND_BASE[collectionName]}/${slugify(form.slug || form.title) || '…'}  ·  cambiarla rompe los enlaces ya compartidos`}>
-            <input type="text" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} placeholder={slugify(form.title)} />
-          </Field>
-          <Field label="Enlace externo">
-            <input type="url" value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
-          </Field>
-          <Field label="Etiquetas (separadas por comas)" hint="Los nombres de las etiquetas se traducen en la pestaña «Etiquetas».">
-            <ListInput value={form.tags} onChange={tags => setForm({ ...form, tags })} placeholder="Professional Experience, Hackathons" />
-          </Field>
-        </div>
+        <h3 className="adm-subhead">Contenido de la página</h3>
+        <Field label="Descripción principal" hint="Aparece primero en la página del proyecto. Admite negritas, cursivas, enlaces, listas y subtítulos.">
+          <TText obj={form} field="description" lang={lang} onChange={setForm} multiline rows={10} markdown />
+        </Field>
+        <Field label="Contenido adicional" hint="Bloques que aparecen debajo de la descripción, en este orden.">
+          <BlocksEditor blocks={form.blocks} onChange={blocks => setForm({ ...form, blocks })} lang={lang} />
+        </Field>
 
-        {cfg.hasSdg && (
-          <Field label="ODS (opcional, separados por comas)">
-            <ListInput value={form.sdg} onChange={sdg => setForm({ ...form, sdg })} placeholder="ODS 4, ODS 13" />
-          </Field>
-        )}
-
-        <Field label="Imágenes" hint="La primera imagen es la portada; las demás aparecen en el carrusel.">
+        <h3 className="adm-subhead">Portada e imágenes de la tarjeta</h3>
+        <Field label="Imágenes" hint="La primera imagen es la portada; las demás aparecen en el carrusel de la tarjeta y en la galería superior de la página.">
           <ImagesField images={form.images} onChange={images => setForm({ ...form, images })} />
         </Field>
-
         {cover && (
           <Field label="Encuadre de la portada">
             <FramingEditor src={cover} value={form} onChange={framing => setForm({ ...form, ...framing })} />
           </Field>
         )}
 
+        <h3 className="adm-subhead">Publicación</h3>
         <div className="adm-grid-2">
+          <Field label="Dirección de la página" hint={`${KIND_BASE[collectionName]}/${slugify(form.slug || form.title) || '…'}  ·  cambiarla rompe los enlaces ya compartidos`}>
+            <input type="text" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} placeholder={slugify(form.title)} />
+          </Field>
+          <Field label="Enlace externo (botón «Visitar proyecto»)">
+            <input type="url" value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
+          </Field>
+          <Field label="Etiquetas (separadas por comas)" hint="Los nombres de las etiquetas se traducen en la pestaña «Etiquetas».">
+            <ListInput value={form.tags} onChange={tags => setForm({ ...form, tags })} placeholder="Professional Experience, Hackathons" />
+          </Field>
+          {cfg.hasSdg && (
+            <Field label="ODS (opcional, separados por comas)">
+              <ListInput value={form.sdg} onChange={sdg => setForm({ ...form, sdg })} placeholder="SDG 4, SDG 13" />
+            </Field>
+          )}
           <label className="adm-check">
             <input type="checkbox" checked={Boolean(form.featured)} onChange={e => setForm({ ...form, featured: e.target.checked })} />
             Destacar en la página de inicio
           </label>
-          <Field label="Orden (opcional)" hint="Número menor = aparece primero. Vacío = más reciente primero.">
+          <Field label="Orden (opcional)" hint="Número menor = aparece primero. Vacío = por fechas, lo más reciente primero.">
             <input type="number" className="adm-w-sm" value={form.order ?? ''} onChange={e => setForm({ ...form, order: e.target.value })} />
           </Field>
         </div>

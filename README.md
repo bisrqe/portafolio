@@ -11,7 +11,8 @@ Built with React 18 + Vite, Firebase (Firestore, Auth, Storage) and Cloudinary; 
 - **Static HTML for search engines and link previews:** every public page is prerendered at build time with its real content, title, description, canonical URL, `hreflang` alternates, Open Graph image and `schema.org` data; React then hydrates it.
 - **Three languages:** interface strings live in `src/i18n/`. Content is written in **English** in the dashboard and translated **automatically** into Spanish and French when saved (see *Automatic translation*). Translations can be corrected by hand; manual edits are never overwritten and are flagged for review if the English text changes. The language is part of the URL; first-time visitors whose browser is in Spanish or French are sent to that version, and an explicit choice (or `?lang=es|en|fr`) is remembered.
 - **Light / dark theme** with a toggle, remembered per visitor (defaults to the system setting).
-- **Admin dashboard** (Google sign-in): edit the home page, projects, leadership items, image framing, featured items, ordering, visible tag filters and tag translations. Settings are stored in Firestore, so every visitor sees them.
+- **Admin dashboard** (Google sign-in): edit the home page (quick facts, education, key areas, highlights, skills, toolkit), projects and leadership entries, image framing, featured items, ordering, visible tag filters and tag translations. Settings are stored in Firestore, so every visitor sees them.
+- **Project pages with free-form content:** dates, role, collaborators and skills learned in the *Details* card; a Markdown description (bold, italic, links, lists, subheadings) followed by content blocks — text, subheadings, images, galleries, documents (uploaded to Firebase Storage, optional PDF preview), YouTube/Vimeo videos, quotes, link buttons and dividers.
 
 ## Project structure
 
@@ -52,7 +53,7 @@ npm run lint
 ## Firebase setup
 
 1. **Firestore rules:** paste `FIRESTORE_RULES.txt` into *Firebase Console → Firestore → Rules* and publish.
-2. **Storage rules:** paste `FIREBASE_STORAGE_RULES.txt` into *Storage → Rules* and publish.
+2. **Storage rules:** paste `FIREBASE_STORAGE_RULES.txt` into *Storage → Rules* and publish (CV under `portfolio_pdfs/`, project documents under `portfolio_files/`, 25 MB per file).
 3. **Authentication:** enable the Google provider and add the production domain under *Authorized domains*.
 
 Collections used: `home/content`, `projects`, `leadership`, `settings/site`.

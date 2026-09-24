@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { deleteField } from 'firebase/firestore'
 import { firestoreApi, HOME_PATH } from '../../hooks/useFirestore'
 import {
-  ABILITY_FIELDS, EXPERTISE_FIELDS, HIGHLIGHT_FIELDS, TOOLKIT_FIELDS, resolveHome,
+  ABILITY_FIELDS, EDUCATION_FIELDS, EXPERTISE_FIELDS, HIGHLIGHT_FIELDS, QUICK_FACT_FIELDS, TOOLKIT_FIELDS, resolveHome,
 } from '../../content/homeContent'
 import CloudinaryUpload from './CloudinaryUpload'
 import FirebaseUpload from './FirebaseUpload'
@@ -14,7 +14,10 @@ import { schedulePublish } from './publish'
 const TOP_FIELDS = ['tagline', 'description', 'fullBio']
 export const HOME_SCHEMA = {
   fields: TOP_FIELDS,
-  lists: { expertiseAreas: EXPERTISE_FIELDS, highlights: HIGHLIGHT_FIELDS, toolkit: TOOLKIT_FIELDS, abilities: ABILITY_FIELDS },
+  lists: {
+    quickFacts: QUICK_FACT_FIELDS, expertiseAreas: EXPERTISE_FIELDS, education: EDUCATION_FIELDS,
+    highlights: HIGHLIGHT_FIELDS, toolkit: TOOLKIT_FIELDS, abilities: ABILITY_FIELDS,
+  },
 }
 
 function fromDoc(home) {
@@ -31,7 +34,9 @@ function fromDoc(home) {
   const list = (items, fields) => items.map((x, i) => migrateLegacy({ ...x, id: x.id ?? `i${i}`, translations: x.translations || {}, i18nMeta: x.i18nMeta || {} }, fields))
   return {
     ...top,
+    quickFacts: list(resolved.quickFacts, QUICK_FACT_FIELDS),
     expertiseAreas: list(resolved.expertiseAreas, EXPERTISE_FIELDS),
+    education: list(resolved.education, EDUCATION_FIELDS),
     highlights: list(resolved.highlights, HIGHLIGHT_FIELDS),
     toolkit: list(resolved.toolkit, TOOLKIT_FIELDS),
     // The old emoji "icon" field is no longer shown and is dropped on save
@@ -45,7 +50,9 @@ function toPayload(form) {
   const clean = items => items.map(cleanI18n)
   return {
     ...cleanI18n(form),
+    quickFacts: clean(form.quickFacts),
     expertiseAreas: clean(form.expertiseAreas),
+    education: clean(form.education),
     highlights: clean(form.highlights),
     toolkit: clean(form.toolkit),
     abilities: clean(form.abilities),
@@ -146,6 +153,20 @@ export default function HomeEditor({ home, notify }) {
         </Field>
       </div>
 
+      <h3 className="adm-subhead">Datos rápidos <span className="adm-muted adm-small">(recuadro de «Quién soy»)</span></h3>
+      <ListEditor
+        items={form.quickFacts}
+        onChange={setList('quickFacts')}
+        lang={lang}
+        fields={[
+          { field: 'label', label: 'Etiqueta', placeholder: 'Hobbies' },
+          { field: 'value', label: 'Valor', placeholder: 'Reading, dancing, photography' },
+        ]}
+        newItem={() => ({ label: '', value: '', translations: {}, i18nMeta: {} })}
+        addLabel="Agregar dato"
+      />
+      <p className="adm-hint">Si el valor es un correo electrónico, se muestra como enlace.</p>
+
       <h3 className="adm-subhead">Áreas clave de especialización <span className="adm-muted adm-small">(sección «Quién soy»)</span></h3>
       <ListEditor
         items={form.expertiseAreas}
@@ -158,6 +179,27 @@ export default function HomeEditor({ home, notify }) {
         ]}
         newItem={() => ({ title: '', description: '', translations: {}, i18nMeta: {} })}
         addLabel="Agregar área"
+      />
+
+      <h3 className="adm-subhead">Formación académica</h3>
+      <ListEditor
+        items={form.education}
+        onChange={setList('education')}
+        lang={lang}
+        fields={[
+          { field: 'institution', label: 'Institución', translatable: false, placeholder: 'Tecnológico de Monterrey' },
+          { field: 'program', label: 'Programa o título', placeholder: 'B.S. in Digital Transformation Engineering' },
+          { field: 'dates', label: 'Fechas', placeholder: 'Aug 2024 – Jun 2028 (expected)' },
+          { field: 'location', label: 'Lugar', placeholder: 'Monterrey, Mexico' },
+          { field: 'detail', label: 'Detalle (opcional)', multiline: true, rows: 2 },
+        ]}
+        renderExtra={(entry, set) => (
+          <Field label="Enlace de la institución (opcional)">
+            <input type="url" value={entry.url || ''} placeholder="https://…" onChange={e => set({ ...entry, url: e.target.value })} />
+          </Field>
+        )}
+        newItem={() => ({ institution: '', program: '', dates: '', location: '', detail: '', url: '', translations: {}, i18nMeta: {} })}
+        addLabel="Agregar formación"
       />
 
       <h3 className="adm-subhead">Logros y reconocimientos</h3>

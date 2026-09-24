@@ -8,12 +8,16 @@ import Lightbox from '../shared/Lightbox'
 import Icon from '../shared/Icon'
 import { framingStyle, getImages } from '../shared/media'
 import { sortItems } from '../shared/sort'
+import ContentBlocks from '../shared/ContentBlocks'
+import { Markdown } from '../../content/markdown'
+import { formatRange } from '../../content/dates'
+import { splitItems } from '../../content/homeContent'
 import '../shared/shared.css'
 import './detail.css'
 
 /** Full page for one project or leadership entry: /professional-projects/:slug, /leadership/:slug */
 export default function ItemDetailPage({ kind, item, items }) {
-  const { t, pick } = useLanguage()
+  const { t, pick, lang } = useLanguage()
   const { tagLabel } = useSiteSettings()
   const [expanded, setExpanded] = useState(null)
   const closeLightbox = useCallback(() => setExpanded(null), [])
@@ -25,6 +29,9 @@ export default function ItemDetailPage({ kind, item, items }) {
   const summary = pick(item, 'summary')
   const description = pick(item, 'description')
   const images = getImages(item)
+  const dates = formatRange(item, lang)
+  const skills = splitItems(pick(item, 'skills'))
+  const collaborators = (item.collaborators || []).filter(c => c.name?.trim())
   const [cover, ...rest] = images
 
   const slugs = useMemo(() => resolveSlugs(items), [items])
@@ -39,7 +46,9 @@ export default function ItemDetailPage({ kind, item, items }) {
           </Link>
           <p className="eyebrow">{t(isLeadership ? 'leadership.label' : 'projects.label')}</p>
           <h1 className="section-title detail-title">{title}</h1>
-          {role && <p className="detail-role">{role}</p>}
+          {(role || dates) && (
+            <p className="detail-role">{[role, dates].filter(Boolean).join(' · ')}</p>
+          )}
           {summary && <p className="section-subtitle detail-lead">{summary}</p>}
         </div>
       </header>
@@ -61,15 +70,41 @@ export default function ItemDetailPage({ kind, item, items }) {
                 ))}
               </div>
             )}
-            <div className="detail-body">
-              {description.split(/\n\s*\n/).filter(Boolean).map((paragraph, i) => <p key={i}>{paragraph}</p>)}
-            </div>
+            {description && <Markdown text={description} className="detail-body cb-text" />}
+            <ContentBlocks blocks={item.blocks || []} onExpand={setExpanded} />
           </div>
 
           <aside className="detail-aside card">
             <p className="panel-title">{t('detail.details')}</p>
             <dl>
+              {dates && <div><dt>{t('detail.dates')}</dt><dd>{dates}</dd></div>}
               {role && <div><dt>{t('detail.role')}</dt><dd>{role}</dd></div>}
+              {collaborators.length > 0 && (
+                <div>
+                  <dt>{t('detail.collaborators')}</dt>
+                  <dd>
+                    <ul className="detail-people">
+                      {collaborators.map((person, i) => {
+                        const personRole = pick(person, 'role')
+                        return (
+                          <li key={person.id ?? i}>
+                            {person.url
+                              ? <a href={person.url} target="_blank" rel="noopener noreferrer">{person.name}</a>
+                              : <span>{person.name}</span>}
+                            {personRole && <small>{personRole}</small>}
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+              {skills.length > 0 && (
+                <div>
+                  <dt>{t('detail.skills')}</dt>
+                  <dd className="chips">{skills.map(skill => <span key={skill} className="chip chip--accent">{skill}</span>)}</dd>
+                </div>
+              )}
               {item.tags?.length > 0 && (
                 <div>
                   <dt>{t('detail.categories')}</dt>

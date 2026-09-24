@@ -1,6 +1,7 @@
 import { Link, useRouter } from '../../router'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { excerpt } from '../../content/items'
+import { formatRange } from '../../content/dates'
 import ImageCarousel from './ImageCarousel'
 import Icon from './Icon'
 import { getImages } from './media'
@@ -18,12 +19,13 @@ function shortName(title) {
  * `variant="compact"` is used for the previews on the home page and detail pages.
  */
 export default function ItemCard({ item, kind = 'projects', href, tagLabel = tag => tag, variant }) {
-  const { t, pick } = useLanguage()
+  const { t, pick, lang } = useLanguage()
   const { navigate } = useRouter()
   const title = pick(item, 'title') || 'Untitled'
   const role = kind === 'leadership' ? pick(item, 'role') : ''
   const summary = pick(item, 'summary') || excerpt(pick(item, 'description'))
   const images = getImages(item)
+  const dates = formatRange(item, lang)
   const tags = item.tags || []
 
   return (
@@ -37,7 +39,11 @@ export default function ItemCard({ item, kind = 'projects', href, tagLabel = tag
         </Link>
       )}
       <div className="item-body">
-        {role && <p className="item-role">{role}</p>}
+        {(role || dates) && (
+          <p className="item-role">
+            {role}{role && dates && <span className="item-sep"> · </span>}{dates && <span className="item-dates">{dates}</span>}
+          </p>
+        )}
         <h3 className="item-title"><Link to={href} className="item-title-link">{title}</Link></h3>
         {summary && <p className="item-desc">{summary}</p>}
 

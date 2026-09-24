@@ -131,3 +131,28 @@
   .areas, .toolkit { padding: 20px 18px; }
   .cta { padding: 36px 20px; }
 }
+
+/* ---------- Education timeline ---------- */
+.edu-list { list-style: none; position: relative; display: grid; gap: 18px; }
+.edu-list::before { content: ''; position: absolute; left: 200px; top: 8px; bottom: 8px; width: 1px; background: var(--border-strong); }
+.edu-item { position: relative; display: grid; grid-template-columns: 180px 1fr; gap: 40px; align-items: start; }
+.edu-dot {
+  position: absolute; left: 195px; top: 22px; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent);
+}
+.edu-meta { display: grid; gap: 4px; padding-top: 16px; text-align: right; }
+.edu-dates { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); }
+.edu-location { font-size: 0.85rem; color: var(--text-soft); }
+.edu-body { padding: 20px 22px; display: grid; gap: 6px; }
+.edu-body:hover { transform: none; }
+.edu-body h3 { font-size: 1.08rem; font-weight: 650; line-height: 1.35; }
+.edu-institution { font-weight: 500; color: var(--text-muted); }
+.edu-institution a:hover { color: var(--accent); }
+.edu-detail { color: var(--text-muted); font-size: 0.93rem; }
+
+@media (max-width: 720px) {
+  .edu-list::before { left: 5px; }
+  .edu-item { grid-template-columns: 1fr; gap: 8px; padding-left: 28px; }
+  .edu-dot { left: 0; top: 4px; }
+  .edu-meta { text-align: left; padding-top: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+}

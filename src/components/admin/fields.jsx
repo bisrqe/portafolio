@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import CloudinaryUpload from './CloudinaryUpload'
 import { EDIT_LANGS, fieldStatus, getText, setText, splitList } from './translate'
 import { retranslateField } from './autoTranslate'
+import { Markdown } from '../../content/markdown'
+import '../shared/shared.css'
 
 export function Field({ label, hint, children }) {
   return (
@@ -43,19 +45,74 @@ const STATUS = {
  * Text input bound to a translatable field of `obj` for the selected language.
  * In ES/FR it shows the translation status and a button to re-translate from English.
  */
-export function TText({ obj, field, lang, onChange, multiline, rows = 4, required, placeholder }) {
+const MD_TOOLS = [
+  { label: 'N', title: 'Negrita', wrap: ['**', '**'], style: { fontWeight: 700 } },
+  { label: 'I', title: 'Cursiva', wrap: ['*', '*'], style: { fontStyle: 'italic' } },
+  { label: 'Enlace', title: 'Enlace: [texto](https://…)', wrap: ['[', '](https://)'] },
+  { label: '• Lista', title: 'Lista con viñetas', line: '- ' },
+  { label: '1. Lista', title: 'Lista numerada', line: '1. ' },
+  { label: 'Subtítulo', title: 'Subtítulo dentro del texto', line: '## ' },
+]
+
+/**
+ * Text input bound to a translatable field of `obj` for the selected language.
+ * In ES/FR it shows the translation status and a button to re-translate from English.
+ * `markdown` adds a formatting toolbar and a preview (bold, italic, links, lists).
+ */
+export function TText({ obj, field, lang, onChange, multiline, rows = 4, required, placeholder, markdown }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [preview, setPreview] = useState(false)
+  const areaRef = useRef(null)
   const value = getText(obj, field, lang)
   const base = obj?.[field] || ''
   const isBase = lang === 'base'
+  const update = next => onChange(setText(obj, field, lang, next))
   const props = {
     value,
     required: required && isBase,
     placeholder: isBase ? placeholder : (base ? `EN: ${base.slice(0, 90)}${base.length > 90 ? '…' : ''}` : ''),
-    onChange: e => onChange(setText(obj, field, lang, e.target.value)),
+    onChange: e => update(e.target.value),
   }
-  const input = multiline ? <textarea rows={rows} {...props} /> : <input type="text" {...props} />
+
+  // Wraps the selected text (or prefixes the selected lines) with Markdown syntax
+  const applyTool = tool => {
+    const el = areaRef.current
+    if (!el) return
+    const { selectionStart: start, selectionEnd: end } = el
+    let next
+    let caret
+    if (tool.wrap) {
+      const selected = value.slice(start, end) || 'texto'
+      next = value.slice(0, start) + tool.wrap[0] + selected + tool.wrap[1] + value.slice(end)
+      caret = [start + tool.wrap[0].length, start + tool.wrap[0].length + selected.length]
+    } else {
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1
+      const block = value.slice(lineStart, end) || ''
+      const prefixed = block.split('\n').map((line, i) => (tool.line === '1. ' ? `${i + 1}. ` : tool.line) + line).join('\n')
+      next = value.slice(0, lineStart) + prefixed + value.slice(end)
+      caret = [lineStart + prefixed.length, lineStart + prefixed.length]
+    }
+    update(next)
+    requestAnimationFrame(() => { el.focus(); el.setSelectionRange(caret[0], caret[1]) })
+  }
+
+  const control = multiline ? <textarea ref={areaRef} rows={rows} {...props} /> : <input type="text" {...props} />
+  const input = markdown && multiline ? (
+    <div className="adm-md">
+      <div className="adm-md-toolbar" role="toolbar" aria-label="Formato">
+        {MD_TOOLS.map(tool => (
+          <button key={tool.label} type="button" title={tool.title} style={tool.style} onClick={() => applyTool(tool)} disabled={preview}>{tool.label}</button>
+        ))}
+        <button type="button" className={`adm-md-preview-btn ${preview ? 'is-active' : ''}`} onClick={() => setPreview(p => !p)}>
+          {preview ? 'Editar' : 'Vista previa'}
+        </button>
+      </div>
+      {preview
+        ? <div className="adm-md-preview"><Markdown text={value || '—'} className="cb-text" /></div>
+        : control}
+    </div>
+  ) : control
   if (isBase) return input
 
   const status = STATUS[fieldStatus(obj, field, lang)]
@@ -122,7 +179,7 @@ export function ListEditor({ items, onChange, lang, fields, newItem, addLabel, r
           </div>
           {fields.filter(f => f.multiline).map(f => (
             <Field key={f.field} label={f.label}>
-              <TText obj={item} field={f.field} lang={lang} multiline rows={f.rows || 3} placeholder={f.placeholder} onChange={next => update(i, next)} />
+              <TText obj={item} field={f.field} lang={lang} multiline rows={f.rows || 3} markdown={f.markdown} placeholder={f.placeholder} onChange={next => update(i, next)} />
             </Field>
           ))}
         </div>

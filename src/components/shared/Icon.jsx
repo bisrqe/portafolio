@@ -18,6 +18,8 @@ const PATHS = {
   globe: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z" /></>,
   camera: <><path d="M4 8h3l2-3h6l2 3h3v11H4Z" /><circle cx="12" cy="13" r="3.5" /></>,
   award: <><circle cx="12" cy="9" r="6" /><path d="m8.5 13.5-1.5 7.5 5-3 5 3-1.5-7.5" /></>,
+  file: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h4" /></>,
+  play: <><circle cx="12" cy="12" r="9" /><path d="m10 8.5 5 3.5-5 3.5Z" /></>,
   terminal: <><path d="m5 8 4 4-4 4" /><path d="M12 16h7" /></>,
   plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
   edit: <><path d="M4 20h4L19 9l-4-4L4 16Z" /><path d="m13 7 4 4" /></>,

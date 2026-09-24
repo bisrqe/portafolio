@@ -1,4 +1,5 @@
 // URL slugs and short summaries for projects / leadership entries
+import { stripMarkdown } from './markdown'
 
 export const KIND_BASE = { projects: '/professional-projects', leadership: '/leadership' }
 
@@ -41,7 +42,7 @@ export function findBySlug(items, slug) {
 
 /** Short summary for cards: first sentences up to `max` characters. */
 export function excerpt(text = '', max = 190) {
-  const first = text.trim().split(/\n\s*\n/)[0].replace(/\s+/g, ' ')
+  const first = stripMarkdown(text).trim().split(/\n\s*\n/)[0].replace(/\s+/g, ' ')
   if (first.length <= max) return first
   const window = first.slice(0, max)
   const sentenceEnd = Math.max(window.lastIndexOf('. '), window.lastIndexOf('! '), window.lastIndexOf('? '))

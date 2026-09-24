@@ -3,22 +3,34 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { storage } from '../../firebaseAdmin'
 
 const ERRORS = {
-  'storage/unauthorized': 'Permiso denegado: revisa las reglas de Storage y el claim de administrador.',
+  'storage/unauthorized': 'Permiso denegado: publica las reglas de FIREBASE_STORAGE_RULES.txt y vuelve a iniciar sesión.',
   'storage/unauthenticated': 'Sesión no válida: vuelve a iniciar sesión.',
 }
 
-// Uploads a PDF (the CV) to Firebase Storage under portfolio_pdfs/
-export default function FirebaseUpload({ onUploadSuccess, label = 'Subir PDF' }) {
+/**
+ * Uploads a file to Firebase Storage.
+ *  - default: the CV (PDF only) under portfolio_pdfs/
+ *  - folder="portfolio_files", accept="*": documents attached to project pages
+ */
+export default function FirebaseUpload({
+  onUploadSuccess, label = 'Subir PDF', folder = 'portfolio_pdfs', accept = 'application/pdf', maxMb = 25,
+}) {
   const inputRef = useRef(null)
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
+  const pdfOnly = accept === 'application/pdf'
 
   const handleFile = async e => {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
-    if (file.type !== 'application/pdf') {
+    if (pdfOnly && file.type !== 'application/pdf') {
       setError('El archivo debe ser un PDF.')
+      setStatus('error')
+      return
+    }
+    if (file.size > maxMb * 1024 * 1024) {
+      setError(`El archivo supera ${maxMb} MB.`)
       setStatus('error')
       return
     }
@@ -26,10 +38,11 @@ export default function FirebaseUpload({ onUploadSuccess, label = 'Subir PDF' })
     setError('')
     try {
       if (!storage) throw new Error('Firebase Storage no está configurado.')
-      const fileRef = ref(storage, `portfolio_pdfs/${Date.now()}_${file.name}`)
-      const snapshot = await uploadBytes(fileRef, file, { contentType: 'application/pdf' })
+      const safeName = file.name.replace(/[^\w.-]+/g, '_')
+      const fileRef = ref(storage, `${folder}/${Date.now()}_${safeName}`)
+      const snapshot = await uploadBytes(fileRef, file, { contentType: file.type || 'application/octet-stream' })
       const url = await getDownloadURL(snapshot.ref)
-      await onUploadSuccess({ url, name: file.name })
+      await onUploadSuccess({ url, name: file.name, size: file.size, type: file.type })
       setStatus('idle')
     } catch (err) {
       setError(ERRORS[err.code] || err.message)
@@ -39,7 +52,7 @@ export default function FirebaseUpload({ onUploadSuccess, label = 'Subir PDF' })
 
   return (
     <span className="adm-upload">
-      <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFile} hidden />
+      <input ref={inputRef} type="file" accept={accept === '*' ? undefined : accept} onChange={handleFile} hidden />
       <button type="button" className="adm-btn adm-btn--accent" disabled={status === 'uploading'} onClick={() => inputRef.current?.click()}>
         {status === 'uploading' ? 'Subiendo…' : label}
       </button>

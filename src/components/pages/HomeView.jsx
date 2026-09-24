@@ -75,6 +75,8 @@ function Hero({ home, cvUrl }) {
   )
 }
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 function About({ home }) {
   const { t, pick } = useLanguage()
   const bio = pick(home, 'fullBio')
@@ -96,9 +98,15 @@ function About({ home }) {
           <aside className="facts card">
             <p className="panel-title">{t('about.facts')}</p>
             <dl>
-              <div><dt>{t('about.basedIn')}</dt><dd>{t('hero.location')}</dd></div>
-              <div><dt>{t('about.speaks')}</dt><dd>{t('hero.languages')}</dd></div>
-              <div><dt>{t('about.email')}</dt><dd><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></dd></div>
+              {(home.quickFacts || []).map((fact, i) => {
+                const value = pick(fact, 'value')
+                return (
+                  <div key={fact.id ?? i}>
+                    <dt>{pick(fact, 'label')}</dt>
+                    <dd>{EMAIL.test(value.trim()) ? <a href={`mailto:${value.trim()}`}>{value}</a> : value}</dd>
+                  </div>
+                )
+              })}
             </dl>
           </aside>
         </div>
@@ -117,6 +125,44 @@ function About({ home }) {
             </div>
           </div>
         )}
+      </div>
+    </section>
+  )
+}
+
+function Education({ items }) {
+  const { t, pick } = useLanguage()
+  if (items.length === 0) return null
+  return (
+    <section className="section" id="education">
+      <div className="container">
+        <div className="section-head">
+          <p className="eyebrow">{t('education.label')}</p>
+          <h2 className="section-title">{t('education.title')}</h2>
+        </div>
+        <ol className="edu-list">
+          {items.map((entry, i) => {
+            const dates = pick(entry, 'dates')
+            const location = pick(entry, 'location')
+            const detail = pick(entry, 'detail')
+            return (
+              <li key={entry.id ?? i} className="edu-item">
+                <span className="edu-dot" aria-hidden="true" />
+                <div className="edu-meta">
+                  {dates && <span className="edu-dates">{dates}</span>}
+                  {location && <span className="edu-location">{location}</span>}
+                </div>
+                <div className="edu-body card">
+                  <h3>{pick(entry, 'program')}</h3>
+                  <p className="edu-institution">
+                    {entry.url ? <a href={entry.url} target="_blank" rel="noopener noreferrer">{entry.institution}</a> : entry.institution}
+                  </p>
+                  {detail && <p className="edu-detail">{detail}</p>}
+                </div>
+              </li>
+            )
+          })}
+        </ol>
       </div>
     </section>
   )
@@ -251,6 +297,7 @@ export default function HomeView({ home: rawHome, projects, leadership }) {
     <>
       <Hero home={home} cvUrl={home.cvUrl} />
       <About home={home} />
+      <Education items={home.education} />
       <Highlights items={home.highlights} />
       <Expertise abilities={home.abilities} toolkit={home.toolkit} />
       <Featured items={featuredItems(projects)} all={projects} kind="projects" to="/professional-projects" />

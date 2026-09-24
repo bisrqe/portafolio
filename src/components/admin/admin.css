@@ -166,3 +166,31 @@
 }
 .adm-publish--done { border-color: color-mix(in srgb, var(--success) 50%, transparent); }
 .adm-publish--error, .adm-publish--disabled { border-color: color-mix(in srgb, #f59e0b 55%, transparent); }
+
+/* Markdown toolbar */
+.adm-md { display: grid; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.adm-md textarea { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+.adm-md-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+.adm-md-toolbar button { height: 28px; padding: 0 10px; border-radius: 6px; font-size: 0.8rem; color: var(--text-muted); }
+.adm-md-toolbar button:hover:not(:disabled) { background: var(--surface); color: var(--text); }
+.adm-md-toolbar button:disabled { opacity: 0.4; }
+.adm-md-preview-btn { margin-left: auto; border: 1px solid var(--border) !important; }
+.adm-md-preview-btn.is-active { color: var(--accent) !important; border-color: var(--accent) !important; }
+.adm-md-preview { padding: 14px 16px; background: var(--bg); min-height: 120px; }
+
+/* Content blocks editor */
+.adm-blocks { display: grid; gap: 12px; }
+.adm-block { border-left: 3px solid var(--accent); }
+.adm-block-type { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.adm-block-preview { max-width: 320px; max-height: 200px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+.adm-block-add { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px; border: 1px dashed var(--border-strong); border-radius: 10px; }
+.adm-check--inline { padding-top: 0; }
+.adm-empty--sm { padding: 18px; }
+.adm-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; }
+.adm input[type='month'] {
+  width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font-size: 0.93rem; color-scheme: inherit;
+}
+.adm input[type='month']:disabled { opacity: 0.5; }
+.adm-panel > .adm-subhead { padding-top: 14px; border-top: 1px solid var(--border); margin-top: 6px; }
+@media (max-width: 720px) { .adm-grid-3 { grid-template-columns: 1fr; } }

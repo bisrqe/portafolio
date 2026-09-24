@@ -4,6 +4,7 @@ import { LANG_CODES, localizePath } from '../i18n/paths'
 import { pickField, translate } from '../i18n/t'
 import { PROFILE } from '../content/profile'
 import { excerpt } from '../content/items'
+import { stripMarkdown } from '../content/markdown'
 import { resolveHome } from '../content/homeContent'
 import { getImages } from '../components/shared/media'
 import { HOME_PATH } from '../hooks/useFirestore'
@@ -91,7 +92,7 @@ export function buildHead({ lang, path, data = {}, siteUrl = '' }) {
     const item = route.item
     const itemTitle = pickField(item, 'title', lang)
     title = `${itemTitle} — ${PROFILE.shortName}`
-    description = pickField(item, 'summary', lang) || excerpt(pickField(item, 'description', lang), 160)
+    description = stripMarkdown(pickField(item, 'summary', lang)) || excerpt(pickField(item, 'description', lang), 160)
     const cover = getImages(item)[0]
     image = socialImage(cover, siteUrl)
     type = 'article'
@@ -105,6 +106,8 @@ export function buildHead({ lang, path, data = {}, siteUrl = '' }) {
       ...(cover ? { image: cover } : {}),
       ...(item.tags?.length ? { keywords: item.tags.join(', ') } : {}),
       ...(item.link ? { sameAs: item.link } : {}),
+      ...(item.startDate ? { temporalCoverage: `${item.startDate}/${item.current ? '..' : (item.endDate || item.startDate)}` } : {}),
+      ...(item.collaborators?.length ? { contributor: item.collaborators.filter(c => c.name).map(c => ({ '@type': 'Thing', name: c.name, ...(c.url ? { url: c.url } : {}) })) } : {}),
       author: { '@id': person['@id'] },
     }, {
       '@type': 'BreadcrumbList',

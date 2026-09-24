@@ -18,5 +18,13 @@ service firebase.storage {
       allow write, delete: if isAdmin()
         && (request.resource == null || request.resource.contentType == 'application/pdf');
     }
+
+    // Documents attached to project pages (PDF, Office files, images…) — public read,
+    // admin-only write, 25 MB per file
+    match /portfolio_files/{allPaths=**} {
+      allow read: if true;
+      allow write, delete: if isAdmin()
+        && (request.resource == null || request.resource.size < 25 * 1024 * 1024);
+    }
   }
 }
