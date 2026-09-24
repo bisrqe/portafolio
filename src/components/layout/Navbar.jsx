@@ -3,14 +3,15 @@ import { Link, useRouter } from '../../router'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { LanguageSwitcher, ThemeToggle } from './Controls'
 import Icon from '../shared/Icon'
+import { FEATURES } from '../../content/features'
 import './layout.css'
 
 const LINKS = [
   { to: '/', key: 'nav.home' },
   { to: '/professional-projects', key: 'nav.projects' },
   { to: '/leadership', key: 'nav.leadership' },
-  { to: '/timelessfts', key: 'nav.photography' },
-]
+  { to: '/timelessfts', key: 'nav.photography', hidden: !FEATURES.photography },
+].filter(link => !link.hidden)
 
 export default function Navbar() {
   const { path } = useRouter()
