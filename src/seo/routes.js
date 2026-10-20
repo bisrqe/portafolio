@@ -1,21 +1,13 @@
 // Route table shared by the React app and the prerender script
 import { KIND_BASE, findBySlug, resolveSlugs } from '../content/items'
-import { GALLERIES } from '../timelessfts/galleries'
-import { FEATURES } from '../content/features'
-
-const TIMELESS_PAGES = ['', 'about', 'contact', ...Object.keys(GALLERIES)]
 
 /**
  * matchRoute('/leadership/vanttec', data) →
- *   { name: 'home' | 'list' | 'detail' | 'timeless' | 'admin' | 'notfound', kind?, slug?, item?, sub? }
+ *   { name: 'home' | 'list' | 'detail' | 'admin' | 'notfound', kind?, slug?, item? }
  */
 export function matchRoute(path, data = {}) {
   if (path === '/') return { name: 'home' }
   if (path.startsWith('/admin')) return { name: 'admin' }
-  if (FEATURES.photography && (path === '/timelessfts' || path.startsWith('/timelessfts/'))) {
-    const sub = path.replace(/^\/timelessfts\/?/, '')
-    return TIMELESS_PAGES.includes(sub) ? { name: 'timeless', sub } : { name: 'notfound' }
-  }
   for (const [kind, base] of Object.entries(KIND_BASE)) {
     if (path === base) return { name: 'list', kind }
     if (path.startsWith(`${base}/`)) {
@@ -34,6 +26,5 @@ export function listPaths(data = {}) {
     const slugs = resolveSlugs(data[kind] || [])
     slugs.forEach(slug => paths.push(`${base}/${slug}`))
   })
-  if (FEATURES.photography) TIMELESS_PAGES.forEach(sub => paths.push(sub ? `/timelessfts/${sub}` : '/timelessfts'))
   return paths
 }

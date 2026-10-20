@@ -9,7 +9,6 @@ import Footer from './components/layout/Footer'
 import HomeView from './components/pages/HomeView'
 import CollectionPage from './components/pages/CollectionPage'
 import ItemDetailPage from './components/pages/ItemDetailPage'
-import TimelessApp from './timelessfts/TimelessApp'
 
 // The admin area is only loaded when someone visits /admin
 const AdminPage = lazy(() => import('./components/admin/AdminPage'))
@@ -49,8 +48,6 @@ export default function App() {
     if (route.name === 'admin') return
     applyHead(buildHead({ lang, path, data, siteUrl: window.location.origin }))
   }, [lang, path, data, route.name])
-
-  if (route.name === 'timeless') return <TimelessApp />
 
   if (route.name === 'admin') {
     return (

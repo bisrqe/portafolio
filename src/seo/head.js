@@ -117,11 +117,6 @@ export function buildHead({ lang, path, data = {}, siteUrl = '' }) {
         { '@type': 'ListItem', position: 3, name: itemTitle, item: `${siteUrl}${localizePath(path, lang)}` },
       ],
     })
-  } else if (route.name === 'timeless') {
-    const sub = route.sub
-    const pageName = sub === '' ? '' : (sub === 'about' || sub === 'contact' ? t(`timeless.nav.${sub}`) : t(`timeless.galleries.${sub}.title`))
-    title = pageName ? `${pageName} — Timeless FTS` : t('timeless.meta.title')
-    description = sub && !['about', 'contact'].includes(sub) ? t(`timeless.galleries.${sub}.subtitle`) : t('timeless.meta.description')
   } else {
     title = `${t('common.notFound')} — ${PROFILE.shortName}`
     noindex = true

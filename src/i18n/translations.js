@@ -1,7 +1,5 @@
 // Interface strings for the portfolio (EN / ES / FR).
 // Content stored in Firestore is translated per item from the admin dashboard.
-import { timeless } from './timeless'
-
 export const translations = {
   en: {
     meta: {
@@ -109,7 +107,6 @@ export const translations = {
       notFound: 'Page not found.',
       backHome: 'Back to home',
     },
-    timeless: timeless.en,
   },
 
   es: {
@@ -218,7 +215,6 @@ export const translations = {
       notFound: 'Página no encontrada.',
       backHome: 'Volver al inicio',
     },
-    timeless: timeless.es,
   },
 
   fr: {
@@ -327,6 +323,5 @@ export const translations = {
       notFound: 'Page introuvable.',
       backHome: 'Retour à l’accueil',
     },
-    timeless: timeless.fr,
   },
 }
