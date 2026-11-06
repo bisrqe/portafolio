@@ -10,6 +10,7 @@ const LINKS = [
   { to: '/', key: 'nav.home' },
   { to: '/professional-projects', key: 'nav.projects' },
   { to: '/leadership', key: 'nav.leadership' },
+  { to: '/mapa', key: 'nav.map' },
   { to: '/timelessfts', key: 'nav.photography', hidden: !FEATURES.photography },
 ].filter(link => !link.hidden)
 

@@ -68,10 +68,10 @@ async function loadData() {
     return JSON.parse(await fs.readFile(path.resolve(root, env.PRERENDER_DATA_FILE), 'utf8'))
   }
   if (!env.VITE_FIREBASE_PROJECT_ID || !env.VITE_FIREBASE_API_KEY) throw new Error('VITE_FIREBASE_PROJECT_ID / VITE_FIREBASE_API_KEY are not set')
-  const [home, settings, projects, leadership] = await Promise.all([
-    readDoc('home/content'), readDoc('settings/site'), readCollection('projects'), readCollection('leadership'),
+  const [home, settings, projects, leadership, graphNodes] = await Promise.all([
+    readDoc('home/content'), readDoc('settings/site'), readCollection('projects'), readCollection('leadership'), readCollection('graphNodes'),
   ])
-  return { 'home/content': home, 'settings/site': settings, projects, leadership }
+  return { 'home/content': home, 'settings/site': settings, projects, leadership, graphNodes }
 }
 
 // ---------- Helpers ----------
@@ -97,7 +97,7 @@ try {
     process.exit(1)
   }
   console.warn(`[prerender] Could not read Firestore (${err.message}); pages will be rendered without content.`)
-  data = { 'home/content': {}, 'settings/site': {}, projects: [], leadership: [] }
+  data = { 'home/content': {}, 'settings/site': {}, projects: [], leadership: [], graphNodes: [] }
 }
 
 const { render, listPaths, localizePath, LANG_CODES } = await import(pathToFileURL(path.join(root, 'dist-server', 'entry-server.js')).href)

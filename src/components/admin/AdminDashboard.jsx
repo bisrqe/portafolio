@@ -13,7 +13,7 @@ const TABS = [
   { id: 'tags', label: 'Etiquetas' },
 ]
 
-export default function AdminDashboard({ home, projects, leadership, user, onSignOut }) {
+export default function AdminDashboard({ home, projects, leadership, graphNodes, user, onSignOut }) {
   const [tab, setTab] = useState('projects')
   const [notice, setNotice] = useState(null)
 
@@ -25,7 +25,7 @@ export default function AdminDashboard({ home, projects, leadership, user, onSig
     return () => clearTimeout(id)
   }, [notice])
 
-  const counts = { projects: projects.length, leadership: leadership.length }
+  const counts = { projects: projects.length, leadership: leadership.length, map: graphNodes.length }
 
   // Status of the static-site rebuild that follows each save (see publish.js)
   const [publish, setPublish] = useState({ state: 'idle' })
@@ -77,9 +77,9 @@ export default function AdminDashboard({ home, projects, leadership, user, onSig
 
       <main className="adm-main">
         {tab === 'home' && <HomeEditor home={home} notify={notify} />}
-        {tab === 'projects' && <ItemsEditor key="projects" collectionName="projects" items={projects} otherItems={leadership.map(i => ({ ...i, kind: 'leadership' }))} notify={notify} />}
-        {tab === 'leadership' && <ItemsEditor key="leadership" collectionName="leadership" items={leadership} otherItems={projects.map(i => ({ ...i, kind: 'projects' }))} notify={notify} />}
-        {tab === 'map' && <DependencyGraph projects={projects} leadership={leadership} notify={notify} />}
+        {tab === 'projects' && <ItemsEditor key="projects" collectionName="projects" items={projects} notify={notify} />}
+        {tab === 'leadership' && <ItemsEditor key="leadership" collectionName="leadership" items={leadership} notify={notify} />}
+        {tab === 'map' && <DependencyGraph nodes={graphNodes} projects={projects} leadership={leadership} notify={notify} />}
         {tab === 'tags' && <TagSettings projects={projects} leadership={leadership} notify={notify} />}
       </main>
 

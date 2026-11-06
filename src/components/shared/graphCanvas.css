@@ -1,0 +1,19 @@
+/* Force-directed graph canvas — shared by the admin node editor and the public map page */
+.graph-canvas {
+  position: relative; min-height: 420px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg-elev); overflow: hidden; cursor: grab; touch-action: none;
+}
+.graph-canvas:active { cursor: grabbing; }
+.graph-canvas svg { display: block; }
+.graph-edge { stroke: var(--text-soft); stroke-width: 1.4; opacity: 0.55; transition: opacity 0.15s; }
+.graph-edge.is-dim { opacity: 0.1; }
+.graph-node { cursor: pointer; }
+.graph-node circle { stroke: var(--bg-elev); stroke-width: 2; transition: opacity 0.15s; }
+.graph-node.is-dim circle, .graph-node.is-dim text { opacity: 0.25; }
+.graph-node.is-active circle { stroke: var(--text); }
+.graph-node.is-linked circle { stroke: var(--accent); stroke-width: 2.5; }
+.graph-node text { font-size: 12px; fill: var(--text); paint-order: stroke; stroke: var(--bg-elev); stroke-width: 3px; }
+.graph-legend { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font-size: 0.85rem; color: var(--text-muted); }
+.graph-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.graph-legend i { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+.graph-empty { padding: 32px; text-align: center; color: var(--text-muted); }

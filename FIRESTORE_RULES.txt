@@ -28,6 +28,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Experience map (Mapa): manually authored nodes, public read, admin-only write
+    match /graphNodes/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Site-wide settings (visible tag filters, tag translations)
     match /settings/{docId} {
       allow read: if true;

@@ -16,7 +16,7 @@ const CONFIG = {
 
 const emptyItem = () => ({
   title: '', role: '', summary: '', description: '', slug: '', link: '', images: [], tags: [], sdg: [],
-  startDate: '', endDate: '', current: false, skills: '', collaborators: [], blocks: [], dependsOn: [],
+  startDate: '', endDate: '', current: false, skills: '', collaborators: [], blocks: [],
   featured: false, order: '', positionX: 0, positionY: 0, zoom: 1, translations: {}, i18nMeta: {},
 })
 
@@ -49,26 +49,7 @@ function uniqueSlug(form, items) {
 
 const SUMMARY_MAX = 220
 
-const KIND_LABEL = { projects: 'Proyecto', leadership: 'Liderazgo' }
-
-/** Checklist of every other project/experience this item feeds from, across both collections. */
-function DependsOnField({ value, onChange, options }) {
-  const sorted = useMemo(() => [...options].sort((a, b) => a.title.localeCompare(b.title)), [options])
-  const toggle = key => onChange(value.includes(key) ? value.filter(k => k !== key) : [...value, key])
-  if (sorted.length === 0) return <p className="adm-muted adm-small">No hay más elementos todavía para conectar.</p>
-  return (
-    <div className="adm-deplist">
-      {sorted.map(o => (
-        <label key={o.key} className="adm-check adm-depitem">
-          <input type="checkbox" checked={value.includes(o.key)} onChange={() => toggle(o.key)} />
-          {o.title} <span className="adm-muted adm-small">· {KIND_LABEL[o.kind]}</span>
-        </label>
-      ))}
-    </div>
-  )
-}
-
-export default function ItemsEditor({ collectionName, items, otherItems = [], notify }) {
+export default function ItemsEditor({ collectionName, items, notify }) {
   const cfg = CONFIG[collectionName]
   const [form, setForm] = useState(null) // null = list view
   const [lang, setLang] = useState('base')
@@ -76,10 +57,6 @@ export default function ItemsEditor({ collectionName, items, otherItems = [], no
   const sorted = useMemo(() => sortItems(items), [items])
   const schema = useMemo(() => schemaFor(cfg), [cfg])
   const slugs = useMemo(() => resolveSlugs(items), [items])
-  const dependsOnOptions = useMemo(() => [
-    ...items.filter(i => i.id !== form?.id).map(i => ({ key: `${collectionName}/${i.id}`, title: i.title || 'Sin título', kind: collectionName })),
-    ...otherItems.map(i => ({ key: `${i.kind}/${i.id}`, title: i.title || 'Sin título', kind: i.kind })),
-  ], [items, otherItems, collectionName, form?.id])
   const pendingItems = useMemo(() => sorted.map(i => toForm(i, slugs)).filter(item => countPending(item, schema) > 0), [sorted, schema, slugs])
 
   const openNew = () => { setForm(emptyItem()); setLang('base') }
@@ -126,7 +103,6 @@ export default function ItemsEditor({ collectionName, items, otherItems = [], no
     const payload = toPayload(translated)
     payload.collaborators = translated.collaborators.filter(c => c.name?.trim()).map(cleanI18n)
     payload.blocks = translated.blocks.map(cleanI18n)
-    payload.dependsOn = translated.dependsOn || []
     if (payload.current) payload.endDate = ''
     payload.slug = uniqueSlug(translated, items)
     payload.image = payload.images[0] || ''
@@ -228,13 +204,6 @@ export default function ItemsEditor({ collectionName, items, otherItems = [], no
             newItem={() => ({ name: '', role: '', url: '', translations: {}, i18nMeta: {} })}
             addLabel="Agregar colaborador"
           />
-        </Field>
-
-        <Field
-          label="Depende de (se alimenta de estas experiencias)"
-          hint="Se usa en el Mapa de experiencias para dibujar cómo una experiencia lleva a otra (ej. GLF → EGS → CEIBA → capacitaciones)."
-        >
-          <DependsOnField value={form.dependsOn} onChange={dependsOn => setForm({ ...form, dependsOn })} options={dependsOnOptions} />
         </Field>
 
         <h3 className="adm-subhead">Contenido de la página</h3>

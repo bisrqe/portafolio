@@ -88,6 +88,9 @@ export function buildHead({ lang, path, data = {}, siteUrl = '' }) {
       inLanguage: lang,
       about: { '@id': person['@id'] },
     })
+  } else if (route.name === 'map') {
+    title = `${t('map.title')} — ${PROFILE.shortName}`
+    description = t('map.subtitle')
   } else if (route.name === 'detail' && route.item) {
     const item = route.item
     const itemTitle = pickField(item, 'title', lang)

@@ -1,13 +1,16 @@
 // Route table shared by the React app and the prerender script
 import { KIND_BASE, findBySlug, resolveSlugs } from '../content/items'
 
+export const MAP_PATH = '/mapa'
+
 /**
  * matchRoute('/leadership/vanttec', data) →
- *   { name: 'home' | 'list' | 'detail' | 'admin' | 'notfound', kind?, slug?, item? }
+ *   { name: 'home' | 'list' | 'detail' | 'map' | 'admin' | 'notfound', kind?, slug?, item? }
  */
 export function matchRoute(path, data = {}) {
   if (path === '/') return { name: 'home' }
   if (path.startsWith('/admin')) return { name: 'admin' }
+  if (path === MAP_PATH) return { name: 'map' }
   for (const [kind, base] of Object.entries(KIND_BASE)) {
     if (path === base) return { name: 'list', kind }
     if (path.startsWith(`${base}/`)) {
@@ -21,7 +24,7 @@ export function matchRoute(path, data = {}) {
 
 /** Every language-independent path that should exist as a static page */
 export function listPaths(data = {}) {
-  const paths = ['/', ...Object.values(KIND_BASE)]
+  const paths = ['/', MAP_PATH, ...Object.values(KIND_BASE)]
   Object.entries(KIND_BASE).forEach(([kind, base]) => {
     const slugs = resolveSlugs(data[kind] || [])
     slugs.forEach(slug => paths.push(`${base}/${slug}`))

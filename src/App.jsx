@@ -9,6 +9,7 @@ import Footer from './components/layout/Footer'
 import HomeView from './components/pages/HomeView'
 import CollectionPage from './components/pages/CollectionPage'
 import ItemDetailPage from './components/pages/ItemDetailPage'
+import MapView from './components/pages/MapView'
 
 // The admin area is only loaded when someone visits /admin
 const AdminPage = lazy(() => import('./components/admin/AdminPage'))
@@ -36,10 +37,11 @@ export default function App() {
   const home = useDocument(HOME_PATH)
   const projects = useCollection('projects')
   const leadership = useCollection('leadership')
+  const graphNodes = useCollection('graphNodes')
 
   const data = useMemo(
-    () => ({ [HOME_PATH]: home.data, projects: projects.items, leadership: leadership.items }),
-    [home.data, projects.items, leadership.items],
+    () => ({ [HOME_PATH]: home.data, projects: projects.items, leadership: leadership.items, graphNodes: graphNodes.items }),
+    [home.data, projects.items, leadership.items, graphNodes.items],
   )
   const route = matchRoute(path, data)
 
@@ -52,7 +54,7 @@ export default function App() {
   if (route.name === 'admin') {
     return (
       <Suspense fallback={<Loader />}>
-        <AdminPage home={home.data} projects={projects.items} leadership={leadership.items} />
+        <AdminPage home={home.data} projects={projects.items} leadership={leadership.items} graphNodes={graphNodes.items} />
       </Suspense>
     )
   }
@@ -65,6 +67,8 @@ export default function App() {
     page = <HomeView home={home.data} projects={projects.items} leadership={leadership.items} />
   } else if (route.name === 'list') {
     page = <CollectionPage kind={route.kind} items={data[route.kind]} />
+  } else if (route.name === 'map') {
+    page = <MapView nodes={graphNodes.items} projects={projects.items} leadership={leadership.items} />
   } else if (route.name === 'detail') {
     const loading = route.kind === 'leadership' ? leadership.loading : projects.loading
     if (route.item) page = <ItemDetailPage key={route.item.id} kind={route.kind} item={route.item} items={data[route.kind]} />
