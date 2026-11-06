@@ -2,12 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 import HomeEditor from './HomeEditor'
 import ItemsEditor from './ItemsEditor'
 import TagSettings from './TagSettings'
+import DependencyGraph from './DependencyGraph'
 import { onPublishState, publishNow } from './publish'
 
 const TABS = [
   { id: 'home', label: 'Inicio' },
   { id: 'projects', label: 'Proyectos' },
   { id: 'leadership', label: 'Liderazgo' },
+  { id: 'map', label: 'Mapa' },
   { id: 'tags', label: 'Etiquetas' },
 ]
 
@@ -75,8 +77,9 @@ export default function AdminDashboard({ home, projects, leadership, user, onSig
 
       <main className="adm-main">
         {tab === 'home' && <HomeEditor home={home} notify={notify} />}
-        {tab === 'projects' && <ItemsEditor key="projects" collectionName="projects" items={projects} notify={notify} />}
-        {tab === 'leadership' && <ItemsEditor key="leadership" collectionName="leadership" items={leadership} notify={notify} />}
+        {tab === 'projects' && <ItemsEditor key="projects" collectionName="projects" items={projects} otherItems={leadership.map(i => ({ ...i, kind: 'leadership' }))} notify={notify} />}
+        {tab === 'leadership' && <ItemsEditor key="leadership" collectionName="leadership" items={leadership} otherItems={projects.map(i => ({ ...i, kind: 'projects' }))} notify={notify} />}
+        {tab === 'map' && <DependencyGraph projects={projects} leadership={leadership} notify={notify} />}
         {tab === 'tags' && <TagSettings projects={projects} leadership={leadership} notify={notify} />}
       </main>
 
